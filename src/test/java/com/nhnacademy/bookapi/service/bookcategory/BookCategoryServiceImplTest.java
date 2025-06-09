@@ -77,9 +77,7 @@ class BookCategoryServiceImplTest {
     void getCategoryById_notFound() {
         when(bookCategoryRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(BookCategoryNotFoundException.class, () -> {
-            bookCategoryService.getCategoryById(99L);
-        });
+        assertThrows(BookCategoryNotFoundException.class, () -> bookCategoryService.getCategoryById(99L));
     }
 
     @Test
@@ -113,9 +111,7 @@ class BookCategoryServiceImplTest {
 
         when(bookCategoryRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(BookCategoryNotFoundException.class, () -> {
-            bookCategoryService.updateCategory(99L, update);
-        });
+        assertThrows(BookCategoryNotFoundException.class, () -> bookCategoryService.updateCategory(99L, update));
     }
 
     @Test
@@ -132,9 +128,7 @@ class BookCategoryServiceImplTest {
     void deleteCategory_notFound() {
         when(bookCategoryRepository.existsById(99L)).thenReturn(false);
 
-        assertThrows(BookCategoryNotFoundException.class, () -> {
-            bookCategoryService.deleteCategory(99L);
-        });
+        assertThrows(BookCategoryNotFoundException.class, () -> bookCategoryService.deleteCategory(99L));
     }
 
     @Test
