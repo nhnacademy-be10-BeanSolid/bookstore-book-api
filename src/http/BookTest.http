@@ -1,0 +1,53 @@
+### 도서 추가
+POST http://localhost:8080/api/books
+Content-Type: application/json
+
+{
+  "title" : "book1",
+  "description": "저어어어엉말 유익한 책",
+  "publisher": "pub1",
+  "author": "Lee",
+  "publishedDate": "2025-06-09",
+  "isbn": "isbn001111111",
+  "originalPrice": 1000,
+  "salePrice": 500,
+  "wrappable": false,
+  "stock": 100
+}
+
+### 도서 추가
+POST http://localhost:8080/api/books
+Content-Type: application/json
+
+{
+  "title" : "book2",
+  "description": "<p><strong>이 책은 자바 입문자를 위한 최고의 안내서입니다.</strong></p><p>예제를 중심으로 쉽고 자세하게 설명되어 있습니다.</p>",
+  "publisher": "pub2",
+  "author": "Lee",
+  "publishedDate": "2025-06-09",
+  "isbn": "isbn001111112",
+  "originalPrice": 1000,
+  "salePrice": 1,
+  "wrappable": false,
+  "stock": 100
+}
+
+### ISBN 코드로 도서 찾기
+GET http://localhost:8080/api/books/isbn001111111
+
+### 작가로 도서 찾기
+GET http://localhost:8080/api/authors/Lee
+
+### 출판사로 도서 찾기
+GET http://localhost:8080/api/publishers/pub1
+
+### 도서 업데이트
+PUT http://localhost:8080/api/books/isbn001111111
+Content-Type: application/json
+
+{
+  "title": "수정 타이틀"
+}
+
+### 도서 삭제
+DELETE http://localhost:8080/api/books/isbn001111111
