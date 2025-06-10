@@ -8,15 +8,15 @@ import java.util.List;
 
 public interface BookService {
 
-    public BookResponse createBook(BookCreateRequest request);
+    BookResponse createBook(BookCreateRequest request);
 
-    public BookResponse getBook(String isbn);
+    BookResponse getBook(String isbn);
 
-    public List<BookResponse> getBooksByAuthor(String author);
+    List<BookResponse> getBooksByAuthor(String author);
 
-    public List<BookResponse> getBooksByPublisher(String title);
+    List<BookResponse> getBooksByPublisher(String title);
 
-    public BookResponse updateBook(String isbn, BookUpdateRequest request);
+    BookResponse updateBook(String isbn, BookUpdateRequest request);
 
-    public void deleteBook(String isbn);
+    void deleteBook(String isbn);
 }

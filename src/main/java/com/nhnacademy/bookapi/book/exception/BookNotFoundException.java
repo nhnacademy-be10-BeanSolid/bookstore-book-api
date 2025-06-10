@@ -11,4 +11,8 @@ public class BookNotFoundException extends RuntimeException {
     public BookNotFoundException(String isbn) {
         super(isbn + MESSAGE);
     }
+
+    public BookNotFoundException(Long id) {
+        super(id + MESSAGE);
+    }
 }
