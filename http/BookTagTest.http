@@ -1,0 +1,41 @@
+### 북태그 전체 조회
+GET /book-tags HTTP/1.1
+Host: localhost:8080
+Accept: application/json
+
+### 단일 북태그 조회
+GET /book-tags/1 HTTP/1.1
+Host: localhost:8080
+Accept: application/json
+
+### 북태그 생성 1
+POST /book-tags HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "name": "테스트"
+}
+
+### 북태그 생성 2
+POST /book-tags HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "name": "테스트2"
+}
+
+### 북태그 수정
+PATCH /book-tags/1 HTTP/1.1
+Host: localhost:8080
+Content-Type: application/json
+
+{
+  "name": "수정"
+}
+
+### 북태그 삭제
+
+DELETE /book-tags/1 HTTP/1.1
+Host: localhost:8080
