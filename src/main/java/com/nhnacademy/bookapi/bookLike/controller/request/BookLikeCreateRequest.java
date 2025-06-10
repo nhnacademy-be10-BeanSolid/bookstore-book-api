@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookLikeCreateRequest {
-
     String userId;
 
     Long bookId;

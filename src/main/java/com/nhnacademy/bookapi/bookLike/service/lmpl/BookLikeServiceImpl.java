@@ -52,7 +52,9 @@ public class BookLikeServiceImpl implements BookLikeService {
     // 도서별 좋아요 조회
     @Override
     public List<BookLikeResponse> getBookLikesByBookId(Long bookId) {
-        // 위랑 동일
+        if(!bookLikeRepository.existsByBookId(bookId)) {
+            throw new BookNotFoundException(bookId);
+        }
         List<BookLike> bookLikes = bookLikeRepository.getBookLikesByBookId(bookId);
         return bookLikes.stream().map(BookLikeResponse::of).collect(Collectors.toList());
     }
@@ -70,7 +72,7 @@ public class BookLikeServiceImpl implements BookLikeService {
     @Override
     public void deleteBookLikeByBookId(Long bookId) {
         if(!bookLikeRepository.existsByBookId(bookId)) {
-            throw new BookLikeNotExistsException(bookId);
+            throw new BookNotFoundException(bookId);
         }
         bookLikeRepository.deleteByBookId(bookId);
     }
