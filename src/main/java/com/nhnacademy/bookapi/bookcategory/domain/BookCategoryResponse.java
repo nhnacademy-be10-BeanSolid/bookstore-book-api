@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.domain.bookcategory;
+package com.nhnacademy.bookapi.bookcategory.domain;
 
 import java.time.LocalDateTime;
 
