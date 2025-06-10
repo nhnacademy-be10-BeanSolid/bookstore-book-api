@@ -1,6 +1,6 @@
-package com.nhnacademy.bookapi.service.bookcategory;
+package com.nhnacademy.bookapi.bookcategory.service;
 
-import com.nhnacademy.bookapi.domain.bookcategory.BookCategory;
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 
 import java.util.List;
 
