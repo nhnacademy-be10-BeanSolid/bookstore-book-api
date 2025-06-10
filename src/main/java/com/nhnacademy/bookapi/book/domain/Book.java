@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.book.domain;
 
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -74,6 +75,14 @@ public class Book {
             inverseJoinColumns = @JoinColumn(name = "tag_id")
     )
     private Set<BookTag> bookTags = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(
+            name = "book_category_map",
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id")
+    )
+    private Set<BookCategory> bookCategories = new HashSet<>();
 
     public Book(String title, String description, String toc, String publisher, String author, LocalDate publishedDate,
                 String isbn, int originalPrice, int salePrice, boolean wrappable, int stock) {
