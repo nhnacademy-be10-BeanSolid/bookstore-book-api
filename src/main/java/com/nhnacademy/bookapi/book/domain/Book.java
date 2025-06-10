@@ -1,10 +1,16 @@
 package com.nhnacademy.bookapi.book.domain;
 
+import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.HashSet;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -60,6 +66,14 @@ public class Book {
 
     @Column(nullable = false)
     private int stock;
+
+    @ManyToMany
+    @JoinTable(
+            name = "book_tag_map",
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "tag_id")
+    )
+    private Set<BookTag> bookTags = new HashSet<>();
 
     public Book(String title, String description, String toc, String publisher, String author, LocalDate publishedDate,
                 String isbn, int originalPrice, int salePrice, boolean wrappable, int stock) {
