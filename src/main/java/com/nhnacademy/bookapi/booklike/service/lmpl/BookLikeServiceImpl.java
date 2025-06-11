@@ -1,15 +1,15 @@
-package com.nhnacademy.bookapi.bookLike.service.lmpl;
+package com.nhnacademy.bookapi.booklike.service.lmpl;
 
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
-import com.nhnacademy.bookapi.bookLike.controller.request.BookLikeCreateRequest;
-import com.nhnacademy.bookapi.bookLike.controller.response.BookLikeResponse;
-import com.nhnacademy.bookapi.bookLike.domain.BookLike;
-import com.nhnacademy.bookapi.bookLike.exception.BookLikeAlreadyExistsException;
-import com.nhnacademy.bookapi.bookLike.exception.BookLikeNotExistsException;
-import com.nhnacademy.bookapi.bookLike.repository.BookLikeRepository;
-import com.nhnacademy.bookapi.bookLike.service.BookLikeService;
+import com.nhnacademy.bookapi.booklike.controller.request.BookLikeCreateRequest;
+import com.nhnacademy.bookapi.booklike.controller.response.BookLikeResponse;
+import com.nhnacademy.bookapi.booklike.domain.BookLike;
+import com.nhnacademy.bookapi.booklike.exception.BookLikeAlreadyExistsException;
+import com.nhnacademy.bookapi.booklike.exception.BookLikeNotExistsException;
+import com.nhnacademy.bookapi.booklike.repository.BookLikeRepository;
+import com.nhnacademy.bookapi.booklike.service.BookLikeService;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

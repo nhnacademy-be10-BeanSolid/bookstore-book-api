@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.bookLike.controller.request;
+package com.nhnacademy.bookapi.booklike.controller.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

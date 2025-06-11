@@ -8,6 +8,7 @@ import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.exception.AuthorNotFoundException;
 import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
+import com.nhnacademy.bookapi.book.exception.PublisherNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.book.service.impl.BookServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -120,6 +121,29 @@ public class BookServiceImplTest {
 
         assertThrows(AuthorNotFoundException.class,
                 () -> bookService.getBooksByAuthor(author));
+    }
+
+    @Test
+    @DisplayName("출판사로 도서 찾기 성공")
+    void getBooksByPublisherSuccessTest() {
+        String publisher = book.getPublisher();
+        when(bookRepository.existsByPublisher(publisher)).thenReturn(true);
+        when(bookRepository.findByPublisher(publisher)).thenReturn(List.of(book));
+
+        List<BookResponse> books = bookService.getBooksByPublisher(publisher);
+
+        assertThat(books).isNotNull();
+        assertThat(books.size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("출판사로 도서 찾기 실패")
+    void getBooksByPublisherFailTest() {
+        String publisher = book.getPublisher();
+        when(bookRepository.existsByPublisher(publisher)).thenReturn(false);
+
+        assertThrows(PublisherNotFoundException.class,
+                () -> bookService.getBooksByPublisher(publisher));
     }
 
     @Test

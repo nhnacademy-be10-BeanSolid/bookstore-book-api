@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.service.bookcategory;
+package com.nhnacademy.bookapi.bookcategory;
 
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryAlreadyExistsException;

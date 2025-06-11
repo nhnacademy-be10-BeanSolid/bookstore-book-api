@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.bookLike.domain;
+package com.nhnacademy.bookapi.booklike.domain;
 
 import com.nhnacademy.bookapi.book.domain.Book;
 import jakarta.persistence.*;

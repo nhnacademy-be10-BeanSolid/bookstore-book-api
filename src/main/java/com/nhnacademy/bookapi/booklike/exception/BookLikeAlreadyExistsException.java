@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.bookLike.exception;
+package com.nhnacademy.bookapi.booklike.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
