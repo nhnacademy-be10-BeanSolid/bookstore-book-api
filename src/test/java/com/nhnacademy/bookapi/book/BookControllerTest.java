@@ -6,7 +6,10 @@ import com.nhnacademy.bookapi.book.controller.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.controller.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.controller.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.Book;
+import com.nhnacademy.bookapi.book.domain.BookItem;
+import com.nhnacademy.bookapi.book.domain.BookSearchResponse;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
+import com.nhnacademy.bookapi.book.service.BookSearchApiService;
 import com.nhnacademy.bookapi.book.service.BookService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -41,12 +44,27 @@ public class BookControllerTest {
     @MockitoBean
     BookService bookService;
 
+    @MockitoBean
+    BookSearchApiService bookSearchService;
+
     Book book;
 
     @BeforeEach
     void setUp() {
         book = new Book("타이틀", "설명", "목차", "출판사", "작가",
                 LocalDate.now(), "test000000000", 10000, 5000, false, 100);
+    }
+
+    @Test
+    @DisplayName("GET /books?query=")
+    void bookServiceTest() throws Exception {
+        String query = "포켓몬스터";
+
+        given(bookSearchService.searchBook(query, 1)).willReturn(new BookSearchResponse());
+
+        mockMvc.perform(get("/books?query=" + query)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -80,6 +98,21 @@ public class BookControllerTest {
                 .andExpect(jsonPath("$[0].author").value(author));
     }
 
+    @Test
+    @DisplayName("GET /publishers/{publisher}")
+    void getBooksByPublisherTest() throws Exception{
+        String publisher = book.getPublisher();
+        BookResponse response = BookResponse.of(book);
+
+        given(bookService.getBooksByPublisher(publisher)).willReturn(List.of(response));
+
+        mockMvc.perform(get("/publishers/{publisher}", publisher)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray())
+                .andExpect(jsonPath("$[0].publisher").value(publisher));
+    }
+
 
     @Test
     @DisplayName("POST /books")
@@ -97,8 +130,8 @@ public class BookControllerTest {
         given(bookService.createBook(any(BookCreateRequest.class))).willReturn(response);
 
         mockMvc.perform(post("/books")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title").value("타이틀"))
                 .andExpect(jsonPath("$.isbn").value("test123456789"))
@@ -142,7 +175,6 @@ public class BookControllerTest {
                 .andExpect(jsonPath("$.title").value(updateTitle))
                 .andExpect(jsonPath("$.status").value(BookStatus.SALE_END.name()));
     }
-
 
     @Test
     @DisplayName("DELETE /books/{isbn}")

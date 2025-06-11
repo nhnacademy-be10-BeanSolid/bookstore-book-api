@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.book.domain.openapi;
+package com.nhnacademy.bookapi.book.domain;
 
 import lombok.Data;
 

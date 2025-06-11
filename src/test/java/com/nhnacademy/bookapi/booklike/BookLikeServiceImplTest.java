@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.booklike;
 
 import com.nhnacademy.bookapi.book.domain.Book;
+import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.booklike.controller.request.BookLikeCreateRequest;
 import com.nhnacademy.bookapi.booklike.controller.response.BookLikeResponse;
@@ -76,7 +77,6 @@ public class BookLikeServiceImplTest {
                 () -> bookLikeService.createBookLike(request));
     }
 
-
     @Test
     @DisplayName("유저아이디로 좋아요 리스트 조회")
     void getBookLikesByUserIdTest() {
@@ -98,6 +98,15 @@ public class BookLikeServiceImplTest {
         assertThat(bookLikes).isNotNull();
         assertThat(bookLikes.size()).isEqualTo(1);
         assertThat(bookLikes.get(0)).isEqualTo(BookLikeResponse.of(bookLike));
+    }
+
+    @Test
+    @DisplayName("도서아이디에 해당하는 책이 없는 경우에 조회")
+    void getBookLikeByBookIdFailTest() {
+        when(bookLikeRepository.existsByBookId(book.getId())).thenReturn(false);
+
+        assertThrows(BookNotFoundException.class,
+                () -> bookLikeService.getBookLikesByBookId(book.getId()));
     }
 
     @Test

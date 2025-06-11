@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.book.service;
 
-import com.nhnacademy.bookapi.book.domain.openapi.BookSearchResponse;
+import com.nhnacademy.bookapi.book.domain.BookSearchResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpEntity;
@@ -12,7 +13,10 @@ import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Service
-public class NaverBookSearchService {
+@RequiredArgsConstructor
+public class BookSearchApiService {
+
+    // 아이디, 시크릿 properties 에 저장
 
     @Value("${naver.client-id}")
     private String clientId;
@@ -20,19 +24,18 @@ public class NaverBookSearchService {
     @Value("${naver-client-secret}")
     private String clientSecret;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final RestTemplate restTemplate;
 
     public BookSearchResponse searchBook(String query, int start) {
 
         log.info("Query: {}", query);
 
+        // 외부 api url
         String url = "https://openapi.naver.com/v1/search/book.json?query=" + query + "&start=" + start;
 
         log.info("URL: {}", url);
 
         HttpHeaders headers = new HttpHeaders();
-//        headers.set("X-Naver-Client-Id", "TxeWzDGQGvVuWtukpNQ3");
-//        headers.set("X-Naver-Client-Secret", "9EZsM4pPL6");
         headers.set("X-Naver-Client-Id", clientId);
         headers.set("X-Naver-Client-Secret", clientSecret);
 
