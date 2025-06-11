@@ -3,8 +3,10 @@ package com.nhnacademy.bookapi.book.controller;
 import com.nhnacademy.bookapi.book.controller.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.controller.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.controller.response.BookResponse;
+import com.nhnacademy.bookapi.book.domain.openapi.BookSearchResponse;
 import com.nhnacademy.bookapi.book.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
+import com.nhnacademy.bookapi.book.service.NaverBookSearchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -19,6 +21,14 @@ import java.util.List;
 public class BookController {
 
     private final BookService bookService;
+    private final NaverBookSearchService naverBookSearchService;
+
+    @GetMapping("/books")
+    public ResponseEntity<BookSearchResponse> searchBook(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "1") int start) {
+        return ResponseEntity.status(HttpStatus.OK).body(naverBookSearchService.searchBook(query, start));
+    }
 
     @GetMapping("/books/{isbn}")
     public ResponseEntity<BookResponse> getBook(@PathVariable String isbn) {

@@ -1,15 +1,14 @@
-package com.nhnacademy.bookapi.bookLike;
+package com.nhnacademy.bookapi.booklike;
 
 import com.nhnacademy.bookapi.book.domain.Book;
-import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
-import com.nhnacademy.bookapi.bookLike.controller.request.BookLikeCreateRequest;
-import com.nhnacademy.bookapi.bookLike.controller.response.BookLikeResponse;
-import com.nhnacademy.bookapi.bookLike.domain.BookLike;
-import com.nhnacademy.bookapi.bookLike.exception.BookLikeAlreadyExistsException;
-import com.nhnacademy.bookapi.bookLike.exception.BookLikeNotExistsException;
-import com.nhnacademy.bookapi.bookLike.repository.BookLikeRepository;
-import com.nhnacademy.bookapi.bookLike.service.lmpl.BookLikeServiceImpl;
+import com.nhnacademy.bookapi.booklike.controller.request.BookLikeCreateRequest;
+import com.nhnacademy.bookapi.booklike.controller.response.BookLikeResponse;
+import com.nhnacademy.bookapi.booklike.domain.BookLike;
+import com.nhnacademy.bookapi.booklike.exception.BookLikeAlreadyExistsException;
+import com.nhnacademy.bookapi.booklike.exception.BookLikeNotExistsException;
+import com.nhnacademy.bookapi.booklike.repository.BookLikeRepository;
+import com.nhnacademy.bookapi.booklike.service.lmpl.BookLikeServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

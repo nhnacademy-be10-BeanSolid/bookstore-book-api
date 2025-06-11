@@ -1,12 +1,12 @@
-package com.nhnacademy.bookapi.bookLike;
+package com.nhnacademy.bookapi.booklike;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.bookapi.book.domain.Book;
-import com.nhnacademy.bookapi.bookLike.controller.BookLikeController;
-import com.nhnacademy.bookapi.bookLike.controller.request.BookLikeCreateRequest;
-import com.nhnacademy.bookapi.bookLike.controller.response.BookLikeResponse;
-import com.nhnacademy.bookapi.bookLike.domain.BookLike;
-import com.nhnacademy.bookapi.bookLike.service.BookLikeService;
+import com.nhnacademy.bookapi.booklike.controller.BookLikeController;
+import com.nhnacademy.bookapi.booklike.controller.request.BookLikeCreateRequest;
+import com.nhnacademy.bookapi.booklike.controller.response.BookLikeResponse;
+import com.nhnacademy.bookapi.booklike.domain.BookLike;
+import com.nhnacademy.bookapi.booklike.service.BookLikeService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

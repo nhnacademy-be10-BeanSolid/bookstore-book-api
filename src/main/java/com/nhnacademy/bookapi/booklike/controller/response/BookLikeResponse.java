@@ -1,6 +1,6 @@
-package com.nhnacademy.bookapi.bookLike.controller.response;
+package com.nhnacademy.bookapi.booklike.controller.response;
 
-import com.nhnacademy.bookapi.bookLike.domain.BookLike;
+import com.nhnacademy.bookapi.booklike.domain.BookLike;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
