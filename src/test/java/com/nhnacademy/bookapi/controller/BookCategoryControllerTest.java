@@ -1,10 +1,11 @@
 package com.nhnacademy.bookapi.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.bookapi.domain.bookcategory.BookCategory;
-import com.nhnacademy.bookapi.domain.bookcategory.BookCategoryCreateRequest;
-import com.nhnacademy.bookapi.domain.bookcategory.BookCategoryUpdateRequest;
-import com.nhnacademy.bookapi.service.bookcategory.BookCategoryService;
+import com.nhnacademy.bookapi.bookcategory.controller.BookCategoryController;
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategoryCreateRequest;
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategoryUpdateRequest;
+import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

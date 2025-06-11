@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.domain.bookcategory;
+package com.nhnacademy.bookapi.bookcategory.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
@@ -24,12 +24,13 @@ public class BookCategory {
     @OneToMany(mappedBy = "parentCategory", cascade = CascadeType.REMOVE)
     private List<BookCategory> children = new ArrayList<>();
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "DATETIME")
     private LocalDateTime createdAt;
 
+    @Column(columnDefinition = "DATETIME")
     private LocalDateTime updatedAt;
 
     public BookCategory(String name, BookCategory parentCategory) {

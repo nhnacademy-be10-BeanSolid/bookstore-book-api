@@ -1,6 +1,6 @@
-package com.nhnacademy.bookapi.repository;
+package com.nhnacademy.bookapi.bookcategory.repository;
 
-import com.nhnacademy.bookapi.domain.bookcategory.BookCategory;
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

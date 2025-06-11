@@ -1,10 +1,10 @@
-package com.nhnacademy.bookapi.controller;
+package com.nhnacademy.bookapi.bookcategory.controller;
 
-import com.nhnacademy.bookapi.domain.bookcategory.BookCategory;
-import com.nhnacademy.bookapi.domain.bookcategory.BookCategoryCreateRequest;
-import com.nhnacademy.bookapi.domain.bookcategory.BookCategoryResponse;
-import com.nhnacademy.bookapi.domain.bookcategory.BookCategoryUpdateRequest;
-import com.nhnacademy.bookapi.service.bookcategory.BookCategoryService;
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategoryCreateRequest;
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategoryResponse;
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategoryUpdateRequest;
+import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
