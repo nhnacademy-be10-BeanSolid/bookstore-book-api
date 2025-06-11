@@ -59,8 +59,20 @@ public class BookLikeControllerTest {
 
         given(bookLikeService.getBookLikesByBookId(book.getId())).willReturn(List.of(response));
 
-        mockMvc.perform(get("/books/{bookId}/bookLikes", book.getId())
-                .contentType(MediaType.APPLICATION_JSON))
+        mockMvc.perform(get("/books/{bookId}/bookLikes", book.getId()))
+//                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray());
+    }
+
+    @Test
+    @DisplayName("GET /users/{userId}/bookLikes")
+    void getBookLikesByUserIdTest() throws Exception {
+        List<BookLikeResponse> responses = bookLikeService.getBookLikesByUserId(userId);
+
+        given(bookLikeService.getBookLikesByUserId(userId)).willReturn(responses);
+
+        mockMvc.perform(get("/users/{userId}/bookLikes", userId))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
     }
@@ -93,5 +105,16 @@ public class BookLikeControllerTest {
                 .andExpect(status().isNoContent());
 
         verify(bookLikeService).deleteBookLikeByBookId(book.getId());
+    }
+
+    @Test
+    @DisplayName("DELETE /users/{userId}/bookLikes/{bookId}")
+    void deleteBookLikeByUserIdAndBookIdTest() throws Exception {
+        doNothing().when(bookLikeService).deleteBookLikeByUserIdAndBookId(userId, book.getId());
+
+        mockMvc.perform(delete("/users/{userId}/bookLikes/{bookId}", userId, book.getId()))
+                .andExpect(status().isNoContent());
+
+        verify(bookLikeService).deleteBookLikeByUserIdAndBookId(userId, book.getId());
     }
 }

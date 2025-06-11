@@ -28,7 +28,7 @@ public class BookLike {
     private String userId;
 
     @ManyToOne
-    @JoinColumn(name = "book_id")
+    @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
     public BookLike(String userId, Book book) {

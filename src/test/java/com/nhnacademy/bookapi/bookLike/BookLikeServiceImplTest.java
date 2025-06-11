@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -44,9 +45,8 @@ public class BookLikeServiceImplTest {
     @BeforeEach
     void setUp() {
         userId = "userId";
-//        book = new Book("타이틀", "설명", "목차", "출판사", "작가",
-//                LocalDate.now(), "test000000000", 10000, 5000, false, 100);
-        book = new Book();
+        book = new Book("타이틀", "설명", "목차", "출판사", "작가",
+                LocalDate.now(), "test000000000", 10000, 5000, false, 100);
         bookLike = new BookLike(userId, book);
     }
 
@@ -90,6 +90,18 @@ public class BookLikeServiceImplTest {
     }
 
     @Test
+    @DisplayName("도서아이디로 좋아요 리스트 조회")
+    void getBookLikesByBookIdTest() {
+        when(bookLikeRepository.existsByBookId(book.getId())).thenReturn(true);
+        when(bookLikeRepository.getBookLikesByBookId(book.getId())).thenReturn(List.of(bookLike));
+        List<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByBookId(book.getId());
+
+        assertThat(bookLikes).isNotNull();
+        assertThat(bookLikes.size()).isEqualTo(1);
+        assertThat(bookLikes.get(0)).isEqualTo(BookLikeResponse.of(bookLike));
+    }
+
+    @Test
     @DisplayName("유저정보를 가지고 좋아요 삭제 테스트")
     void deleteBookLikeByUserIdTest() {
         Long bookId = book.getId();
@@ -115,6 +127,7 @@ public class BookLikeServiceImplTest {
     @DisplayName("삭제 성공")
     void deleteBookLikeByBookIdSuccessTest() {
         Long bookId = book.getId();
+        when(bookRepository.existsById(book.getId())).thenReturn(true);
         when(bookLikeRepository.existsByBookId(bookId)).thenReturn(true);
 
         doNothing().when(bookLikeRepository).deleteByBookId(bookId);
@@ -124,12 +137,13 @@ public class BookLikeServiceImplTest {
     }
 
     @Test
-    @DisplayName("삭제 실패")
-    void deleteBookLikeByBookIdFailTest() {
+    @DisplayName("삭제 실패 - 좋아요 존재하지 않은 경우")
+    void deleteBookLikeByBookIdFailTestCase1() {
         Long bookId = book.getId();
+        when(bookRepository.existsById(book.getId())).thenReturn(true);
         when(bookLikeRepository.existsByBookId(bookId)).thenReturn(false);
 
-        assertThrows(BookNotFoundException.class,
+        assertThrows(BookLikeNotExistsException.class,
                 () -> bookLikeService.deleteBookLikeByBookId(bookId));
     }
 }

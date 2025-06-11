@@ -1,0 +1,23 @@
+### 책 좋아요 생성
+POST http://localhost:8080/books/1/bookLikes
+Content-Type: application/json
+
+{
+  "userId": "user",
+  "bookId": 1
+}
+
+### 책 좋아요 생성
+POST http://localhost:8080/books/2/bookLikes
+Content-Type: application/json
+
+{
+  "userId": "user",
+  "bookId": 2
+}
+
+### 좋아요 조회
+GET http://localhost:8080/users/user/bookLikes
+
+### 좋아요 삭제
+DELETE http://localhost:8080/users/user/bookLikes/2

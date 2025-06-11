@@ -28,7 +28,7 @@ Content-Type: application/json
   "isbn": "isbn001111112",
   "originalPrice": 1000,
   "salePrice": 1,
-  "wrappable": false,
+  "wrappable": true,
   "stock": 100
 }
 
@@ -42,11 +42,12 @@ GET http://localhost:8080/authors/Lee
 GET http://localhost:8080/publishers/pub1
 
 ### 도서 업데이트
-PUT http://localhost:8080/books/isbn001111111
+PUT http://localhost:8080/books/isbn001111112
 Content-Type: application/json
 
 {
-  "title": "수정 타이틀"
+  "title": "수정 제목",
+  "status": "sale_end"
 }
 
 ### 도서 삭제

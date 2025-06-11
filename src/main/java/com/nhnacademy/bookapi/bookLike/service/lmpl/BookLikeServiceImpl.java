@@ -10,6 +10,7 @@ import com.nhnacademy.bookapi.bookLike.exception.BookLikeAlreadyExistsException;
 import com.nhnacademy.bookapi.bookLike.exception.BookLikeNotExistsException;
 import com.nhnacademy.bookapi.bookLike.repository.BookLikeRepository;
 import com.nhnacademy.bookapi.bookLike.service.BookLikeService;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookLikeServiceImpl implements BookLikeService {
 
     private final BookLikeRepository bookLikeRepository;
@@ -43,14 +45,15 @@ public class BookLikeServiceImpl implements BookLikeService {
 
     // 유저별 좋아요 조회
     @Override
+    @Transactional(readOnly = true)
     public List<BookLikeResponse> getBookLikesByUserId(String userId) {
-        // 예외가 필요한가?
         List<BookLike> bookLikes = bookLikeRepository.getBookLikesByUserId(userId);
         return bookLikes.stream().map(BookLikeResponse::of).collect(Collectors.toList());
     }
 
     // 도서별 좋아요 조회
     @Override
+    @Transactional(readOnly = true)
     public List<BookLikeResponse> getBookLikesByBookId(Long bookId) {
         if(!bookLikeRepository.existsByBookId(bookId)) {
             throw new BookNotFoundException(bookId);
@@ -71,8 +74,11 @@ public class BookLikeServiceImpl implements BookLikeService {
     // 도서 아이디로 삭제
     @Override
     public void deleteBookLikeByBookId(Long bookId) {
-        if(!bookLikeRepository.existsByBookId(bookId)) {
+        if(!bookRepository.existsById(bookId)) {
             throw new BookNotFoundException(bookId);
+        }
+        if(!bookLikeRepository.existsByBookId(bookId)) {
+            throw new BookLikeNotExistsException(bookId);
         }
         bookLikeRepository.deleteByBookId(bookId);
     }

@@ -16,7 +16,12 @@ public class BookLikeController {
 
     private final BookLikeService bookLikeService;
 
-    // 좋아요 누른 도서는 마이페이지에서 확인가능 > 경로를 어떻게할지
+    // 좋아요 누른 도서는 마이페이지에서 확인가능 > 임시 경로
+    @GetMapping("/users/{userId}/bookLikes")
+    public ResponseEntity<List<BookLikeResponse>> getBookLikes(@PathVariable String userId) {
+        List<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByUserId(userId);
+        return ResponseEntity.status(HttpStatus.OK).body(bookLikes);
+    }
 
     @GetMapping("/books/{bookId}/bookLikes")
     public ResponseEntity<List<BookLikeResponse>> getBookLikesByBookId(@PathVariable Long bookId) {
@@ -30,9 +35,9 @@ public class BookLikeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // 마이페이지에서 삭제? 유저 아이디와 도서 아이디를 어떻게 받을지    헤더에 정보 저장?
-    @DeleteMapping("/users/{userId}/mypage")
-    public ResponseEntity<Void> deleteBookLikeByUserIdAndBookId(String userId, Long bookId) {
+    // 마이페이지에서 삭제? 임시경로임  유저 아이디와 도서 아이디를 어떻게 받을지    헤더에 정보 저장?
+    @DeleteMapping("/users/{userId}/bookLikes/{bookId}")
+    public ResponseEntity<Void> deleteBookLikeByUserIdAndBookId(@PathVariable String userId, @PathVariable Long bookId) {
         bookLikeService.deleteBookLikeByUserIdAndBookId(userId, bookId);
         return ResponseEntity.noContent().build();
     }
