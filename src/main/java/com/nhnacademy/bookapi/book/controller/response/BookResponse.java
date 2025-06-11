@@ -27,7 +27,7 @@ public class BookResponse {
     private String isbn;
     private int originalPrice;
     private int salePrice;
-    private boolean wrappable;
+    private Boolean wrappable;
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createAt;

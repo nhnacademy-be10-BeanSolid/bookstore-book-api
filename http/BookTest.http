@@ -1,5 +1,5 @@
 ### 도서 추가
-POST http://localhost:8080/api/books
+POST http://localhost:8080/books
 Content-Type: application/json
 
 {
@@ -16,7 +16,7 @@ Content-Type: application/json
 }
 
 ### 도서 추가
-POST http://localhost:8080/api/books
+POST http://localhost:8080/books
 Content-Type: application/json
 
 {
@@ -28,26 +28,27 @@ Content-Type: application/json
   "isbn": "isbn001111112",
   "originalPrice": 1000,
   "salePrice": 1,
-  "wrappable": false,
+  "wrappable": true,
   "stock": 100
 }
 
 ### ISBN 코드로 도서 찾기
-GET http://localhost:8080/api/books/isbn001111111
+GET http://localhost:8080/books/isbn001111111
 
 ### 작가로 도서 찾기
-GET http://localhost:8080/api/authors/Lee
+GET http://localhost:8080/authors/Lee
 
 ### 출판사로 도서 찾기
-GET http://localhost:8080/api/publishers/pub1
+GET http://localhost:8080/publishers/pub1
 
 ### 도서 업데이트
-PUT http://localhost:8080/api/books/isbn001111111
+PUT http://localhost:8080/books/isbn001111112
 Content-Type: application/json
 
 {
-  "title": "수정 타이틀"
+  "title": "수정 제목",
+  "status": "sale_end"
 }
 
 ### 도서 삭제
-DELETE http://localhost:8080/api/books/isbn001111111
+DELETE http://localhost:8080/books/isbn001111111

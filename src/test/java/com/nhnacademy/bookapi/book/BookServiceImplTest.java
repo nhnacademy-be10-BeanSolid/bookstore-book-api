@@ -155,6 +155,7 @@ public class BookServiceImplTest {
         String isbn = "test000000000";
         when(bookRepository.findByIsbn(isbn)).thenReturn(Optional.of(book));
 
+        doNothing().when(bookRepository).delete(book);
         bookService.deleteBook(isbn);
 
         verify(bookRepository, times(1)).delete(book);

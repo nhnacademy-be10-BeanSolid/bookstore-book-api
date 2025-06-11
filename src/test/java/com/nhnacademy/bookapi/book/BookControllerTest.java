@@ -50,14 +50,14 @@ public class BookControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/books/{isbn}")
+    @DisplayName("GET /books/{isbn}")
     void getBookTest() throws Exception{
         String isbn = book.getIsbn();
         BookResponse response = BookResponse.of(book);
 
         given(bookService.getBook(isbn)).willReturn(response);
 
-        mockMvc.perform(get("/api/books/{isbn}", isbn)
+        mockMvc.perform(get("/books/{isbn}", isbn)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value("타이틀"))
@@ -66,14 +66,14 @@ public class BookControllerTest {
     }
 
     @Test
-    @DisplayName("GET /api/authors/{author}")
+    @DisplayName("GET /authors/{author}")
     void getAuthorTest() throws Exception{
         String author = book.getAuthor();
         BookResponse response = BookResponse.of(book);
 
         given(bookService.getBooksByAuthor(author)).willReturn(List.of(response));
 
-        mockMvc.perform(get("/api/authors/{author}", author)
+        mockMvc.perform(get("/authors/{author}", author)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray())
@@ -82,7 +82,7 @@ public class BookControllerTest {
 
 
     @Test
-    @DisplayName("POST /api/books")
+    @DisplayName("POST /books")
     void createBookTest() throws Exception{
         BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
                 LocalDate.now(), "test123456789", 10000, 5000, false, 100);
@@ -96,7 +96,7 @@ public class BookControllerTest {
 
         given(bookService.createBook(any(BookCreateRequest.class))).willReturn(response);
 
-        mockMvc.perform(post("/api/books")
+        mockMvc.perform(post("/books")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
@@ -106,22 +106,20 @@ public class BookControllerTest {
     }
 
     @Test
-    @DisplayName("POST /api/books - valid fail")
+    @DisplayName("POST /books - valid fail")
     void createBookValidationFailTest() throws Exception {
         BookCreateRequest request = new BookCreateRequest();
         request.setTitle("");
 
-        mockMvc.perform(post("/api/books")
+        mockMvc.perform(post("/books")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
     }
 
 
-
-
     @Test
-    @DisplayName("PUT /api/books/{isbn}")
+    @DisplayName("PUT /books/{isbn}")
     void updateBookTest() throws Exception{
         String isbn = "test123456789";
         String updateTitle = "수정된 타이틀";
@@ -137,7 +135,7 @@ public class BookControllerTest {
         given(bookService.updateBook(eq(isbn), any(BookUpdateRequest.class)))
                 .willReturn(response);
 
-        mockMvc.perform(put("/api/books/{isbn}", isbn)
+        mockMvc.perform(put("/books/{isbn}", isbn)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -147,13 +145,13 @@ public class BookControllerTest {
 
 
     @Test
-    @DisplayName("DELETE /api/books/{isbn}")
+    @DisplayName("DELETE /books/{isbn}")
     void deleteBookSuccessTest() throws Exception {
         String isbn = "test123456789";
 
         doNothing().when(bookService).deleteBook(isbn);
 
-        mockMvc.perform(delete("/api/books/{isbn}", isbn))
+        mockMvc.perform(delete("/books/{isbn}", isbn))
                 .andExpect(status().isNoContent());
     }
 }

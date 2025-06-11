@@ -15,3 +15,4 @@ CREATE TABLE IF NOT EXISTS `book` (
                         `status` VARCHAR(20) NOT NULL COMMENT '판매중 or 판매종료',
                         `stock` INT NOT NULL
 );
+
