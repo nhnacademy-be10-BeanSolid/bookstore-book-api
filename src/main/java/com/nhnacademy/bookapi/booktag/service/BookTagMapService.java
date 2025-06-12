@@ -1,7 +1,7 @@
 package com.nhnacademy.bookapi.booktag.service;
 
-import com.nhnacademy.bookapi.booktag.controller.request.BookTagMapCreateRequest;
-import com.nhnacademy.bookapi.booktag.controller.response.BookTagMapResponse;
+import com.nhnacademy.bookapi.booktag.domain.request.BookTagMapCreateRequest;
+import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 
 public interface BookTagMapService {
 

@@ -1,9 +1,9 @@
 package com.nhnacademy.bookapi.book.controller;
 
-import com.nhnacademy.bookapi.book.controller.request.BookCreateRequest;
-import com.nhnacademy.bookapi.book.controller.request.BookUpdateRequest;
-import com.nhnacademy.bookapi.book.controller.response.BookDetailResponse;
-import com.nhnacademy.bookapi.book.controller.response.BookResponse;
+import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
+import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
+import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.BookSearchResponse;
 import com.nhnacademy.bookapi.book.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
@@ -31,23 +31,27 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.OK).body(naverBookSearchService.searchBook(query, start));
     }
 
-    @GetMapping("/books/{isbn}")
-    public ResponseEntity<BookDetailResponse> getBook(@PathVariable String isbn) {
-//        BookResponse response = bookService.getBook(isbn);
-//        return ResponseEntity.status(HttpStatus.OK).body(response);
-        BookDetailResponse bookDetailResponse = bookService.getBookDetail(isbn);
-        return ResponseEntity.status(HttpStatus.OK).body(bookDetailResponse);
+    @GetMapping("/books/{id}")
+    public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
+        BookDetailResponse response = bookService.getBookDetailByBookId(id);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+//    @GetMapping("/books/{isbn}")
+//    public ResponseEntity<BookDetailResponse> getBook(@PathVariable String isbn) {
+//        BookDetailResponse response = bookService.getBookDetailByIsbn(isbn);
+//        return ResponseEntity.status(HttpStatus.OK).body(response);
+//    }
+
     @GetMapping("/authors/{author}")
-    public ResponseEntity<List<BookResponse>> getBooksByAuthor(@PathVariable String author) {
-        List<BookResponse> response = bookService.getBooksByAuthor(author);
+    public ResponseEntity<List<BookDetailResponse>> getBooksByAuthor(@PathVariable String author) {
+        List<BookDetailResponse> response = bookService.getBooksByAuthor(author);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/publishers/{publisher}")
-    public ResponseEntity<List<BookResponse>> getBooksByPublisher(@PathVariable String publisher) {
-        List<BookResponse> response = bookService.getBooksByPublisher(publisher);
+    public ResponseEntity<List<BookDetailResponse>> getBooksByPublisher(@PathVariable String publisher) {
+        List<BookDetailResponse> response = bookService.getBooksByPublisher(publisher);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -61,20 +65,20 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @PutMapping("/books/{isbn}")
-    public ResponseEntity<BookResponse> updateBook(@PathVariable String isbn,
+    @PatchMapping("/books/{bookId}")
+    public ResponseEntity<BookResponse> updateBook(@PathVariable Long bookId,
                                                    @Valid @RequestBody BookUpdateRequest request,
                                                    BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException();
         }
-        BookResponse response = bookService.updateBook(isbn, request);
+        BookResponse response = bookService.updateBook(bookId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @DeleteMapping("/books/{isbn}")
-    public ResponseEntity<Void> deleteBook(@PathVariable String isbn) {
-        bookService.deleteBook(isbn);
+    @DeleteMapping("/books/{bookId}")
+    public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
+        bookService.deleteBook(bookId);
         return ResponseEntity.noContent().build();
     }
 }

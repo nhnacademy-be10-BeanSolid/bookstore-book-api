@@ -2,8 +2,8 @@ package com.nhnacademy.bookapi.booktag.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
-import com.nhnacademy.bookapi.booktag.controller.request.BookTagCreateRequest;
-import com.nhnacademy.bookapi.booktag.controller.request.BookTagUpdateRequest;
+import com.nhnacademy.bookapi.booktag.domain.request.BookTagCreateRequest;
+import com.nhnacademy.bookapi.booktag.domain.request.BookTagUpdateRequest;
 import com.nhnacademy.bookapi.booktag.service.BookTagService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

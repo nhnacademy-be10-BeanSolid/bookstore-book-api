@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.book.controller.response;
+package com.nhnacademy.bookapi.book.domain.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nhnacademy.bookapi.book.domain.Book;
@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookResponse {
+public class BookDetailResponse {
 
     private Long id;
     private String title;
@@ -41,9 +41,22 @@ public class BookResponse {
     private BookStatus Status;
     private int stock;
 
-    public static BookResponse of(Book book) {
+    private Set<String> bookCategories;
 
-        return new BookResponse(book.getId(),
+    private Set<String> bookTags;
+
+    public static BookDetailResponse of(Book book) {
+        Set<String> categories = book.getBookCategories()
+                .stream()
+                .map(BookCategory::getName)
+                .collect(Collectors.toSet());
+
+        Set<String> tags = book.getBookTags()
+                .stream()
+                .map(BookTag::getName)
+                .collect(Collectors.toSet());
+
+        return new BookDetailResponse(book.getId(),
                 book.getTitle(),
                 book.getDescription(),
                 book.getToc(),
@@ -57,7 +70,10 @@ public class BookResponse {
                 book.getCreateAt(),
                 book.getUpdateAt(),
                 book.getStatus(),
-                book.getStock());
+                book.getStock(),
+                categories,
+                tags);
     }
 
 }
+

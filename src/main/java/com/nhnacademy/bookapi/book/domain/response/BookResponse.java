@@ -1,10 +1,8 @@
-package com.nhnacademy.bookapi.book.controller.response;
+package com.nhnacademy.bookapi.book.domain.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
-import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
-import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.Getter;
@@ -12,15 +10,12 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Data
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookDetailResponse {
+public class BookResponse {
 
     private Long id;
     private String title;
@@ -42,22 +37,9 @@ public class BookDetailResponse {
     private BookStatus Status;
     private int stock;
 
-    private Set<String> bookCategories;
+    public static BookResponse of(Book book) {
 
-    private Set<String> bookTags;
-
-    public static BookDetailResponse of(Book book) {
-        Set<String> categories = book.getBookCategories()
-                .stream()
-                .map(BookCategory::getName)
-                .collect(Collectors.toSet());
-
-        Set<String> tags = book.getBookTags()
-                .stream()
-                .map(BookTag::getName)
-                .collect(Collectors.toSet());
-
-        return new BookDetailResponse(book.getId(),
+        return new BookResponse(book.getId(),
                 book.getTitle(),
                 book.getDescription(),
                 book.getToc(),
@@ -71,10 +53,7 @@ public class BookDetailResponse {
                 book.getCreateAt(),
                 book.getUpdateAt(),
                 book.getStatus(),
-                book.getStock(),
-                categories,
-                tags);
+                book.getStock());
     }
 
 }
-

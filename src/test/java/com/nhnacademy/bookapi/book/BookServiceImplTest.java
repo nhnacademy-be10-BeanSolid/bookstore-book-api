@@ -1,10 +1,11 @@
 package com.nhnacademy.bookapi.book;
 
-import com.nhnacademy.bookapi.book.controller.request.BookCreateRequest;
-import com.nhnacademy.bookapi.book.controller.request.BookUpdateRequest;
-import com.nhnacademy.bookapi.book.controller.response.BookResponse;
-import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
+import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
+import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
+import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookResponse;
+import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.exception.AuthorNotFoundException;
 import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
@@ -20,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,37 +79,40 @@ public class BookServiceImplTest {
     }
 
     @Test
-    @DisplayName("ISBN 도서 찾기 성공")
-    void getBookByIsbnSuccessTest() {
-        String isbn = book.getIsbn();
-        when(bookRepository.findByIsbn(isbn)).thenReturn(Optional.of(book));
+    @DisplayName("아이디로 도서 찾기 성공")
+    void getBookDetailByBookIdSuccessTest() {
+        Long id = book.getId();
 
-        BookResponse response = bookService.getBook(isbn);
+        when(bookRepository.findById(id)).thenReturn(Optional.of(book));
+
+        BookDetailResponse response = bookService.getBookDetailByBookId(id);
 
         assertThat(response).isNotNull();
         assertThat(response.getTitle()).isEqualTo(book.getTitle());
-        assertThat(response.getIsbn()).isEqualTo(isbn);
+        assertThat(response.getIsbn()).isEqualTo(book.getIsbn());
         assertThat(response.getAuthor()).isEqualTo(book.getAuthor());
     }
 
     @Test
-    @DisplayName("ISBN 도서 찾기 실패")
-    void getBookByIsbnFailTest() {
-        String isbn = book.getIsbn();
-        when(bookRepository.findByIsbn(isbn)).thenReturn(Optional.empty());
+    @DisplayName("아이디로 도서 찾기 실패")
+    void getBookDetailByBookIdFailTest() {
+        Long id = book.getId();
+
+        when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(BookNotFoundException.class,
-                () -> bookService.deleteBook(isbn));
+                () -> bookService.getBookDetailByBookId(id));
     }
+
 
     @Test
     @DisplayName("작가 도서 찾기 성공")
     void getBooksByAuthorSuccessTest() {
         String author = book.getAuthor();
-        when(bookRepository.existsByAuthor(author)).thenReturn(true);
+
         when(bookRepository.findByAuthor(author)).thenReturn(List.of(book));
 
-        List<BookResponse> books = bookService.getBooksByAuthor(author);
+        List<BookDetailResponse> books = bookService.getBooksByAuthor(author);
 
         assertThat(books).isNotNull();
         assertThat(books.size()).isEqualTo(1);
@@ -117,7 +122,8 @@ public class BookServiceImplTest {
     @DisplayName("작가 도서 찾기 실패")
     void getBooksByAuthorFailTest() {
         String author = book.getAuthor();
-        when(bookRepository.existsByAuthor(author)).thenReturn(false);
+
+        when(bookRepository.findByAuthor(author)).thenReturn(Collections.emptyList());
 
         assertThrows(AuthorNotFoundException.class,
                 () -> bookService.getBooksByAuthor(author));
@@ -127,10 +133,10 @@ public class BookServiceImplTest {
     @DisplayName("출판사로 도서 찾기 성공")
     void getBooksByPublisherSuccessTest() {
         String publisher = book.getPublisher();
-        when(bookRepository.existsByPublisher(publisher)).thenReturn(true);
+
         when(bookRepository.findByPublisher(publisher)).thenReturn(List.of(book));
 
-        List<BookResponse> books = bookService.getBooksByPublisher(publisher);
+        List<BookDetailResponse> books = bookService.getBooksByPublisher(publisher);
 
         assertThat(books).isNotNull();
         assertThat(books.size()).isEqualTo(1);
@@ -140,7 +146,8 @@ public class BookServiceImplTest {
     @DisplayName("출판사로 도서 찾기 실패")
     void getBooksByPublisherFailTest() {
         String publisher = book.getPublisher();
-        when(bookRepository.existsByPublisher(publisher)).thenReturn(false);
+
+        when(bookRepository.findByPublisher(publisher)).thenReturn(Collections.emptyList());
 
         assertThrows(PublisherNotFoundException.class,
                 () -> bookService.getBooksByPublisher(publisher));
@@ -149,38 +156,39 @@ public class BookServiceImplTest {
     @Test
     @DisplayName("업데이트 성공")
     void updateBookSuccessTest() {
-        String isbn = book.getIsbn();
-        when(bookRepository.findByIsbn(isbn)).thenReturn(Optional.of(book));
+        Long id = book.getId();
 
-       BookUpdateRequest request = new BookUpdateRequest();
-       request.setTitle("수정합니다");
-       request.setStatus("sale_end");
+        when(bookRepository.findById(id)).thenReturn(Optional.of(book));
 
-       BookResponse response = bookService.updateBook(isbn, request);
+        BookUpdateRequest request = new BookUpdateRequest();
+        request.setTitle("수정합니다");
+        request.setStatus("sale_end");
 
-       assertThat(response).isNotNull();
-       assertThat(response.getTitle()).isEqualTo(request.getTitle());
-       assertThat(response.getStatus()).isEqualTo(BookStatus.SALE_END);
+        BookResponse response = bookService.updateBook(id, request);
+
+        assertThat(response).isNotNull();
+        assertThat(response.getTitle()).isEqualTo(request.getTitle());
+        assertThat(response.getStatus()).isEqualTo(BookStatus.SALE_END);
     }
 
     @Test
     @DisplayName("업데이트 실패")
     void updateBookFailTest() {
-        String isbn = "test111111111";
-        when(bookRepository.findByIsbn(isbn)).thenReturn(Optional.empty());
+        Long id = book.getId();
+        when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(BookNotFoundException.class,
-                () -> bookService.updateBook(isbn, new BookUpdateRequest()));
+                () -> bookService.updateBook(id, new BookUpdateRequest()));
     }
 
     @Test
     @DisplayName("삭제 성공")
     void deleteBookSuccessTest() {
-        String isbn = "test000000000";
-        when(bookRepository.findByIsbn(isbn)).thenReturn(Optional.of(book));
+        Long id = book.getId();
+        when(bookRepository.findById(id)).thenReturn(Optional.of(book));
 
         doNothing().when(bookRepository).delete(book);
-        bookService.deleteBook(isbn);
+        bookService.deleteBook(id);
 
         verify(bookRepository, times(1)).delete(book);
     }
@@ -188,12 +196,10 @@ public class BookServiceImplTest {
     @Test
     @DisplayName("삭제 실패")
     void deleteBookFailTest() {
-        String isbn = "test000000000";
-        when(bookRepository.findByIsbn(isbn)).thenReturn(Optional.empty());
+        Long id = book.getId();
+        when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(BookNotFoundException.class,
-                () -> bookService.deleteBook(isbn));
+                () -> bookService.deleteBook(id));
     }
-
-
 }

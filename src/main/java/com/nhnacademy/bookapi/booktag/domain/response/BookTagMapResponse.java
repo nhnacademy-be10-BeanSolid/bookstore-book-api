@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.booktag.controller.response;
+package com.nhnacademy.bookapi.booktag.domain.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

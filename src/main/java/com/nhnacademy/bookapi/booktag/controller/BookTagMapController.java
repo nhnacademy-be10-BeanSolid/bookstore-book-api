@@ -1,7 +1,7 @@
 package com.nhnacademy.bookapi.booktag.controller;
 
-import com.nhnacademy.bookapi.booktag.controller.request.BookTagMapCreateRequest;
-import com.nhnacademy.bookapi.booktag.controller.response.BookTagMapResponse;
+import com.nhnacademy.bookapi.booktag.domain.request.BookTagMapCreateRequest;
+import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.nhnacademy.bookapi.booktag.service.BookTagMapService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

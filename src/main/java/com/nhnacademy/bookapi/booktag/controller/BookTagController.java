@@ -1,9 +1,9 @@
 package com.nhnacademy.bookapi.booktag.controller;
 
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
-import com.nhnacademy.bookapi.booktag.controller.request.BookTagCreateRequest;
-import com.nhnacademy.bookapi.booktag.controller.response.BookTagResponse;
-import com.nhnacademy.bookapi.booktag.controller.request.BookTagUpdateRequest;
+import com.nhnacademy.bookapi.booktag.domain.request.BookTagCreateRequest;
+import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
+import com.nhnacademy.bookapi.booktag.domain.request.BookTagUpdateRequest;
 import com.nhnacademy.bookapi.booktag.service.BookTagService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
