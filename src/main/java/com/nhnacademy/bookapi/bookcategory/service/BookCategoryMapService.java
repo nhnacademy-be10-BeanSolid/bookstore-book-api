@@ -5,7 +5,7 @@ import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapRespon
 
 public interface BookCategoryMapService {
 
-    BookCategoryMapResponse bookCategoryMapCreate(Long bookId , BookCategoryMapCreateRequest request);
+    BookCategoryMapResponse createBookCategoryMap(Long bookId , BookCategoryMapCreateRequest request);
 
     void deleteCategory(Long bookId, Long categoryId);
 }

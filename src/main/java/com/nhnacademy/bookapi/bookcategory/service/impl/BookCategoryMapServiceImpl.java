@@ -24,7 +24,7 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
 
     // 도서에 카테고리 추가
     @Override
-    public BookCategoryMapResponse bookCategoryMapCreate(Long bookId , BookCategoryMapCreateRequest request) {
+    public BookCategoryMapResponse createBookCategoryMap(Long bookId , BookCategoryMapCreateRequest request) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
 

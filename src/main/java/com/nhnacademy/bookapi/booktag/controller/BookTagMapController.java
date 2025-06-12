@@ -16,7 +16,8 @@ public class BookTagMapController {
     private final BookTagMapService bookTagMapService;
 
     @PostMapping
-    public ResponseEntity<BookTagMapResponse> createBookTagMap(@PathVariable Long bookId, @RequestBody BookTagMapCreateRequest request) {
+    public ResponseEntity<BookTagMapResponse> createBookTagMap(@PathVariable Long bookId,
+                                                               @RequestBody BookTagMapCreateRequest request) {
         BookTagMapResponse response = bookTagMapService.createBookTag(bookId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
