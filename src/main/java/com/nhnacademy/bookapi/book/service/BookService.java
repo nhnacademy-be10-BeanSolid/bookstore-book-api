@@ -22,4 +22,5 @@ public interface BookService {
     BookResponse updateBook(String isbn, BookUpdateRequest request);
 
     void deleteBook(String isbn);
+
 }

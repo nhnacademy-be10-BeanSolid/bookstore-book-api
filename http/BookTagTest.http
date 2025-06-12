@@ -39,3 +39,19 @@ Content-Type: application/json
 
 DELETE /book-tags/1 HTTP/1.1
 Host: localhost:8080
+
+### 도서에 태그 추가
+POST http://localhost:8080/books/1/tags
+Content-Type: application/json
+
+{
+  "tagId": 1
+}
+
+### 도서에 태그 추가
+POST http://localhost:8080/books/1/tags
+Content-Type: application/json
+
+{
+  "tagId": 2
+}

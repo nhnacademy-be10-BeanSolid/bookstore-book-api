@@ -31,12 +31,6 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.OK).body(naverBookSearchService.searchBook(query, start));
     }
 
-//    @GetMapping("/books")
-//    public ResponseEntity<BookSearchResponse> getBookDetails(@RequestParam Long bookId) {
-//
-//        return null;
-//    }
-
     @GetMapping("/books/{isbn}")
     public ResponseEntity<BookDetailResponse> getBook(@PathVariable String isbn) {
 //        BookResponse response = bookService.getBook(isbn);
