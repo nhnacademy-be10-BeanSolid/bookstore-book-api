@@ -1,9 +1,10 @@
-package com.nhnacademy.bookapi.bookcategory.service;
+package com.nhnacademy.bookapi.bookcategory.service.impl;
 
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryAlreadyExistsException;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
+import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

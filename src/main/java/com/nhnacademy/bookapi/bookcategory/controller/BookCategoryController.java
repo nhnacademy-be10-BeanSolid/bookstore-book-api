@@ -1,9 +1,9 @@
 package com.nhnacademy.bookapi.bookcategory.controller;
 
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
-import com.nhnacademy.bookapi.bookcategory.domain.BookCategoryCreateRequest;
-import com.nhnacademy.bookapi.bookcategory.domain.BookCategoryResponse;
-import com.nhnacademy.bookapi.bookcategory.domain.BookCategoryUpdateRequest;
+import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
+import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
+import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;

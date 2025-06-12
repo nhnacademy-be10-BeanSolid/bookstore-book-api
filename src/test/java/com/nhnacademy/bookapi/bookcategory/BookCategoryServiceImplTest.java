@@ -4,7 +4,7 @@ import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryAlreadyExistsException;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
-import com.nhnacademy.bookapi.bookcategory.service.BookCategoryServiceImpl;
+import com.nhnacademy.bookapi.bookcategory.service.impl.BookCategoryServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
