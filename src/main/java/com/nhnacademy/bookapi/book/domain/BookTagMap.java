@@ -1,6 +1,5 @@
-package com.nhnacademy.bookapi.booktagmap.domain;
+package com.nhnacademy.bookapi.book.domain;
 
-import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -26,9 +25,11 @@ public class BookTagMap {
     Book book;
 
     @ManyToOne
-    @JoinColumn(name = "book_tag_id")
+    @JoinColumn(name = "tag_id")
     BookTag tag;
 
-
-
+    public BookTagMap(Book book, BookTag tag) {
+        this.book = book;
+        this.tag = tag;
+    }
 }
