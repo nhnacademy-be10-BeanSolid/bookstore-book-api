@@ -4,6 +4,7 @@ import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import com.nhnacademy.bookapi.booktag.exception.BookTagAlreadyExistsException;
 import com.nhnacademy.bookapi.booktag.exception.BookTagNotFoundException;
 import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
+import com.nhnacademy.bookapi.booktag.service.impl.BookTagServiceImpl;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

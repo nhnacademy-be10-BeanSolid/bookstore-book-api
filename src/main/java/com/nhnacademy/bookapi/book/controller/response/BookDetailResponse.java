@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookResponse {
+public class BookDetailResponse {
 
     private Long id;
     private String title;
@@ -41,9 +41,15 @@ public class BookResponse {
     private BookStatus Status;
     private int stock;
 
-    public static BookResponse of(Book book) {
+    private Set<String> bookTags;
 
-        return new BookResponse(book.getId(),
+    public static BookDetailResponse of(Book book) {
+        Set<String> tags = book.getBookTags()
+                .stream()
+                .map(BookTag::getName)
+                .collect(Collectors.toSet());
+
+        return new BookDetailResponse(book.getId(),
                 book.getTitle(),
                 book.getDescription(),
                 book.getToc(),
@@ -57,7 +63,9 @@ public class BookResponse {
                 book.getCreateAt(),
                 book.getUpdateAt(),
                 book.getStatus(),
-                book.getStock());
+                book.getStock(),
+                tags);
     }
 
 }
+

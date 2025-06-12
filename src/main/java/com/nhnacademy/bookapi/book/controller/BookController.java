@@ -2,6 +2,7 @@ package com.nhnacademy.bookapi.book.controller;
 
 import com.nhnacademy.bookapi.book.controller.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.controller.request.BookUpdateRequest;
+import com.nhnacademy.bookapi.book.controller.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.controller.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.BookSearchResponse;
 import com.nhnacademy.bookapi.book.exception.ValidationFailedException;
@@ -23,17 +24,25 @@ public class BookController {
     private final BookService bookService;
     private final BookSearchApiService naverBookSearchService;
 
-    @GetMapping("/books")
+    @GetMapping("/books-search")
     public ResponseEntity<BookSearchResponse> searchBook(
             @RequestParam String query,
             @RequestParam(defaultValue = "1") int start) {
         return ResponseEntity.status(HttpStatus.OK).body(naverBookSearchService.searchBook(query, start));
     }
 
+//    @GetMapping("/books")
+//    public ResponseEntity<BookSearchResponse> getBookDetails(@RequestParam Long bookId) {
+//
+//        return null;
+//    }
+
     @GetMapping("/books/{isbn}")
-    public ResponseEntity<BookResponse> getBook(@PathVariable String isbn) {
-        BookResponse response = bookService.getBook(isbn);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public ResponseEntity<BookDetailResponse> getBook(@PathVariable String isbn) {
+//        BookResponse response = bookService.getBook(isbn);
+//        return ResponseEntity.status(HttpStatus.OK).body(response);
+        BookDetailResponse bookDetailResponse = bookService.getBookDetail(isbn);
+        return ResponseEntity.status(HttpStatus.OK).body(bookDetailResponse);
     }
 
     @GetMapping("/authors/{author}")

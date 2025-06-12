@@ -2,6 +2,7 @@ package com.nhnacademy.bookapi.book.service.impl;
 
 import com.nhnacademy.bookapi.book.controller.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.controller.request.BookUpdateRequest;
+import com.nhnacademy.bookapi.book.controller.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.controller.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
@@ -49,6 +50,14 @@ public class BookServiceImpl implements BookService {
         Book savedBook = bookRepository.save(book);
 
         return BookResponse.of(savedBook);
+    }
+
+    // 도서 상세정보
+    @Override
+    public BookDetailResponse getBookDetail(String isbn) {
+        Book book = bookRepository.findByIsbn(isbn)
+                .orElseThrow(() -> new BookNotFoundException(isbn));
+        return BookDetailResponse.of(book);
     }
 
     // 국제표준도서번호로 도서 찾기

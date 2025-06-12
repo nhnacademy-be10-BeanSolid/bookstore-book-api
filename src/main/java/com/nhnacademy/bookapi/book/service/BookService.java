@@ -2,6 +2,7 @@ package com.nhnacademy.bookapi.book.service;
 
 import com.nhnacademy.bookapi.book.controller.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.controller.request.BookUpdateRequest;
+import com.nhnacademy.bookapi.book.controller.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.controller.response.BookResponse;
 
 import java.util.List;
@@ -9,6 +10,8 @@ import java.util.List;
 public interface BookService {
 
     BookResponse createBook(BookCreateRequest request);
+
+    BookDetailResponse getBookDetail(String isbn);
 
     BookResponse getBook(String isbn);
 

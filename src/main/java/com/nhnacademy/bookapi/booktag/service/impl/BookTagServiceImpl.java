@@ -1,9 +1,10 @@
-package com.nhnacademy.bookapi.booktag.service;
+package com.nhnacademy.bookapi.booktag.service.impl;
 
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import com.nhnacademy.bookapi.booktag.exception.BookTagAlreadyExistsException;
 import com.nhnacademy.bookapi.booktag.exception.BookTagNotFoundException;
 import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
+import com.nhnacademy.bookapi.booktag.service.BookTagService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
