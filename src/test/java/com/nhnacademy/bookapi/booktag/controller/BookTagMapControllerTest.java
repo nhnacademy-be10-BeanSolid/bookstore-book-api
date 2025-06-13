@@ -61,7 +61,6 @@ class BookTagMapControllerTest {
                 .andExpect(status().isBadRequest());
     }
 
-
     @Test
     @DisplayName("DELETE /books/{bookId}/tags/{tagId}")
     void deleteBookTagMapTest() throws Exception {
