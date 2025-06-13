@@ -29,7 +29,7 @@ public class BookLikeServiceImpl implements BookLikeService {
     // 도서 좋아요 생성
     @Override
     public BookLikeResponse createBookLike(Long bookId, BookLikeCreateRequest request) {
-        String userId = request.getUserId();
+        String userId = request.userId();
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException(bookId));
 
         if(bookLikeRepository.existsByUserIdAndBookId(userId, bookId)) {

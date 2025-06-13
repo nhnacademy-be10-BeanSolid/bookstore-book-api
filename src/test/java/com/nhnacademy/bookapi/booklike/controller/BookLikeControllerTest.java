@@ -97,6 +97,17 @@ class BookLikeControllerTest {
     }
 
     @Test
+    @DisplayName("POST /books/{bookId}/bookLikes - 유효성 검사 실패")
+    void createBookLikeValidFailTest() throws Exception {
+        BookLikeCreateRequest request = new BookLikeCreateRequest(null);
+
+        mockMvc.perform(post("/books/1/bookLikes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("DELETE /books/{bookId}/bookLikes")
     void deleteBookLikeTest() throws Exception {
         doNothing().when(bookLikeService).deleteBookLikeByBookId(book.getId());

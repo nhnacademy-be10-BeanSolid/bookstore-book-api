@@ -73,8 +73,8 @@ class BookLikeServiceImplTest {
         BookLikeResponse response = bookLikeService.createBookLike(book.getId(), request);
 
         assertThat(response).isNotNull();
-        assertThat(response.getBookId()).isEqualTo(book.getId());
-        assertThat(response.getUserId()).isEqualTo(userId);
+        assertThat(response.bookId()).isEqualTo(book.getId());
+        assertThat(response.userId()).isEqualTo(userId);
     }
 
     @Test
