@@ -6,7 +6,6 @@ import com.nhnacademy.bookapi.book.controller.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.controller.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.controller.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.Book;
-import com.nhnacademy.bookapi.book.domain.BookItem;
 import com.nhnacademy.bookapi.book.domain.BookSearchResponse;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.service.BookSearchApiService;
@@ -16,17 +15,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -41,10 +40,10 @@ public class BookControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @MockBean
     BookService bookService;
 
-    @MockitoBean
+    @MockBean
     BookSearchApiService bookSearchService;
 
     Book book;
