@@ -30,8 +30,8 @@ public class BookLikeController {
     }
 
     @PostMapping("/books/{bookId}/bookLikes")
-    public ResponseEntity<BookLikeResponse> createBookLike(@RequestBody BookLikeCreateRequest request) {
-        BookLikeResponse response = bookLikeService.createBookLike(request);
+    public ResponseEntity<BookLikeResponse> createBookLike(@PathVariable Long bookId, @RequestBody BookLikeCreateRequest request) {
+        BookLikeResponse response = bookLikeService.createBookLike(bookId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 

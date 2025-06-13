@@ -75,7 +75,7 @@ public class BookServiceImpl implements BookService {
         if(books.isEmpty()) {
             throw new AuthorNotFoundException(author);
         }
-        return books.stream().map(BookDetailResponse::of).collect(Collectors.toList());
+        return books.stream().map(BookDetailResponse::of).toList();
     }
 
     // 출판사로 도서 찾기
@@ -85,7 +85,7 @@ public class BookServiceImpl implements BookService {
         if(books.isEmpty()) {
             throw new PublisherNotFoundException(publisher);
         }
-        return books.stream().map(BookDetailResponse::of).collect(Collectors.toList());
+        return books.stream().map(BookDetailResponse::of).toList();
     }
 
     // 도서 업데이트

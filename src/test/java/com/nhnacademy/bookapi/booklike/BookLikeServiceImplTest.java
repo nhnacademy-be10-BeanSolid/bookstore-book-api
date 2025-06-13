@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -47,18 +48,19 @@ public class BookLikeServiceImplTest {
         userId = "userId";
         book = new Book("타이틀", "설명", "목차", "출판사", "작가",
                 LocalDate.now(), "test000000000", 10000, 5000, false, 100);
+        ReflectionTestUtils.setField(book, "id", 1L);
         bookLike = new BookLike(userId, book);
     }
 
     @Test
     @DisplayName("좋아요 생성 성공")
     void createBookLikeSuccessTest() {
-        BookLikeCreateRequest request = new BookLikeCreateRequest(userId, book.getId());
+        BookLikeCreateRequest request = new BookLikeCreateRequest(userId);
 
         when(bookRepository.findById(book.getId())).thenReturn(Optional.ofNullable(book));
         when(bookLikeRepository.existsByUserIdAndBookId(userId, book.getId())).thenReturn(false);
 
-        BookLikeResponse response = bookLikeService.createBookLike(request);
+        BookLikeResponse response = bookLikeService.createBookLike(book.getId(), request);
 
         assertThat(response).isNotNull();
         assertThat(response.getBookId()).isEqualTo(book.getId());
@@ -68,13 +70,13 @@ public class BookLikeServiceImplTest {
     @Test
     @DisplayName("좋아요 생성 실패")
     void createBookLikeFailTest() {
-        BookLikeCreateRequest request = new BookLikeCreateRequest(userId, book.getId());
+        BookLikeCreateRequest request = new BookLikeCreateRequest(userId);
 
         when(bookRepository.findById(book.getId())).thenReturn(Optional.ofNullable(book));
         when(bookLikeRepository.existsByUserIdAndBookId(userId, book.getId())).thenReturn(true);
 
         assertThrows(BookLikeAlreadyExistsException.class,
-                () -> bookLikeService.createBookLike(request));
+                () -> bookLikeService.createBookLike(book.getId(), request));
     }
 
     @Test
