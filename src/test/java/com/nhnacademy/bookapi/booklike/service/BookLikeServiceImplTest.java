@@ -75,7 +75,8 @@ class BookLikeServiceImplTest {
         when(bookRepository.findById(book.getId())).thenReturn(Optional.ofNullable(book));
         when(bookLikeRepository.existsByUserIdAndBookId(userId, book.getId())).thenReturn(true);
 
-        assertThrows(BookLikeAlreadyExistsException.class, () -> bookLikeService.createBookLike(book.getId(), request));
+        assertThrows(BookLikeAlreadyExistsException.class,
+                () -> bookLikeService.createBookLike(book.getId(), request));
     }
 
     @Test
@@ -106,7 +107,8 @@ class BookLikeServiceImplTest {
     void getBookLikeByBookIdFailTest() {
         when(bookLikeRepository.existsByBookId(book.getId())).thenReturn(false);
 
-        assertThrows(BookNotFoundException.class, () -> bookLikeService.getBookLikesByBookId(book.getId()));
+        assertThrows(BookNotFoundException.class,
+                () -> bookLikeService.getBookLikesByBookId(book.getId()));
     }
 
     @Test
@@ -127,7 +129,8 @@ class BookLikeServiceImplTest {
         Long bookId = book.getId();
         when(bookLikeRepository.existsByUserIdAndBookId(userId, bookId)).thenReturn(false);
 
-        assertThrows(BookLikeNotExistsException.class, () -> bookLikeService.deleteBookLikeByUserIdAndBookId(userId, bookId));
+        assertThrows(BookLikeNotExistsException.class,
+                () -> bookLikeService.deleteBookLikeByUserIdAndBookId(userId, bookId));
     }
 
     @Test
@@ -150,6 +153,7 @@ class BookLikeServiceImplTest {
         when(bookRepository.existsById(book.getId())).thenReturn(true);
         when(bookLikeRepository.existsByBookId(bookId)).thenReturn(false);
 
-        assertThrows(BookLikeNotExistsException.class, () -> bookLikeService.deleteBookLikeByBookId(bookId));
+        assertThrows(BookLikeNotExistsException.class,
+                () -> bookLikeService.deleteBookLikeByBookId(bookId));
     }
 }
