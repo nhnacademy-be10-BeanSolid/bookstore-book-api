@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.bookcategory;
+package com.nhnacademy.bookapi.bookcategory.service;
 
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class BookCategoryMapServiceImplTest {
+class BookCategoryMapServiceImplTest {
 
     @Mock
     BookRepository bookRepository;

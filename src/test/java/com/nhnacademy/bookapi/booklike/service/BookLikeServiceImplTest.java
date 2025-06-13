@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.booklike;
+package com.nhnacademy.bookapi.booklike.service;
 
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class BookLikeServiceImplTest {
+class BookLikeServiceImplTest {
 
     @Mock
     private BookLikeRepository bookLikeRepository;
@@ -75,8 +75,7 @@ public class BookLikeServiceImplTest {
         when(bookRepository.findById(book.getId())).thenReturn(Optional.ofNullable(book));
         when(bookLikeRepository.existsByUserIdAndBookId(userId, book.getId())).thenReturn(true);
 
-        assertThrows(BookLikeAlreadyExistsException.class,
-                () -> bookLikeService.createBookLike(book.getId(), request));
+        assertThrows(BookLikeAlreadyExistsException.class, () -> bookLikeService.createBookLike(book.getId(), request));
     }
 
     @Test
@@ -107,8 +106,7 @@ public class BookLikeServiceImplTest {
     void getBookLikeByBookIdFailTest() {
         when(bookLikeRepository.existsByBookId(book.getId())).thenReturn(false);
 
-        assertThrows(BookNotFoundException.class,
-                () -> bookLikeService.getBookLikesByBookId(book.getId()));
+        assertThrows(BookNotFoundException.class, () -> bookLikeService.getBookLikesByBookId(book.getId()));
     }
 
     @Test
@@ -129,8 +127,7 @@ public class BookLikeServiceImplTest {
         Long bookId = book.getId();
         when(bookLikeRepository.existsByUserIdAndBookId(userId, bookId)).thenReturn(false);
 
-        assertThrows(BookLikeNotExistsException.class,
-                () -> bookLikeService.deleteBookLikeByUserIdAndBookId(userId, bookId));
+        assertThrows(BookLikeNotExistsException.class, () -> bookLikeService.deleteBookLikeByUserIdAndBookId(userId, bookId));
     }
 
     @Test
@@ -153,7 +150,6 @@ public class BookLikeServiceImplTest {
         when(bookRepository.existsById(book.getId())).thenReturn(true);
         when(bookLikeRepository.existsByBookId(bookId)).thenReturn(false);
 
-        assertThrows(BookLikeNotExistsException.class,
-                () -> bookLikeService.deleteBookLikeByBookId(bookId));
+        assertThrows(BookLikeNotExistsException.class, () -> bookLikeService.deleteBookLikeByBookId(bookId));
     }
 }

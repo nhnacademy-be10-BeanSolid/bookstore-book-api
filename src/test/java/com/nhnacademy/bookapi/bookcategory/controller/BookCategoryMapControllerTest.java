@@ -1,7 +1,6 @@
-package com.nhnacademy.bookapi.bookcategory;
+package com.nhnacademy.bookapi.bookcategory.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.bookapi.bookcategory.controller.BookCategoryMapController;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryMapCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryMapService;
@@ -22,7 +21,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookCategoryMapController.class)
-public class BookCategoryMapControllerTest {
+class BookCategoryMapControllerTest {
 
     @Autowired
     MockMvc mockMvc;

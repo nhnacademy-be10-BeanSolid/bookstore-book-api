@@ -1,7 +1,6 @@
-package com.nhnacademy.bookapi.book;
+package com.nhnacademy.bookapi.book.service;
 
 import com.nhnacademy.bookapi.book.domain.BookSearchResponse;
-import com.nhnacademy.bookapi.book.service.BookSearchApiService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -19,7 +18,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class BookSearchApiServiceTest {
+class BookSearchApiServiceTest {
 
     @Mock
     RestTemplate restTemplate;

@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.book;
+package com.nhnacademy.bookapi.book.service;
 
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class BookServiceImplTest {
+class BookServiceImplTest {
 
     @Mock
     private BookRepository bookRepository;

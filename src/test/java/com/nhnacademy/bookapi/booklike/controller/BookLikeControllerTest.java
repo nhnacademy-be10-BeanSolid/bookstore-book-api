@@ -1,8 +1,7 @@
-package com.nhnacademy.bookapi.booklike;
+package com.nhnacademy.bookapi.booklike.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.bookapi.book.domain.Book;
-import com.nhnacademy.bookapi.booklike.controller.BookLikeController;
 import com.nhnacademy.bookapi.booklike.domain.request.BookLikeCreateRequest;
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 import com.nhnacademy.bookapi.booklike.domain.BookLike;
@@ -30,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookLikeController.class)
-public class BookLikeControllerTest {
+class BookLikeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

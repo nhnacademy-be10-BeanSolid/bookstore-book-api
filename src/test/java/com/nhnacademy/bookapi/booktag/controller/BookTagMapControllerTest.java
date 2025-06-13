@@ -20,7 +20,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookTagMapController.class)
-public class BookTagMapControllerTest {
+class BookTagMapControllerTest {
 
     @Autowired
     MockMvc mockMvc;
