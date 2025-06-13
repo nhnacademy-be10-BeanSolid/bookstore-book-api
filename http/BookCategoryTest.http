@@ -1,16 +1,16 @@
 ### 카테고리 전체 조회
 GET /categories HTTP/1.1
-Host: localhost:8080
+Host: localhost:10346
 Accept: application/json
 
 ### 단일 카테고리 조회
 GET /categories/1 HTTP/1.1
-Host:localhost:8080
+Host:localhost:10346
 Accept: application/json
 
 ### 카테고리 생성 (부모 카테고리가 없는 최상위 카테고리 생성)
 POST /categories HTTP/1.1
-Host: localhost:8080
+Host: localhost:10346
 Content-Type: application/json
 
 {
@@ -19,7 +19,7 @@ Content-Type: application/json
 
 ### 부모 카테고리가 있는 하위 카테고리 생성(예: parentId가 1)
 POST /categories HTTP/1.1
-Host: localhost:8080
+Host: localhost:10346
 Content-Type: application/json
 
 {
@@ -29,7 +29,7 @@ Content-Type: application/json
 
 ### 카테고리 수정
 PATCH /categories/1 HTTP/1.1
-Host: localhost:8080
+Host: localhost:10346
 Content-Type: application/json
 
 {
@@ -39,10 +39,10 @@ Content-Type: application/json
 
 ### 카테고리 삭제
 DELETE /categories/1 HTTP/1.1
-Host: localhost:8080
+Host: localhost:10346
 
 ### 도서에 카테고리 추가
-POST http://localhost:8080/books/1/categories
+POST http://localhost:10346/books/1/categories
 Content-Type: application/json
 
 {

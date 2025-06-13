@@ -6,10 +6,8 @@ import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
-import com.nhnacademy.bookapi.book.exception.AuthorNotFoundException;
 import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
-import com.nhnacademy.bookapi.book.exception.PublisherNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.book.service.BookService;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -72,9 +69,6 @@ public class BookServiceImpl implements BookService {
     @Transactional(readOnly = true)
     public List<BookDetailResponse> getBooksByAuthor(String author) {
         List<Book> books = bookRepository.findByAuthor(author);
-        if(books.isEmpty()) {
-            throw new AuthorNotFoundException(author);
-        }
         return books.stream().map(BookDetailResponse::of).toList();
     }
 
@@ -82,9 +76,6 @@ public class BookServiceImpl implements BookService {
     @Override
     public List<BookDetailResponse> getBooksByPublisher(String publisher) {
         List<Book> books = bookRepository.findByPublisher(publisher);
-        if(books.isEmpty()) {
-            throw new PublisherNotFoundException(publisher);
-        }
         return books.stream().map(BookDetailResponse::of).toList();
     }
 
