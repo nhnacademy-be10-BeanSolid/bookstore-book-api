@@ -5,7 +5,7 @@ import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.BookSearchResponse;
-import com.nhnacademy.bookapi.book.exception.ValidationFailedException;
+import com.nhnacademy.bookapi.advice.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.book.service.BookSearchApiService;
 import jakarta.validation.Valid;

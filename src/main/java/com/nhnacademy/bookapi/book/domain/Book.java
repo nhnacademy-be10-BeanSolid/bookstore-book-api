@@ -3,16 +3,14 @@ package com.nhnacademy.bookapi.book.domain;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+@Builder
 @Getter
 @Setter
 @Entity
@@ -55,19 +53,21 @@ public class Book {
     private boolean wrappable;
 
     @Column(name = "create_at", nullable = false)
-    private LocalDateTime createAt;
+    @Builder.Default
+    private LocalDateTime createAt = LocalDateTime.now();
 
     @Column(name = "updated_at")
-
     private LocalDateTime updateAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private BookStatus status;
+    @Builder.Default
+    private BookStatus status = BookStatus.ON_SALE;
 
     @Column(nullable = false)
     private int stock;
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "book_tag_map",
@@ -76,6 +76,7 @@ public class Book {
     )
     private Set<BookTag> bookTags = new HashSet<>();
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "book_category_map",
@@ -83,21 +84,4 @@ public class Book {
             inverseJoinColumns = @JoinColumn(name = "category_id")
     )
     private Set<BookCategory> bookCategories = new HashSet<>();
-
-    public Book(String title, String description, String toc, String publisher, String author, LocalDate publishedDate,
-                String isbn, int originalPrice, int salePrice, boolean wrappable, int stock) {
-        this.title = title;
-        this.description = description;
-        this.toc = toc;
-        this.publisher = publisher;
-        this.author = author;
-        this.publishedDate = publishedDate;
-        this.isbn = isbn;
-        this.originalPrice = originalPrice;
-        this.salePrice = salePrice;
-        this.wrappable = wrappable;
-        this.createAt = LocalDateTime.now();
-        this.status = BookStatus.ON_SALE;
-        this.stock = stock;
-    }
 }

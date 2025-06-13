@@ -1,13 +1,10 @@
 package com.nhnacademy.bookapi.booktag.domain.request;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import jakarta.validation.constraints.NotNull;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class BookTagMapCreateRequest {
+public record BookTagMapCreateRequest (
+        @NotNull
+        Long tagId
+)
+{}
 
-    private Long tagId;
-}
