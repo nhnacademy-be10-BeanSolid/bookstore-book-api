@@ -79,6 +79,17 @@ class BookTagControllerTest {
     }
 
     @Test
+    @DisplayName("POST /book-tags - 생성 유효성 검사 실패")
+    void createBookTagValidFailTest() throws Exception {
+        BookTagCreateRequest request = new BookTagCreateRequest(null);
+
+        mockMvc.perform(post("/book-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("PATCH /book-tags/{tagId} - 수정")
     void updateBookTag() throws Exception {
         BookTagUpdateRequest request = new BookTagUpdateRequest("tag2");
@@ -93,6 +104,17 @@ class BookTagControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tagId").value(1L))
                 .andExpect(jsonPath("$.name").value("tag2"));
+    }
+
+    @Test
+    @DisplayName("PATCH /book-tags/{tagId} - 수정 유효성 검사 실패")
+    void updateBookTagValidFailTest() throws Exception {
+        BookTagUpdateRequest request = new BookTagUpdateRequest(null);
+
+        mockMvc.perform(patch("/book-tags/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
