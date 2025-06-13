@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.bookcategory.controller;
 
+import com.nhnacademy.bookapi.advice.ValidationFailedException;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
@@ -8,6 +9,7 @@ import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -40,7 +42,12 @@ public class BookCategoryController {
     }
 
     @PostMapping
-    public ResponseEntity<BookCategoryResponse> createCategory(@Valid @RequestBody BookCategoryCreateRequest request) {
+    public ResponseEntity<BookCategoryResponse> createCategory(@Valid @RequestBody BookCategoryCreateRequest request,
+                                                               BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationFailedException();
+        }
+
         BookCategory parentCategory = getParentCategory(request.parentId());
         BookCategory bookCategory = new BookCategory(request.name(), parentCategory);
 
@@ -54,7 +61,13 @@ public class BookCategoryController {
     }
 
     @PatchMapping("/{categoryId}")
-    public ResponseEntity<BookCategoryResponse> updateCategory(@PathVariable("categoryId") Long categoryId, @Valid @RequestBody BookCategoryUpdateRequest request) {
+    public ResponseEntity<BookCategoryResponse> updateCategory(@PathVariable("categoryId") Long categoryId,
+                                                               @Valid @RequestBody BookCategoryUpdateRequest request,
+                                                               BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationFailedException();
+        }
+
         BookCategory parentCategory = getParentCategory(request.parentId());
         BookCategory bookCategory = new BookCategory(request.name(), parentCategory);
         BookCategory updatedBookCategory = bookCategoryService.updateCategory(categoryId, bookCategory);
