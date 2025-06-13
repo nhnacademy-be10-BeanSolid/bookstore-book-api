@@ -51,6 +51,18 @@ class BookTagMapControllerTest {
     }
 
     @Test
+    @DisplayName("POST /books/{bookId}/tags")
+    void createBookTagMapValidFailTest() throws Exception {
+        BookTagMapCreateRequest request = new BookTagMapCreateRequest(null);
+
+        mockMvc.perform(post("/books/{bookId}/tags", bookId)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
     @DisplayName("DELETE /books/{bookId}/tags/{tagId}")
     void deleteBookTagMapTest() throws Exception {
         doNothing().when(bookTagMapService).deleteBookTag(bookId, tagId);

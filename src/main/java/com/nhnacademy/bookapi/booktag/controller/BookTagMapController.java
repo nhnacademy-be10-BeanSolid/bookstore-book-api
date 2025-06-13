@@ -1,11 +1,14 @@
 package com.nhnacademy.bookapi.booktag.controller;
 
+import com.nhnacademy.bookapi.advice.ValidationFailedException;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagMapCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.nhnacademy.bookapi.booktag.service.BookTagMapService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,7 +20,11 @@ public class BookTagMapController {
 
     @PostMapping
     public ResponseEntity<BookTagMapResponse> createBookTagMap(@PathVariable Long bookId,
-                                                               @RequestBody BookTagMapCreateRequest request) {
+                                                               @Valid @RequestBody BookTagMapCreateRequest request,
+                                                               BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationFailedException();
+        }
         BookTagMapResponse response = bookTagMapService.createBookTag(bookId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }

@@ -51,8 +51,19 @@ class BookControllerTest {
 
     @BeforeEach
     void setUp() {
-        book = new Book("타이틀", "설명", "목차", "출판사", "작가",
-                LocalDate.now(), "test000000000", 10000, 5000, false, 100);
+        book = Book.builder()
+                .title("타이틀")
+                .description("설명")
+                .toc("목차")
+                .publisher("출판사")
+                .author("작가")
+                .publishedDate(LocalDate.now())
+                .isbn("test000000000")
+                .originalPrice(10000)
+                .salePrice(5000)
+                .wrappable(false)
+                .stock(100)
+                .build();
         ReflectionTestUtils.setField(book, "id", 1L);
     }
 

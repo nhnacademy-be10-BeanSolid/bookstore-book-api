@@ -1,4 +1,11 @@
 package com.nhnacademy.bookapi.booktag.domain.request;
 
-public record BookTagCreateRequest(String name) {
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public record BookTagCreateRequest(
+        @NotBlank
+        @Size(max = 50)
+        String name
+) {
 }

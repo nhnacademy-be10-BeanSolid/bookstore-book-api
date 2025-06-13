@@ -31,18 +31,19 @@ public class BookServiceImpl implements BookService {
             throw new BookAlreadyExistsException(request.getIsbn());
         }
 
-        Book book = new Book(request.getTitle(),
-                request.getDescription(),
-                request.getToc(),
-                request.getPublisher(),
-                request.getAuthor(),
-                request.getPublishedDate(),
-                request.getIsbn(),
-                request.getOriginalPrice(),
-                request.getSalePrice(),
-                request.getWrappable(),
-                request.getStock()
-                );
+        Book book = Book.builder()
+                .title(request.getTitle())
+                .description(request.getDescription())
+                .toc(request.getToc())
+                .publisher(request.getPublisher())
+                .author(request.getAuthor())
+                .publishedDate(request.getPublishedDate())
+                .isbn(request.getIsbn())
+                .originalPrice(request.getOriginalPrice())
+                .salePrice(request.getSalePrice())
+                .wrappable(request.getWrappable())
+                .stock(request.getStock())
+                .build();
         Book savedBook = bookRepository.save(book);
         return BookResponse.of(savedBook);
     }
