@@ -63,8 +63,8 @@ class BookTagMapServiceImplTest {
 
         BookTagMapResponse response = bookTagMapService.createBookTag(bookId, request);
 
-        assertEquals(bookId, response.getBookId());
-        assertEquals(tagId, response.getTagId());
+        assertEquals(bookId, response.bookId());
+        assertEquals(tagId, response.tagId());
     }
 
     @Test
