@@ -5,8 +5,8 @@ import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagMapCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
-import com.nhnacademy.bookapi.booktag.exception.BookTagMappingAlreadyExistsException;
-import com.nhnacademy.bookapi.booktag.exception.BookTagMappingNotFoundException;
+import com.nhnacademy.bookapi.booktag.exception.BookTagMapAlreadyExistsException;
+import com.nhnacademy.bookapi.booktag.exception.BookTagMapNotFoundException;
 import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
 import com.nhnacademy.bookapi.booktag.service.impl.BookTagMapServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -68,8 +68,8 @@ public class BookTagMapServiceImplTest {
     }
 
     @Test
-    @DisplayName("도서에 태그 추가 - 이미 태그가 존재하는 경우")
-    void createBookTagFailTest(){
+    @DisplayName("도서에 태그 추가 - 해당 태그가 존재하는 경우")
+    void createBookTagExceptionTest(){
         Long bookId = book.getId();
         Long tagId = tag.getTagId();
 
@@ -82,7 +82,7 @@ public class BookTagMapServiceImplTest {
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookTagRepository.findById(tagId)).thenReturn(Optional.of(tag));
 
-        assertThrows(BookTagMappingAlreadyExistsException.class,
+        assertThrows(BookTagMapAlreadyExistsException.class,
                 () -> bookTagMapService.createBookTag(bookId, request));
     }
 
@@ -106,14 +106,14 @@ public class BookTagMapServiceImplTest {
 
     @Test
     @DisplayName("도서 태그 삭제 - 태그가 존재하지 않은 경우")
-    void deleteBookTagFailTest(){
+    void deleteBookTagExceptionTest(){
         Long bookId = book.getId();
         Long tagId = tag.getTagId();
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookTagRepository.findById(tagId)).thenReturn(Optional.of(tag));
 
-        assertThrows(BookTagMappingNotFoundException.class,
+        assertThrows(BookTagMapNotFoundException.class,
                 () -> bookTagMapService.deleteBookTag(bookId, tagId));
     }
 }

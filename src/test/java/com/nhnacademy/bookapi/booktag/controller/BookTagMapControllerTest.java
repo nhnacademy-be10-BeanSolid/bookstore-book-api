@@ -8,8 +8,8 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.mockito.BDDMockito.given;
@@ -25,7 +25,7 @@ public class BookTagMapControllerTest {
     @Autowired
     MockMvc mockMvc;
 
-    @MockitoBean
+    @MockBean
     BookTagMapService bookTagMapService;
 
     @Autowired
@@ -37,9 +37,9 @@ public class BookTagMapControllerTest {
     @Test
     @DisplayName("POST /books/{bookId}/tags")
     void createBookTagMapTest() throws Exception {
-
         BookTagMapCreateRequest request = new BookTagMapCreateRequest(tagId);
         BookTagMapResponse response = new BookTagMapResponse(bookId, tagId);
+
         given(bookTagMapService.createBookTag(bookId, request)).willReturn(response);
 
         mockMvc.perform(post("/books/{bookId}/tags", bookId)

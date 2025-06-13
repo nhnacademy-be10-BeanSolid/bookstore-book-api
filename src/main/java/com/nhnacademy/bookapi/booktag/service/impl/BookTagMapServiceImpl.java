@@ -6,8 +6,8 @@ import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagMapCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
-import com.nhnacademy.bookapi.booktag.exception.BookTagMappingAlreadyExistsException;
-import com.nhnacademy.bookapi.booktag.exception.BookTagMappingNotFoundException;
+import com.nhnacademy.bookapi.booktag.exception.BookTagMapAlreadyExistsException;
+import com.nhnacademy.bookapi.booktag.exception.BookTagMapNotFoundException;
 import com.nhnacademy.bookapi.booktag.exception.BookTagNotFoundException;
 import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
 import com.nhnacademy.bookapi.booktag.service.BookTagMapService;
@@ -34,7 +34,7 @@ public class BookTagMapServiceImpl implements BookTagMapService {
                 .orElseThrow(() -> new BookTagNotFoundException(request.getTagId()));
 
         if (book.getBookTags().contains(bookTag)) {
-            throw new BookTagMappingAlreadyExistsException(bookId, request.getTagId());
+            throw new BookTagMapAlreadyExistsException(bookId, request.getTagId());
         }
 
         book.getBookTags().add(bookTag);
@@ -53,7 +53,7 @@ public class BookTagMapServiceImpl implements BookTagMapService {
                 .orElseThrow(() -> new BookTagNotFoundException(tagId));
 
         if (!book.getBookTags().contains(bookTag)) {
-            throw new BookTagMappingNotFoundException(bookId, tagId);
+            throw new BookTagMapNotFoundException(bookId, tagId);
         }
 
         book.getBookTags().remove(bookTag);

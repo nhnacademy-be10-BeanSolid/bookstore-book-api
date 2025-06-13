@@ -23,8 +23,8 @@ public class BookCategoryMapController {
     }
 
     @DeleteMapping("/{categoryId}")
-    public ResponseEntity<Void> deleteCategory(@PathVariable Long bookId, @PathVariable Long categoryId) {
-        bookCategoryMapService.deleteCategory(bookId, categoryId);
+    public ResponseEntity<Void> deleteCategoryMap(@PathVariable Long bookId, @PathVariable Long categoryId) {
+        bookCategoryMapService.deleteCategoryMap(bookId, categoryId);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

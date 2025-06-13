@@ -1,7 +1,7 @@
 package com.nhnacademy.bookapi.booklike.service;
 
-import com.nhnacademy.bookapi.booklike.controller.request.BookLikeCreateRequest;
-import com.nhnacademy.bookapi.booklike.controller.response.BookLikeResponse;
+import com.nhnacademy.bookapi.booklike.domain.request.BookLikeCreateRequest;
+import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 
 import java.util.List;
 

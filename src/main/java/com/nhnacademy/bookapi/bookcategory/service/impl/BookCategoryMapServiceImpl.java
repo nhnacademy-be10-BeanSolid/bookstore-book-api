@@ -6,6 +6,8 @@ import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryMapCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
+import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapAlreadyExistsException;
+import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryMapService;
@@ -31,6 +33,10 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
         BookCategory category = bookCategoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> new BookCategoryNotFoundException(request.categoryId()));
 
+        if (book.getBookCategories().contains(category)) {
+            throw new BookCategoryMapAlreadyExistsException(bookId, request.categoryId());
+        }
+
         book.getBookCategories().add(category);
         bookRepository.save(book);
 
@@ -39,12 +45,16 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
 
     // 도서에서 카테고리 삭제
     @Override
-    public void deleteCategory(Long bookId, Long categoryId) {
+    public void deleteCategoryMap (Long bookId, Long categoryId) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
 
         BookCategory category = bookCategoryRepository.findById(categoryId)
                 .orElseThrow(() -> new BookCategoryNotFoundException(categoryId));
+
+        if (!book.getBookCategories().contains(category)) {
+            throw new BookCategoryMapNotFoundException(bookId, categoryId);
+        }
 
         book.getBookCategories().remove(category);
         bookRepository.save(book);
