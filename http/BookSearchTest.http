@@ -1,8 +1,8 @@
 ### 외부 api 사용해서 책 검색
-GET http://localhost:8080/books?query=novel
+GET http://localhost:10346/books-search?query=novel
 
 ### 외부 api 사용해서 책 검색
-GET http://localhost:8080/books?query=추리소설
+GET http://localhost:10346/books-search?query=추리소설
 
 ### 외부 api 사용해서 책 검색
-GET http://localhost:8080/books?query=추리소설&start=5
+GET http://localhost:10346/books-search?query=추리소설&start=5

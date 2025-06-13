@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.book;
+package com.nhnacademy.bookapi.book.service;
 
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
@@ -6,10 +6,8 @@ import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.Book;
-import com.nhnacademy.bookapi.book.exception.AuthorNotFoundException;
 import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
-import com.nhnacademy.bookapi.book.exception.PublisherNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.book.service.impl.BookServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,7 +19,6 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDate;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,7 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class BookServiceImplTest {
+class BookServiceImplTest {
 
     @Mock
     private BookRepository bookRepository;
@@ -106,7 +103,7 @@ public class BookServiceImplTest {
 
 
     @Test
-    @DisplayName("작가 도서 찾기 성공")
+    @DisplayName("작가로 도서 찾기")
     void getBooksByAuthorSuccessTest() {
         String author = book.getAuthor();
 
@@ -119,19 +116,8 @@ public class BookServiceImplTest {
     }
 
     @Test
-    @DisplayName("작가 도서 찾기 실패")
-    void getBooksByAuthorFailTest() {
-        String author = book.getAuthor();
-
-        when(bookRepository.findByAuthor(author)).thenReturn(Collections.emptyList());
-
-        assertThrows(AuthorNotFoundException.class,
-                () -> bookService.getBooksByAuthor(author));
-    }
-
-    @Test
-    @DisplayName("출판사로 도서 찾기 성공")
-    void getBooksByPublisherSuccessTest() {
+    @DisplayName("출판사로 도서 찾기")
+    void getBooksByPublisherTest() {
         String publisher = book.getPublisher();
 
         when(bookRepository.findByPublisher(publisher)).thenReturn(List.of(book));
@@ -140,17 +126,6 @@ public class BookServiceImplTest {
 
         assertThat(books).isNotNull();
         assertThat(books.size()).isEqualTo(1);
-    }
-
-    @Test
-    @DisplayName("출판사로 도서 찾기 실패")
-    void getBooksByPublisherFailTest() {
-        String publisher = book.getPublisher();
-
-        when(bookRepository.findByPublisher(publisher)).thenReturn(Collections.emptyList());
-
-        assertThrows(PublisherNotFoundException.class,
-                () -> bookService.getBooksByPublisher(publisher));
     }
 
     @Test

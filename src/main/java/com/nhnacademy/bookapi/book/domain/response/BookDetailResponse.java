@@ -38,7 +38,7 @@ public class BookDetailResponse {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime updateAt;
 
-    private BookStatus Status;
+    private BookStatus status;
     private int stock;
 
     private Set<String> bookCategories;

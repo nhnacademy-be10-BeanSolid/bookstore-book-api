@@ -28,9 +28,8 @@ public class BookLikeServiceImpl implements BookLikeService {
 
     // 도서 좋아요 생성
     @Override
-    public BookLikeResponse createBookLike(BookLikeCreateRequest request) {
+    public BookLikeResponse createBookLike(Long bookId, BookLikeCreateRequest request) {
         String userId = request.getUserId();
-        Long bookId = request.getBookId();
         Book book = bookRepository.findById(bookId).orElseThrow(() -> new BookNotFoundException(bookId));
 
         if(bookLikeRepository.existsByUserIdAndBookId(userId, bookId)) {
@@ -48,7 +47,7 @@ public class BookLikeServiceImpl implements BookLikeService {
     @Transactional(readOnly = true)
     public List<BookLikeResponse> getBookLikesByUserId(String userId) {
         List<BookLike> bookLikes = bookLikeRepository.getBookLikesByUserId(userId);
-        return bookLikes.stream().map(BookLikeResponse::of).collect(Collectors.toList());
+        return bookLikes.stream().map(BookLikeResponse::of).toList();
     }
 
     // 도서별 좋아요 조회
@@ -59,7 +58,7 @@ public class BookLikeServiceImpl implements BookLikeService {
             throw new BookNotFoundException(bookId);
         }
         List<BookLike> bookLikes = bookLikeRepository.getBookLikesByBookId(bookId);
-        return bookLikes.stream().map(BookLikeResponse::of).collect(Collectors.toList());
+        return bookLikes.stream().map(BookLikeResponse::of).toList();
     }
 
     // 유저 아이디와 도서 아이디로 좋아요 삭제

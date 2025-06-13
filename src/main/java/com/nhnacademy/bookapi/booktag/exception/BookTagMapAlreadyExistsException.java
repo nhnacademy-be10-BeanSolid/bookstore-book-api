@@ -6,6 +6,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @ResponseStatus(HttpStatus.CONFLICT)
 public class BookTagMapAlreadyExistsException extends RuntimeException {
     public BookTagMapAlreadyExistsException(Long bookId, Long tagId) {
-        super();
+        super(String.format("Book id %s tag id %s already exists", bookId, tagId));
     }
 }

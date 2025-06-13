@@ -9,6 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class BookTagMapCreateRequest {
 
-//    private Long bookId;
     private Long tagId;
 }

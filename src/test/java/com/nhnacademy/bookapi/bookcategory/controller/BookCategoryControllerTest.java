@@ -1,7 +1,6 @@
-package com.nhnacademy.bookapi.bookcategory;
+package com.nhnacademy.bookapi.bookcategory.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.bookapi.bookcategory.controller.BookCategoryController;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;

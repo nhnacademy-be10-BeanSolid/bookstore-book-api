@@ -24,9 +24,9 @@ public class BookTagController {
     public ResponseEntity<List<BookTagResponse>> getBookTags() {
         List<BookTag> bookTagList = bookTagService.getBookTags();
         List<BookTagResponse> bookTagResponseList = new ArrayList<>();
-        bookTagList.forEach(bookTag -> {
-            bookTagResponseList.add(new BookTagResponse(bookTag.getTagId(), bookTag.getName()));
-        });
+        bookTagList.forEach(bookTag ->
+            bookTagResponseList.add(new BookTagResponse(bookTag.getTagId(), bookTag.getName()))
+        );
         return ResponseEntity.ok(bookTagResponseList);
     }
 

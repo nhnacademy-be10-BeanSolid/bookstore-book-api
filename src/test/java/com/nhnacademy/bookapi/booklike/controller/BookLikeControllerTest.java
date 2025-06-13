@@ -1,8 +1,7 @@
-package com.nhnacademy.bookapi.booklike;
+package com.nhnacademy.bookapi.booklike.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.bookapi.book.domain.Book;
-import com.nhnacademy.bookapi.booklike.controller.BookLikeController;
 import com.nhnacademy.bookapi.booklike.domain.request.BookLikeCreateRequest;
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 import com.nhnacademy.bookapi.booklike.domain.BookLike;
@@ -21,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(BookLikeController.class)
-public class BookLikeControllerTest {
+class BookLikeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -81,11 +81,12 @@ public class BookLikeControllerTest {
     void createBookLikeTest() throws Exception {
         Book newBook = new Book();
         ReflectionTestUtils.setField(newBook, "id", 2L);
-        BookLikeCreateRequest request = new BookLikeCreateRequest(userId, newBook.getId());
+        BookLikeCreateRequest request = new BookLikeCreateRequest(userId);
 
         BookLikeResponse response = new BookLikeResponse(2L, LocalDateTime.now(), userId, newBook.getId());
 
-        given(bookLikeService.createBookLike(any(BookLikeCreateRequest.class))).willReturn(response);
+        given(bookLikeService.createBookLike(eq(newBook.getId()),
+                any(BookLikeCreateRequest.class))).willReturn(response);
 
         mockMvc.perform(post("/books/{bookId}/bookLikes", newBook.getId())
                 .contentType(MediaType.APPLICATION_JSON)

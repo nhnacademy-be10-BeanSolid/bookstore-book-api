@@ -1,5 +1,5 @@
 ### 책 좋아요 생성
-POST http://localhost:8080/books/1/bookLikes
+POST http://localhost:10346/books/1/bookLikes
 Content-Type: application/json
 
 {
@@ -8,7 +8,7 @@ Content-Type: application/json
 }
 
 ### 책 좋아요 생성
-POST http://localhost:8080/books/2/bookLikes
+POST http://localhost:10346/books/2/bookLikes
 Content-Type: application/json
 
 {
@@ -17,7 +17,7 @@ Content-Type: application/json
 }
 
 ### 좋아요 조회
-GET http://localhost:8080/users/user/bookLikes
+GET http://localhost:10346/users/user/bookLikes
 
 ### 좋아요 삭제
-DELETE http://localhost:8080/users/user/bookLikes/2
+DELETE http://localhost:10346/users/user/bookLikes/1

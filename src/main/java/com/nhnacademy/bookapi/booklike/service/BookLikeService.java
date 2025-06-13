@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface BookLikeService {
 
-    BookLikeResponse createBookLike(BookLikeCreateRequest request);
+    BookLikeResponse createBookLike(Long bookId, BookLikeCreateRequest request);
 
     List<BookLikeResponse> getBookLikesByUserId(String userId);
 

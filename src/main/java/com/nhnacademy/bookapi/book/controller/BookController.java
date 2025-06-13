@@ -37,12 +37,6 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-//    @GetMapping("/books/{isbn}")
-//    public ResponseEntity<BookDetailResponse> getBook(@PathVariable String isbn) {
-//        BookDetailResponse response = bookService.getBookDetailByIsbn(isbn);
-//        return ResponseEntity.status(HttpStatus.OK).body(response);
-//    }
-
     @GetMapping("/authors/{author}")
     public ResponseEntity<List<BookDetailResponse>> getBooksByAuthor(@PathVariable String author) {
         List<BookDetailResponse> response = bookService.getBooksByAuthor(author);
