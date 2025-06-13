@@ -7,5 +7,5 @@ public record BookTagCreateRequest(
         @NotBlank
         @Size(max = 50)
         String name
-) {
-}
+)
+{}

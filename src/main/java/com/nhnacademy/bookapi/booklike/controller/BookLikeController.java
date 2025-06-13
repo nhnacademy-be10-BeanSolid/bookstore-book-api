@@ -1,11 +1,14 @@
 package com.nhnacademy.bookapi.booklike.controller;
 
+import com.nhnacademy.bookapi.advice.ValidationFailedException;
 import com.nhnacademy.bookapi.booklike.domain.request.BookLikeCreateRequest;
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 import com.nhnacademy.bookapi.booklike.service.BookLikeService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -30,7 +33,12 @@ public class BookLikeController {
     }
 
     @PostMapping("/books/{bookId}/bookLikes")
-    public ResponseEntity<BookLikeResponse> createBookLike(@PathVariable Long bookId, @RequestBody BookLikeCreateRequest request) {
+    public ResponseEntity<BookLikeResponse> createBookLike(@PathVariable Long bookId,
+                                                           @Valid @RequestBody BookLikeCreateRequest request,
+                                                           BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationFailedException();
+        }
         BookLikeResponse response = bookLikeService.createBookLike(bookId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
