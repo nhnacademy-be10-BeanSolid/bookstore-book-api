@@ -2,10 +2,9 @@ package com.nhnacademy.bookapi.book;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.bookapi.book.controller.BookController;
-import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
-import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
-import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
-import com.nhnacademy.bookapi.book.domain.response.BookResponse;
+import com.nhnacademy.bookapi.book.controller.request.BookCreateRequest;
+import com.nhnacademy.bookapi.book.controller.request.BookUpdateRequest;
+import com.nhnacademy.bookapi.book.controller.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookSearchResponse;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
@@ -16,18 +15,17 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -42,10 +40,10 @@ public class BookControllerTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @MockBean
     BookService bookService;
 
-    @MockitoBean
+    @MockBean
     BookSearchApiService bookSearchService;
 
     Book book;
@@ -54,42 +52,41 @@ public class BookControllerTest {
     void setUp() {
         book = new Book("타이틀", "설명", "목차", "출판사", "작가",
                 LocalDate.now(), "test000000000", 10000, 5000, false, 100);
-        ReflectionTestUtils.setField(book, "id", 1L);
     }
 
     @Test
-    @DisplayName("GET /books-search?query=")
+    @DisplayName("GET /books?query=")
     void bookServiceTest() throws Exception {
         String query = "포켓몬스터";
 
         given(bookSearchService.searchBook(query, 1)).willReturn(new BookSearchResponse());
 
-        mockMvc.perform(get("/books-search?query=" + query)
+        mockMvc.perform(get("/books?query=" + query)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
     @Test
-    @DisplayName("GET /books/{id}")
+    @DisplayName("GET /books/{isbn}")
     void getBookTest() throws Exception{
-        Long id = book.getId();
-        BookDetailResponse response = BookDetailResponse.of(book);
+        String isbn = book.getIsbn();
+        BookResponse response = BookResponse.of(book);
 
-        given(bookService.getBookDetailByBookId(id)).willReturn(response);
+        given(bookService.getBook(isbn)).willReturn(response);
 
-        mockMvc.perform(get("/books/{id}", id)
+        mockMvc.perform(get("/books/{isbn}", isbn)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value(response.getTitle()))
-                .andExpect(jsonPath("$.isbn").value(response.getIsbn()))
-                .andExpect(jsonPath("$.author").value(response.getAuthor()));
+                .andExpect(jsonPath("$.title").value("타이틀"))
+                .andExpect(jsonPath("$.isbn").value(isbn))
+                .andExpect(jsonPath("$.author").value("작가"));
     }
 
     @Test
     @DisplayName("GET /authors/{author}")
     void getAuthorTest() throws Exception{
         String author = book.getAuthor();
-        BookDetailResponse response = BookDetailResponse.of(book);
+        BookResponse response = BookResponse.of(book);
 
         given(bookService.getBooksByAuthor(author)).willReturn(List.of(response));
 
@@ -104,7 +101,7 @@ public class BookControllerTest {
     @DisplayName("GET /publishers/{publisher}")
     void getBooksByPublisherTest() throws Exception{
         String publisher = book.getPublisher();
-        BookDetailResponse response = BookDetailResponse.of(book);
+        BookResponse response = BookResponse.of(book);
 
         given(bookService.getBooksByPublisher(publisher)).willReturn(List.of(response));
 
@@ -135,9 +132,9 @@ public class BookControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value(request.getTitle()))
-                .andExpect(jsonPath("$.isbn").value(request.getIsbn()))
-                .andExpect(jsonPath("$.author").value(request.getAuthor()));
+                .andExpect(jsonPath("$.title").value("타이틀"))
+                .andExpect(jsonPath("$.isbn").value("test123456789"))
+                .andExpect(jsonPath("$.author").value("작가"));
     }
 
     @Test
@@ -154,9 +151,9 @@ public class BookControllerTest {
 
 
     @Test
-    @DisplayName("PATCH /books/{id}")
+    @DisplayName("PUT /books/{isbn}")
     void updateBookTest() throws Exception{
-        Long id = book.getId();
+        String isbn = "test123456789";
         String updateTitle = "수정된 타이틀";
 
         BookUpdateRequest request = new BookUpdateRequest();
@@ -167,10 +164,10 @@ public class BookControllerTest {
         book.setStatus(BookStatus.SALE_END);
         BookResponse response = BookResponse.of(book);
 
-        given(bookService.updateBook(eq(id), any(BookUpdateRequest.class)))
+        given(bookService.updateBook(eq(isbn), any(BookUpdateRequest.class)))
                 .willReturn(response);
 
-        mockMvc.perform(patch("/books/{id}", id)
+        mockMvc.perform(put("/books/{isbn}", isbn)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -181,11 +178,11 @@ public class BookControllerTest {
     @Test
     @DisplayName("DELETE /books/{isbn}")
     void deleteBookSuccessTest() throws Exception {
-        Long id = book.getId();
+        String isbn = "test123456789";
 
-        doNothing().when(bookService).deleteBook(id);
+        doNothing().when(bookService).deleteBook(isbn);
 
-        mockMvc.perform(delete("/books/{id}", id))
+        mockMvc.perform(delete("/books/{isbn}", isbn))
                 .andExpect(status().isNoContent());
     }
 }
