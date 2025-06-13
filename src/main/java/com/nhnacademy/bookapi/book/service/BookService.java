@@ -1,8 +1,9 @@
 package com.nhnacademy.bookapi.book.service;
 
-import com.nhnacademy.bookapi.book.controller.request.BookCreateRequest;
-import com.nhnacademy.bookapi.book.controller.request.BookUpdateRequest;
-import com.nhnacademy.bookapi.book.controller.response.BookResponse;
+import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
+import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
+import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 
 import java.util.List;
 
@@ -10,13 +11,16 @@ public interface BookService {
 
     BookResponse createBook(BookCreateRequest request);
 
-    BookResponse getBook(String isbn);
+    BookDetailResponse getBookDetailByBookId(Long id);
 
-    List<BookResponse> getBooksByAuthor(String author);
+//    BookDetailResponse getBookDetailByIsbn(String isbn);
 
-    List<BookResponse> getBooksByPublisher(String title);
+    List<BookDetailResponse> getBooksByAuthor(String author);
 
-    BookResponse updateBook(String isbn, BookUpdateRequest request);
+    List<BookDetailResponse> getBooksByPublisher(String publisher);
 
-    void deleteBook(String isbn);
+    BookResponse updateBook(Long id, BookUpdateRequest request);
+
+    void deleteBook(Long id);
+
 }

@@ -1,8 +1,9 @@
 package com.nhnacademy.bookapi.book.service.impl;
 
-import com.nhnacademy.bookapi.book.controller.request.BookCreateRequest;
-import com.nhnacademy.bookapi.book.controller.request.BookUpdateRequest;
-import com.nhnacademy.bookapi.book.controller.response.BookResponse;
+import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
+import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
+import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.exception.AuthorNotFoundException;
@@ -45,48 +46,53 @@ public class BookServiceImpl implements BookService {
                 request.getWrappable(),
                 request.getStock()
                 );
-
         Book savedBook = bookRepository.save(book);
-
         return BookResponse.of(savedBook);
     }
 
-    // 국제표준도서번호로 도서 찾기
+    // 아이디로 도서 찾기
     @Override
     @Transactional(readOnly = true)
-    public BookResponse getBook(String isbn) {
-        Book book = bookRepository.findByIsbn(isbn)
-                .orElseThrow(() -> new BookNotFoundException(isbn));
-
-        return BookResponse.of(book);
+    public BookDetailResponse getBookDetailByBookId(Long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
+        return BookDetailResponse.of(book);
     }
+
+    // isbn 코드로 도서 찾기
+//    @Override
+//    public BookDetailResponse getBookDetailByIsbn(String isbn) {
+//        Book book = bookRepository.findByIsbn(isbn)
+//                .orElseThrow(() -> new BookNotFoundException(isbn));
+//        return BookDetailResponse.of(book);
+//    }
 
     // 작가로 도서 찾기
     @Override
     @Transactional(readOnly = true)
-    public List<BookResponse> getBooksByAuthor(String author) {
-        if(!bookRepository.existsByAuthor(author)) {
+    public List<BookDetailResponse> getBooksByAuthor(String author) {
+        List<Book> books = bookRepository.findByAuthor(author);
+        if(books.isEmpty()) {
             throw new AuthorNotFoundException(author);
         }
-        List<Book> books = bookRepository.findByAuthor(author);
-        return books.stream().map(BookResponse::of).collect(Collectors.toList());
+        return books.stream().map(BookDetailResponse::of).collect(Collectors.toList());
     }
 
     // 출판사로 도서 찾기
     @Override
-    public List<BookResponse> getBooksByPublisher(String publisher) {
-        if(!bookRepository.existsByPublisher(publisher)) {
+    public List<BookDetailResponse> getBooksByPublisher(String publisher) {
+        List<Book> books = bookRepository.findByPublisher(publisher);
+        if(books.isEmpty()) {
             throw new PublisherNotFoundException(publisher);
         }
-        List<Book> books = bookRepository.findByPublisher(publisher);
-        return books.stream().map(BookResponse::of).collect(Collectors.toList());
+        return books.stream().map(BookDetailResponse::of).collect(Collectors.toList());
     }
 
     // 도서 업데이트
     @Override
-    public BookResponse updateBook(String isbn, BookUpdateRequest request) {
-        Book book = bookRepository.findByIsbn(isbn)
-                .orElseThrow(() -> new BookNotFoundException(isbn));
+    public BookResponse updateBook(Long id, BookUpdateRequest request) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
         if (request.getTitle() != null) {
             book.setTitle(request.getTitle());
         }
@@ -127,9 +133,9 @@ public class BookServiceImpl implements BookService {
 
     // 도서 삭제
     @Override
-    public void deleteBook(String isbn) {
-        Book book = bookRepository.findByIsbn(isbn)
-                .orElseThrow(() -> new BookNotFoundException(isbn));
+    public void deleteBook(Long id) {
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
         bookRepository.delete(book);
     }
 }

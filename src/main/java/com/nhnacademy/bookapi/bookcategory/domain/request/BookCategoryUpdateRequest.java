@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.bookcategory.domain;
+package com.nhnacademy.bookapi.bookcategory.domain.request;
 
 import jakarta.validation.constraints.NotBlank;
 

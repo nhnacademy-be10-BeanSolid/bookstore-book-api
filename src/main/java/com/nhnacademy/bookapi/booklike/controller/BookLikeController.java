@@ -1,7 +1,7 @@
 package com.nhnacademy.bookapi.booklike.controller;
 
-import com.nhnacademy.bookapi.booklike.controller.request.BookLikeCreateRequest;
-import com.nhnacademy.bookapi.booklike.controller.response.BookLikeResponse;
+import com.nhnacademy.bookapi.booklike.domain.request.BookLikeCreateRequest;
+import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 import com.nhnacademy.bookapi.booklike.service.BookLikeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

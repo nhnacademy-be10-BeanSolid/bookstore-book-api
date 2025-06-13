@@ -40,3 +40,11 @@ Content-Type: application/json
 ### 카테고리 삭제
 DELETE /categories/1 HTTP/1.1
 Host: localhost:8080
+
+### 도서에 카테고리 추가
+POST http://localhost:8080/books/1/categories
+Content-Type: application/json
+
+{
+  "categoryId": 1
+}

@@ -3,8 +3,8 @@ package com.nhnacademy.bookapi.booklike;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.booklike.controller.BookLikeController;
-import com.nhnacademy.bookapi.booklike.controller.request.BookLikeCreateRequest;
-import com.nhnacademy.bookapi.booklike.controller.response.BookLikeResponse;
+import com.nhnacademy.bookapi.booklike.domain.request.BookLikeCreateRequest;
+import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 import com.nhnacademy.bookapi.booklike.domain.BookLike;
 import com.nhnacademy.bookapi.booklike.service.BookLikeService;
 import org.junit.jupiter.api.BeforeEach;
@@ -60,7 +60,6 @@ public class BookLikeControllerTest {
         given(bookLikeService.getBookLikesByBookId(book.getId())).willReturn(List.of(response));
 
         mockMvc.perform(get("/books/{bookId}/bookLikes", book.getId()))
-//                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
     }
