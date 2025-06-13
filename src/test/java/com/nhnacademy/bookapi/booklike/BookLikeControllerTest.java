@@ -60,7 +60,6 @@ public class BookLikeControllerTest {
         given(bookLikeService.getBookLikesByBookId(book.getId())).willReturn(List.of(response));
 
         mockMvc.perform(get("/books/{bookId}/bookLikes", book.getId()))
-//                .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
     }

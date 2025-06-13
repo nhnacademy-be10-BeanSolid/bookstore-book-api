@@ -32,8 +32,8 @@ Content-Type: application/json
   "stock": 100
 }
 
-### ISBN 코드로 도서 찾기(상세정보)
-GET http://localhost:8080/books/isbn001111111
+### ID로 도서 찾기(상세정보)
+GET http://localhost:8080/books/1
 
 ### 작가로 도서 찾기
 GET http://localhost:8080/authors/Lee
@@ -42,7 +42,7 @@ GET http://localhost:8080/authors/Lee
 GET http://localhost:8080/publishers/pub1
 
 ### 도서 업데이트
-PUT http://localhost:8080/books/isbn00111111
+PATCH http://localhost:8080/books/1
 Content-Type: application/json
 
 {
@@ -51,4 +51,4 @@ Content-Type: application/json
 }
 
 ### 도서 삭제
-DELETE http://localhost:8080/books/isbn001111111
+DELETE http://localhost:8080/books/1
