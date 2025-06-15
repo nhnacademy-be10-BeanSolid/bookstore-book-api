@@ -5,75 +5,67 @@ import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@Data
-@Getter
-@NoArgsConstructor
-@AllArgsConstructor
-public class BookDetailResponse {
+public record BookDetailResponse (
 
-    private Long id;
-    private String title;
-    private String description;
-    private String toc;
-    private String publisher;
-    private String author;
-    private LocalDate publishedDate;
-    private String isbn;
-    private int originalPrice;
-    private int salePrice;
-    private Boolean wrappable;
+    Long id,
+    String title,
+    String description,
+    String toc,
+    String publisher,
+    String author,
+    LocalDate publishedDate,
+    String isbn,
+    int originalPrice,
+    int salePrice,
+    Boolean wrappable,
 
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime createAt;
+    LocalDateTime createAt,
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private LocalDateTime updateAt;
+    LocalDateTime updateAt,
 
-    private BookStatus status;
-    private int stock;
+    BookStatus status,
+    int stock,
 
-    private Set<String> bookCategories;
+    Set<String> bookCategories,
 
-    private Set<String> bookTags;
+    Set<String> bookTags
+) {
+public static BookDetailResponse of(Book book) {
+    Set<String> categories = book.getBookCategories()
+            .stream()
+            .map(BookCategory::getName)
+            .collect(Collectors.toSet());
 
-    public static BookDetailResponse of(Book book) {
-        Set<String> categories = book.getBookCategories()
-                .stream()
-                .map(BookCategory::getName)
-                .collect(Collectors.toSet());
+    Set<String> tags = book.getBookTags()
+            .stream()
+            .map(BookTag::getName)
+            .collect(Collectors.toSet());
 
-        Set<String> tags = book.getBookTags()
-                .stream()
-                .map(BookTag::getName)
-                .collect(Collectors.toSet());
-
-        return new BookDetailResponse(book.getId(),
-                book.getTitle(),
-                book.getDescription(),
-                book.getToc(),
-                book.getPublisher(),
-                book.getAuthor(),
-                book.getPublishedDate(),
-                book.getIsbn(),
-                book.getOriginalPrice(),
-                book.getSalePrice(),
-                book.isWrappable(),
-                book.getCreateAt(),
-                book.getUpdateAt(),
-                book.getStatus(),
-                book.getStock(),
-                categories,
-                tags);
+    return new BookDetailResponse(
+            book.getId(),
+            book.getTitle(),
+            book.getDescription(),
+            book.getToc(),
+            book.getPublisher(),
+            book.getAuthor(),
+            book.getPublishedDate(),
+            book.getIsbn(),
+            book.getOriginalPrice(),
+            book.getSalePrice(),
+            book.isWrappable(),
+            book.getCreateAt(),
+            book.getUpdateAt(),
+            book.getStatus(),
+            book.getStock(),
+            categories,
+            tags);
     }
-
 }
 

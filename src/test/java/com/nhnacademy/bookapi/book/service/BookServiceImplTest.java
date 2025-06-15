@@ -68,9 +68,9 @@ class BookServiceImplTest {
         BookResponse response = bookService.createBook(request);
 
         assertThat(response).isNotNull();
-        assertThat(response.getTitle()).isEqualTo(request.getTitle());
-        assertThat(response.getIsbn()).isEqualTo(request.getIsbn());
-        assertThat(response.getAuthor()).isEqualTo(request.getAuthor());
+        assertThat(response.title()).isEqualTo(request.title());
+        assertThat(response.isbn()).isEqualTo(request.isbn());
+        assertThat(response.author()).isEqualTo(request.author());
     }
 
     @Test
@@ -96,9 +96,9 @@ class BookServiceImplTest {
         BookDetailResponse response = bookService.getBookDetailByBookId(id);
 
         assertThat(response).isNotNull();
-        assertThat(response.getTitle()).isEqualTo(book.getTitle());
-        assertThat(response.getIsbn()).isEqualTo(book.getIsbn());
-        assertThat(response.getAuthor()).isEqualTo(book.getAuthor());
+        assertThat(response.title()).isEqualTo(book.getTitle());
+        assertThat(response.isbn()).isEqualTo(book.getIsbn());
+        assertThat(response.author()).isEqualTo(book.getAuthor());
     }
 
     @Test
@@ -153,8 +153,8 @@ class BookServiceImplTest {
         BookResponse response = bookService.updateBook(id, request);
 
         assertThat(response).isNotNull();
-        assertThat(response.getTitle()).isEqualTo(request.getTitle());
-        assertThat(response.getStatus()).isEqualTo(BookStatus.SALE_END);
+        assertThat(response.title()).isEqualTo(request.getTitle());
+        assertThat(response.status()).isEqualTo(BookStatus.SALE_END);
     }
 
     @Test
