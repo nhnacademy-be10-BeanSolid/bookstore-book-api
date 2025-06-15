@@ -1,6 +1,6 @@
 package com.nhnacademy.bookapi.book.service;
 
-import com.nhnacademy.bookapi.book.domain.BookSearchResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import lombok.extern.slf4j.Slf4j;

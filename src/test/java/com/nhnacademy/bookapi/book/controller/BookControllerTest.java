@@ -2,7 +2,7 @@ package com.nhnacademy.bookapi.book.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.bookapi.book.domain.Book;
-import com.nhnacademy.bookapi.book.domain.BookSearchResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
@@ -48,6 +48,7 @@ class BookControllerTest {
     BookSearchApiService bookSearchService;
 
     Book book;
+    BookCreateRequest request;
 
     @BeforeEach
     void setUp() {
@@ -65,6 +66,8 @@ class BookControllerTest {
                 .stock(100)
                 .build();
         ReflectionTestUtils.setField(book, "id", 1L);
+        request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
+                LocalDate.now(), "test123456789", 10000, 5000, false, 100);
     }
 
     @Test
@@ -125,9 +128,6 @@ class BookControllerTest {
     @Test
     @DisplayName("POST /books")
     void createBookTest() throws Exception{
-        BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
-                LocalDate.now(), "test123456789", 10000, 5000, false, 100);
-
         BookResponse response = new BookResponse(
                 1L, "타이틀", "설명", "목차", "출판사", "작가",
                 LocalDate.now(), "test123456789",
@@ -141,16 +141,18 @@ class BookControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value(request.getTitle()))
-                .andExpect(jsonPath("$.isbn").value(request.getIsbn()))
-                .andExpect(jsonPath("$.author").value(request.getAuthor()));
+                .andExpect(jsonPath("$.title").value(request.title()))
+                .andExpect(jsonPath("$.isbn").value(request.isbn()))
+                .andExpect(jsonPath("$.author").value(request.author()));
     }
 
     @Test
     @DisplayName("POST /books - valid fail")
     void createBookValidationFailTest() throws Exception {
-        BookCreateRequest request = new BookCreateRequest();
-        request.setTitle("");
+
+        // 재고량 -1로 지정
+        BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
+                LocalDate.now(), "test123456789", 10000, 5000, false, -1);
 
         mockMvc.perform(post("/books")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -182,6 +184,18 @@ class BookControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value(updateTitle))
                 .andExpect(jsonPath("$.status").value(BookStatus.SALE_END.name()));
+    }
+
+    @Test
+    @DisplayName("PATCH /books/{id} - valid fail")
+    void updateBookValidFailTest() throws Exception{
+        BookUpdateRequest request = new BookUpdateRequest();
+        request.setIsbn("1234567236827189317");
+
+        mockMvc.perform(patch("/books/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
