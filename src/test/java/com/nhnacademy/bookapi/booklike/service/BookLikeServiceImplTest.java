@@ -23,7 +23,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -80,13 +80,14 @@ class BookLikeServiceImplTest {
     @Test
     @DisplayName("좋아요 생성 실패")
     void createBookLikeFailTest() {
+        Long bookId = book.getId();
         BookLikeCreateRequest request = new BookLikeCreateRequest(userId);
 
         when(bookRepository.findById(book.getId())).thenReturn(Optional.ofNullable(book));
         when(bookLikeRepository.existsByUserIdAndBookId(userId, book.getId())).thenReturn(true);
 
         assertThrows(BookLikeAlreadyExistsException.class,
-                () -> bookLikeService.createBookLike(book.getId(), request));
+                () -> bookLikeService.createBookLike(bookId, request));
     }
 
     @Test
@@ -96,7 +97,7 @@ class BookLikeServiceImplTest {
         List<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByUserId(userId);
 
         assertThat(bookLikes).isNotNull();
-        assertThat(bookLikes.size()).isEqualTo(1);
+        assertThat(bookLikes).hasSize(List.of(bookLike).size());
         assertThat(bookLikes.get(0)).isEqualTo(BookLikeResponse.of(bookLike));
     }
 
@@ -108,17 +109,18 @@ class BookLikeServiceImplTest {
         List<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByBookId(book.getId());
 
         assertThat(bookLikes).isNotNull();
-        assertThat(bookLikes.size()).isEqualTo(1);
+        assertThat(bookLikes).hasSize(List.of(bookLike).size());
         assertThat(bookLikes.get(0)).isEqualTo(BookLikeResponse.of(bookLike));
     }
 
     @Test
-    @DisplayName("도서아이디에 해당하는 책이 없는 경우에 조회")
+    @DisplayName("도서아이디에 해당하는 책이 없는 경우 조회")
     void getBookLikeByBookIdFailTest() {
+        Long bookId = book.getId();
         when(bookLikeRepository.existsByBookId(book.getId())).thenReturn(false);
 
         assertThrows(BookNotFoundException.class,
-                () -> bookLikeService.getBookLikesByBookId(book.getId()));
+                () -> bookLikeService.getBookLikesByBookId(bookId));
     }
 
     @Test

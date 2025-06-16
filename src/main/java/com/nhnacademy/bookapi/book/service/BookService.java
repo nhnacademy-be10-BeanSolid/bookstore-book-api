@@ -13,8 +13,6 @@ public interface BookService {
 
     BookDetailResponse getBookDetailByBookId(Long id);
 
-//    BookDetailResponse getBookDetailByIsbn(String isbn);
-
     List<BookDetailResponse> getBooksByAuthor(String author);
 
     List<BookDetailResponse> getBooksByPublisher(String publisher);

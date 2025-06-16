@@ -22,7 +22,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
@@ -123,7 +123,7 @@ class BookServiceImplTest {
         List<BookDetailResponse> books = bookService.getBooksByAuthor(author);
 
         assertThat(books).isNotNull();
-        assertThat(books.size()).isEqualTo(1);
+        assertThat(books).hasSize(List.of(book).size());
     }
 
     @Test
@@ -136,7 +136,7 @@ class BookServiceImplTest {
         List<BookDetailResponse> books = bookService.getBooksByPublisher(publisher);
 
         assertThat(books).isNotNull();
-        assertThat(books.size()).isEqualTo(1);
+        assertThat(books).hasSize(List.of(book).size());
     }
 
     @Test
@@ -161,10 +161,11 @@ class BookServiceImplTest {
     @DisplayName("업데이트 실패")
     void updateBookFailTest() {
         Long id = book.getId();
+        BookUpdateRequest request = new BookUpdateRequest();
         when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
         assertThrows(BookNotFoundException.class,
-                () -> bookService.updateBook(id, new BookUpdateRequest()));
+                () -> bookService.updateBook(id, request));
     }
 
     @Test
