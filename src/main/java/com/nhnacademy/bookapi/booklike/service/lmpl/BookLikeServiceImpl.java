@@ -7,7 +7,7 @@ import com.nhnacademy.bookapi.booklike.domain.request.BookLikeCreateRequest;
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 import com.nhnacademy.bookapi.booklike.domain.BookLike;
 import com.nhnacademy.bookapi.booklike.exception.BookLikeAlreadyExistsException;
-import com.nhnacademy.bookapi.booklike.exception.BookLikeNotExistsException;
+import com.nhnacademy.bookapi.booklike.exception.BookLikeNotFoundException;
 import com.nhnacademy.bookapi.booklike.repository.BookLikeRepository;
 import com.nhnacademy.bookapi.booklike.service.BookLikeService;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,7 +15,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -65,7 +64,7 @@ public class BookLikeServiceImpl implements BookLikeService {
     @Override
     public void deleteBookLikeByUserIdAndBookId(String userId, Long bookId) {
         if(!bookLikeRepository.existsByUserIdAndBookId(userId, bookId)) {
-            throw new BookLikeNotExistsException(userId, bookId);
+            throw new BookLikeNotFoundException(userId, bookId);
         }
         bookLikeRepository.deleteByUserIdAndBookId(userId, bookId);
     }
@@ -77,7 +76,7 @@ public class BookLikeServiceImpl implements BookLikeService {
             throw new BookNotFoundException(bookId);
         }
         if(!bookLikeRepository.existsByBookId(bookId)) {
-            throw new BookLikeNotExistsException(bookId);
+            throw new BookLikeNotFoundException(bookId);
         }
         bookLikeRepository.deleteByBookId(bookId);
     }

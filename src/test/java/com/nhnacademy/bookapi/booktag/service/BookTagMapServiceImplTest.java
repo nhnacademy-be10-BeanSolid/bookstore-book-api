@@ -22,8 +22,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -63,8 +63,8 @@ class BookTagMapServiceImplTest {
 
         BookTagMapResponse response = bookTagMapService.createBookTag(bookId, request);
 
-        assertEquals(bookId, response.bookId());
-        assertEquals(tagId, response.tagId());
+        assertThat(response.bookId()).isEqualTo(bookId);
+        assertThat(response.tagId()).isEqualTo(tagId);
     }
 
     @Test
@@ -82,8 +82,8 @@ class BookTagMapServiceImplTest {
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookTagRepository.findById(tagId)).thenReturn(Optional.of(tag));
 
-        assertThrows(BookTagMapAlreadyExistsException.class,
-                () -> bookTagMapService.createBookTag(bookId, request));
+        assertThatThrownBy(() -> bookTagMapService.createBookTag(bookId, request))
+                .isInstanceOf(BookTagMapAlreadyExistsException.class);
     }
 
     @Test
@@ -113,7 +113,7 @@ class BookTagMapServiceImplTest {
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookTagRepository.findById(tagId)).thenReturn(Optional.of(tag));
 
-        assertThrows(BookTagMapNotFoundException.class,
-                () -> bookTagMapService.deleteBookTag(bookId, tagId));
+        assertThatThrownBy(() -> bookTagMapService.deleteBookTag(bookId, tagId))
+                .isInstanceOf(BookTagMapNotFoundException.class);
     }
 }

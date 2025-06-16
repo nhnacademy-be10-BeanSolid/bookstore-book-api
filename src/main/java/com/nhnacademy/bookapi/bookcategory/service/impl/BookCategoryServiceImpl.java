@@ -28,12 +28,14 @@ public class BookCategoryServiceImpl implements BookCategoryService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookCategory getCategoryById(Long categoryId) {
         Optional<BookCategory> bookCategory = bookCategoryRepository.findById(categoryId);
         return bookCategory.orElseThrow(() -> new BookCategoryNotFoundException(categoryId));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookCategory> getAllCategories() {
         return bookCategoryRepository.findAll();
     }
