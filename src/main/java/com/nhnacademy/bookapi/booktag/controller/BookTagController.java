@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.booktag.controller;
 
+import com.nhnacademy.bookapi.advice.ValidationFailedException;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
@@ -8,6 +9,7 @@ import com.nhnacademy.bookapi.booktag.service.BookTagService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -38,7 +40,11 @@ public class BookTagController {
     }
 
     @PostMapping
-    public ResponseEntity<BookTagResponse> createBookTag(@Valid @RequestBody BookTagCreateRequest request) {
+    public ResponseEntity<BookTagResponse> createBookTag(@Valid @RequestBody BookTagCreateRequest request,
+                                                         BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationFailedException();
+        }
         BookTag bookTag = new BookTag(request.name());
         BookTag savedBookTag = bookTagService.createBookTag(bookTag);
         BookTagResponse bookTagResponse = new BookTagResponse(savedBookTag.getTagId(), savedBookTag.getName());
@@ -47,7 +53,11 @@ public class BookTagController {
     }
 
     @PatchMapping("/{tagId}")
-    public ResponseEntity<BookTagResponse> updateBookTag(@PathVariable Long tagId, @Valid @RequestBody BookTagUpdateRequest request) {
+    public ResponseEntity<BookTagResponse> updateBookTag(@PathVariable Long tagId, @Valid @RequestBody BookTagUpdateRequest request,
+                                                         BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationFailedException();
+        }
         BookTag bookTag = new BookTag(request.name());
         bookTag.setTagId(tagId);
         BookTag updatedBookTag = bookTagService.updateBookTag(bookTag);

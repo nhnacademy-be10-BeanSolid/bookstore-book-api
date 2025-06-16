@@ -27,22 +27,23 @@ public class BookServiceImpl implements BookService {
     // 도서 추가
     @Override
     public BookResponse createBook(BookCreateRequest request) {
-        if(bookRepository.existsByIsbn(request.getIsbn())) {
-            throw new BookAlreadyExistsException(request.getIsbn());
+        if(bookRepository.existsByIsbn(request.isbn())) {
+            throw new BookAlreadyExistsException(request.isbn());
         }
 
-        Book book = new Book(request.getTitle(),
-                request.getDescription(),
-                request.getToc(),
-                request.getPublisher(),
-                request.getAuthor(),
-                request.getPublishedDate(),
-                request.getIsbn(),
-                request.getOriginalPrice(),
-                request.getSalePrice(),
-                request.getWrappable(),
-                request.getStock()
-                );
+        Book book = Book.builder()
+                .title(request.title())
+                .description(request.description())
+                .toc(request.toc())
+                .publisher(request.publisher())
+                .author(request.author())
+                .publishedDate(request.publishedDate())
+                .isbn(request.isbn())
+                .originalPrice(request.originalPrice())
+                .salePrice(request.salePrice())
+                .wrappable(request.wrappable())
+                .stock(request.stock())
+                .build();
         Book savedBook = bookRepository.save(book);
         return BookResponse.of(savedBook);
     }
@@ -56,13 +57,6 @@ public class BookServiceImpl implements BookService {
         return BookDetailResponse.of(book);
     }
 
-    // isbn 코드로 도서 찾기
-//    @Override
-//    public BookDetailResponse getBookDetailByIsbn(String isbn) {
-//        Book book = bookRepository.findByIsbn(isbn)
-//                .orElseThrow(() -> new BookNotFoundException(isbn));
-//        return BookDetailResponse.of(book);
-//    }
 
     // 작가로 도서 찾기
     @Override

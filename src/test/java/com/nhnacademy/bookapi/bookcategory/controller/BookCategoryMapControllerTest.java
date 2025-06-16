@@ -52,6 +52,17 @@ class BookCategoryMapControllerTest {
     }
 
     @Test
+    @DisplayName("POST /books/{bookId}/categories")
+    void createBookCategoryMapValidFailTest() throws Exception {
+        BookCategoryMapCreateRequest request = new BookCategoryMapCreateRequest(null);
+
+        mockMvc.perform(post("/books/1/categories")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("DELETE /books/{bookId}/categories")
     void deleteBookCategoryMapTest() throws Exception {
         doNothing().when(bookCategoryMapService).deleteCategoryMap(bookId, categoryId);
@@ -61,6 +72,4 @@ class BookCategoryMapControllerTest {
 
         verify(bookCategoryMapService).deleteCategoryMap(bookId, categoryId);
     }
-
-
 }

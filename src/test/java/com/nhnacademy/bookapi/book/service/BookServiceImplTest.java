@@ -22,8 +22,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -40,8 +40,19 @@ class BookServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        book = new Book("타이틀", "설명", "목차", "출판사", "작가",
-                LocalDate.now(), "test000000000", 10000, 5000, false, 100);
+        book = Book.builder()
+                .title("타이틀")
+                .description("설명")
+                .toc("목차")
+                .publisher("출판사")
+                .author("작가")
+                .publishedDate(LocalDate.now())
+                .isbn("test000000000")
+                .originalPrice(10000)
+                .salePrice(5000)
+                .wrappable(false)
+                .stock(100)
+                .build();
         bookRepository.save(book);
     }
 
@@ -57,9 +68,9 @@ class BookServiceImplTest {
         BookResponse response = bookService.createBook(request);
 
         assertThat(response).isNotNull();
-        assertThat(response.getTitle()).isEqualTo(request.getTitle());
-        assertThat(response.getIsbn()).isEqualTo(request.getIsbn());
-        assertThat(response.getAuthor()).isEqualTo(request.getAuthor());
+        assertThat(response.title()).isEqualTo(request.title());
+        assertThat(response.isbn()).isEqualTo(request.isbn());
+        assertThat(response.author()).isEqualTo(request.author());
     }
 
     @Test
@@ -70,9 +81,8 @@ class BookServiceImplTest {
 
         when(bookRepository.existsByIsbn("test123456789")).thenReturn(true);
 
-        assertThrows(BookAlreadyExistsException.class,
-                () -> bookService.createBook(request)
-        );
+        assertThatThrownBy(() -> bookService.createBook(request))
+                .isInstanceOf(BookAlreadyExistsException.class);
     }
 
     @Test
@@ -85,9 +95,9 @@ class BookServiceImplTest {
         BookDetailResponse response = bookService.getBookDetailByBookId(id);
 
         assertThat(response).isNotNull();
-        assertThat(response.getTitle()).isEqualTo(book.getTitle());
-        assertThat(response.getIsbn()).isEqualTo(book.getIsbn());
-        assertThat(response.getAuthor()).isEqualTo(book.getAuthor());
+        assertThat(response.title()).isEqualTo(book.getTitle());
+        assertThat(response.isbn()).isEqualTo(book.getIsbn());
+        assertThat(response.author()).isEqualTo(book.getAuthor());
     }
 
     @Test
@@ -97,8 +107,8 @@ class BookServiceImplTest {
 
         when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(BookNotFoundException.class,
-                () -> bookService.getBookDetailByBookId(id));
+        assertThatThrownBy(() -> bookService.getBookDetailByBookId(id))
+                .isInstanceOf(BookNotFoundException.class);
     }
 
 
@@ -111,8 +121,9 @@ class BookServiceImplTest {
 
         List<BookDetailResponse> books = bookService.getBooksByAuthor(author);
 
-        assertThat(books).isNotNull();
-        assertThat(books.size()).isEqualTo(1);
+        assertThat(books)
+                .isNotNull()
+                .hasSize(1);
     }
 
     @Test
@@ -124,8 +135,9 @@ class BookServiceImplTest {
 
         List<BookDetailResponse> books = bookService.getBooksByPublisher(publisher);
 
-        assertThat(books).isNotNull();
-        assertThat(books.size()).isEqualTo(1);
+        assertThat(books)
+                .isNotNull()
+                .hasSize(1);
     }
 
     @Test
@@ -142,18 +154,19 @@ class BookServiceImplTest {
         BookResponse response = bookService.updateBook(id, request);
 
         assertThat(response).isNotNull();
-        assertThat(response.getTitle()).isEqualTo(request.getTitle());
-        assertThat(response.getStatus()).isEqualTo(BookStatus.SALE_END);
+        assertThat(response.title()).isEqualTo(request.getTitle());
+        assertThat(response.status()).isEqualTo(BookStatus.SALE_END);
     }
 
     @Test
     @DisplayName("업데이트 실패")
     void updateBookFailTest() {
         Long id = book.getId();
+        BookUpdateRequest request = new BookUpdateRequest();
         when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(BookNotFoundException.class,
-                () -> bookService.updateBook(id, new BookUpdateRequest()));
+        assertThatThrownBy(() -> bookService.updateBook(id, request))
+                .isInstanceOf(BookNotFoundException.class);
     }
 
     @Test
@@ -174,7 +187,7 @@ class BookServiceImplTest {
         Long id = book.getId();
         when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(BookNotFoundException.class,
-                () -> bookService.deleteBook(id));
+        assertThatThrownBy(() -> bookService.deleteBook(id))
+                .isInstanceOf(BookNotFoundException.class);
     }
 }

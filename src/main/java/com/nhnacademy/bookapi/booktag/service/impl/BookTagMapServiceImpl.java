@@ -30,17 +30,17 @@ public class BookTagMapServiceImpl implements BookTagMapService {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
 
-        BookTag bookTag = bookTagRepository.findById(request.getTagId())
-                .orElseThrow(() -> new BookTagNotFoundException(request.getTagId()));
+        BookTag bookTag = bookTagRepository.findById(request.tagId())
+                .orElseThrow(() -> new BookTagNotFoundException(request.tagId()));
 
         if (book.getBookTags().contains(bookTag)) {
-            throw new BookTagMapAlreadyExistsException(bookId, request.getTagId());
+            throw new BookTagMapAlreadyExistsException(bookId, request.tagId());
         }
 
         book.getBookTags().add(bookTag);
         bookRepository.save(book);
 
-        return new BookTagMapResponse(bookId, request.getTagId());
+        return new BookTagMapResponse(bookId, request.tagId());
     }
 
     // 도서 태그 삭제

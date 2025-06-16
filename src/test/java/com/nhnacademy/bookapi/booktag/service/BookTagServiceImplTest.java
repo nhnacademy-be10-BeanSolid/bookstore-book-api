@@ -77,24 +77,28 @@ class BookTagServiceImplTest {
     @Test
     @DisplayName("updateBookTag - 중복 이름 예외")
     void updateBookTag_duplicateName() {
+        BookTag tag = new BookTag(1L, "tag");
+
+        when(bookTagRepository.findById(1L)).thenReturn(Optional.of(tag));
         when(bookTagRepository.existsBookTagByName("tag1")).thenReturn(true);
 
-        BookTag tag = new BookTag(null, "tag1");
-        assertThatThrownBy(() -> bookTagService.updateBookTag(tag))
+        BookTag updateTag = new BookTag(tag.getTagId(), "tag1");
+        assertThatThrownBy(() -> bookTagService.updateBookTag(updateTag))
                 .isInstanceOf(BookTagAlreadyExistsException.class);
     }
 
     @Test
     @DisplayName("updateBookTag - 정상 업데이트")
     void updateBookTag_success() {
-        when(bookTagRepository.existsBookTagByName("tag1")).thenReturn(false);
-        BookTag tag = new BookTag(1L, "tag1");
-        when(bookTagRepository.save(tag)).thenReturn(new BookTag(1L, "tag1"));
+        BookTag tag = new BookTag(1L, "tag");
 
-        BookTag updated = bookTagService.updateBookTag(tag);
+        when(bookTagRepository.findById(1L)).thenReturn(Optional.of(tag));
+        when(bookTagRepository.existsBookTagByName("tag1")).thenReturn(false);
+
+        BookTag updateTag = new BookTag(tag.getTagId(), "tag1");
+        BookTag updated = bookTagService.updateBookTag(updateTag);
 
         assertThat(updated.getName()).isEqualTo("tag1");
-        verify(bookTagRepository).save(tag);
     }
 
     @Test
