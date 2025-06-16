@@ -122,8 +122,9 @@ class BookServiceImplTest {
 
         List<BookDetailResponse> books = bookService.getBooksByAuthor(author);
 
-        assertThat(books).isNotNull();
-        assertThat(books).hasSize(List.of(book).size());
+        assertThat(books)
+                .isNotNull()
+                .hasSize(1);
     }
 
     @Test
@@ -135,8 +136,9 @@ class BookServiceImplTest {
 
         List<BookDetailResponse> books = bookService.getBooksByPublisher(publisher);
 
-        assertThat(books).isNotNull();
-        assertThat(books).hasSize(List.of(book).size());
+        assertThat(books)
+                .isNotNull()
+                .hasSize(1);
     }
 
     @Test
