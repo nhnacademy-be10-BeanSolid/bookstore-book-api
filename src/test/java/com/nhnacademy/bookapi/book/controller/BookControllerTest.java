@@ -149,14 +149,14 @@ class BookControllerTest {
     @Test
     @DisplayName("POST /books - valid fail")
     void createBookValidationFailTest() throws Exception {
-
         // 재고량 -1로 지정
-        BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
+        BookCreateRequest badRequest = new BookCreateRequest(
+                "타이틀", "설명", "목차", "출판사", "작가",
                 LocalDate.now(), "test123456789", 10000, 5000, false, -1);
 
         mockMvc.perform(post("/books")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(badRequest)))
                 .andExpect(status().isBadRequest());
     }
 
@@ -167,11 +167,11 @@ class BookControllerTest {
         Long id = book.getId();
         String updateTitle = "수정된 타이틀";
 
-        BookUpdateRequest request = new BookUpdateRequest();
-        request.setTitle(updateTitle);
-        request.setStatus(BookStatus.SALE_END.name());
+        BookUpdateRequest updateRequest = new BookUpdateRequest();
+        updateRequest.setTitle(updateTitle);
+        updateRequest.setStatus(BookStatus.SALE_END.name());
 
-        book.setTitle(request.getTitle());
+        book.setTitle(updateRequest.getTitle());
         book.setStatus(BookStatus.SALE_END);
         BookResponse response = BookResponse.of(book);
 
@@ -189,12 +189,12 @@ class BookControllerTest {
     @Test
     @DisplayName("PATCH /books/{id} - valid fail")
     void updateBookValidFailTest() throws Exception{
-        BookUpdateRequest request = new BookUpdateRequest();
-        request.setIsbn("1234567236827189317");
+        BookUpdateRequest badRequest = new BookUpdateRequest();
+        badRequest.setIsbn("1234567236827189317");
 
         mockMvc.perform(patch("/books/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(badRequest)))
                 .andExpect(status().isBadRequest());
     }
 
