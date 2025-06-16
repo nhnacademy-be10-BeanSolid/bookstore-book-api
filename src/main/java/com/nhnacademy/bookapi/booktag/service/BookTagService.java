@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.booktag.service;
 
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
+import com.nhnacademy.bookapi.booktag.domain.request.BookTagUpdateRequest;
 
 import java.util.List;
 

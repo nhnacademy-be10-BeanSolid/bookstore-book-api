@@ -22,8 +22,8 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -62,8 +62,8 @@ class BookCategoryMapServiceImplTest {
 
         BookCategoryMapResponse response = bookCategoryMapService.createBookCategoryMap(bookId, request);
 
-        assertEquals(response.bookId(), bookId);
-        assertEquals(response.categoryId(), categoryId);
+        assertThat(response.bookId()).isEqualTo(bookId);
+        assertThat(response.categoryId()).isEqualTo(categoryId);
     }
 
     @Test
@@ -81,8 +81,8 @@ class BookCategoryMapServiceImplTest {
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookCategoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
-        assertThrows(BookCategoryMapAlreadyExistsException.class,
-                () -> bookCategoryMapService.createBookCategoryMap(bookId, request));
+        assertThatThrownBy(() -> bookCategoryMapService.createBookCategoryMap(bookId, request))
+                .isInstanceOf(BookCategoryMapAlreadyExistsException.class);
     }
 
     @Test
@@ -112,8 +112,8 @@ class BookCategoryMapServiceImplTest {
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookCategoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
-        assertThrows(BookCategoryMapNotFoundException.class,
-                () -> bookCategoryMapService.deleteCategoryMap(bookId, categoryId));
+        assertThatThrownBy(() -> bookCategoryMapService.deleteCategoryMap(bookId, categoryId))
+                .isInstanceOf(BookCategoryMapNotFoundException.class);
     }
 
 }

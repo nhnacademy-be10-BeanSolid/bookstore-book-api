@@ -18,11 +18,13 @@ public class BookTagServiceImpl implements BookTagService {
     private final BookTagRepository bookTagRepository;
 
     @Override
+    @Transactional(readOnly = true)
     public List<BookTag> getBookTags() {
         return bookTagRepository.findAll();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public BookTag getBookTag(Long tagId) {
         return bookTagRepository.findById(tagId).orElseThrow(() -> new BookTagNotFoundException(tagId));
     }
@@ -37,10 +39,13 @@ public class BookTagServiceImpl implements BookTagService {
 
     @Override
     public BookTag updateBookTag(BookTag bookTag) {
+        BookTag tag = bookTagRepository.findById(bookTag.getTagId())
+                .orElseThrow(() -> new BookTagNotFoundException(bookTag.getTagId()));
         if(existsBookTag(bookTag.getName())) {
             throw new BookTagAlreadyExistsException(bookTag.getName());
         }
-        return bookTagRepository.save(bookTag);
+        tag.setName(bookTag.getName());
+        return tag;
     }
 
     @Override

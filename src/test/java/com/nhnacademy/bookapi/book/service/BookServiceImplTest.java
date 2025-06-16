@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -81,9 +81,8 @@ class BookServiceImplTest {
 
         when(bookRepository.existsByIsbn("test123456789")).thenReturn(true);
 
-        assertThrows(BookAlreadyExistsException.class,
-                () -> bookService.createBook(request)
-        );
+        assertThatThrownBy(() -> bookService.createBook(request))
+                .isInstanceOf(BookAlreadyExistsException.class);
     }
 
     @Test
@@ -108,8 +107,8 @@ class BookServiceImplTest {
 
         when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(BookNotFoundException.class,
-                () -> bookService.getBookDetailByBookId(id));
+        assertThatThrownBy(() -> bookService.getBookDetailByBookId(id))
+                .isInstanceOf(BookNotFoundException.class);
     }
 
 
@@ -166,8 +165,8 @@ class BookServiceImplTest {
         BookUpdateRequest request = new BookUpdateRequest();
         when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(BookNotFoundException.class,
-                () -> bookService.updateBook(id, request));
+        assertThatThrownBy(() -> bookService.updateBook(id, request))
+                .isInstanceOf(BookNotFoundException.class);
     }
 
     @Test
@@ -188,7 +187,7 @@ class BookServiceImplTest {
         Long id = book.getId();
         when(bookRepository.findById(id)).thenReturn(Optional.empty());
 
-        assertThrows(BookNotFoundException.class,
-                () -> bookService.deleteBook(id));
+        assertThatThrownBy(() -> bookService.deleteBook(id))
+                .isInstanceOf(BookNotFoundException.class);
     }
 }
