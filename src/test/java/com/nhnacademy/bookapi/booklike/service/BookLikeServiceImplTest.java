@@ -96,8 +96,9 @@ class BookLikeServiceImplTest {
         when(bookLikeRepository.getBookLikesByUserId(userId)).thenReturn(List.of(bookLike));
         List<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByUserId(userId);
 
-        assertThat(bookLikes).isNotNull();
-        assertThat(bookLikes).hasSize(List.of(bookLike).size());
+        assertThat(bookLikes)
+                .isNotNull()
+                .hasSize(1);
         assertThat(bookLikes.get(0)).isEqualTo(BookLikeResponse.of(bookLike));
     }
 
@@ -108,8 +109,9 @@ class BookLikeServiceImplTest {
         when(bookLikeRepository.getBookLikesByBookId(book.getId())).thenReturn(List.of(bookLike));
         List<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByBookId(book.getId());
 
-        assertThat(bookLikes).isNotNull();
-        assertThat(bookLikes).hasSize(List.of(bookLike).size());
+        assertThat(bookLikes)
+                .isNotNull()
+                .hasSize(1);
         assertThat(bookLikes.get(0)).isEqualTo(BookLikeResponse.of(bookLike));
     }
 
