@@ -91,9 +91,9 @@ class BookControllerTest {
 
         mockMvc.perform(get("/books/{bookId}", bookId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value(response.getTitle()))
-                .andExpect(jsonPath("$.isbn").value(response.getIsbn()))
-                .andExpect(jsonPath("$.author").value(response.getAuthor()));
+                .andExpect(jsonPath("$.title").value(response.title()))
+                .andExpect(jsonPath("$.isbn").value(response.isbn()))
+                .andExpect(jsonPath("$.author").value(response.author()));
     }
 
     @Test
