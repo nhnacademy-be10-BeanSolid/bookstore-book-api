@@ -3,6 +3,8 @@ package com.nhnacademy.bookapi.book.service;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
@@ -12,9 +14,9 @@ public interface BookService {
 
     BookResponse getBookResponseByBookId(Long id);
 
-    List<BookResponse> getBooksByAuthor(String author);
+    Page<BookResponse> getBooksByAuthor(String author, Pageable pageable);
 
-    List<BookResponse> getBooksByPublisher(String publisher);
+    Page<BookResponse> getBooksByPublisher(String publisher, Pageable pageable);
 
     BookResponse updateBook(Long id, BookUpdateRequest request);
 

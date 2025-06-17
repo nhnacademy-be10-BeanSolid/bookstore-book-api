@@ -9,6 +9,8 @@ import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.book.service.BookSearchApiService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -37,14 +39,14 @@ public class BookController {
     }
 
     @GetMapping("/authors/{author}")
-    public ResponseEntity<List<BookResponse>> getBooksByAuthor(@PathVariable String author) {
-        List<BookResponse> response = bookService.getBooksByAuthor(author);
+    public ResponseEntity<Page<BookResponse>> getBooksByAuthor(@PathVariable String author, Pageable pageable) {
+        Page<BookResponse> response = bookService.getBooksByAuthor(author, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/publishers/{publisher}")
-    public ResponseEntity<List<BookResponse>> getBooksByPublisher(@PathVariable String publisher) {
-        List<BookResponse> response = bookService.getBooksByPublisher(publisher);
+    public ResponseEntity<Page<BookResponse>> getBooksByPublisher(@PathVariable String publisher, Pageable pageable) {
+        Page<BookResponse> response = bookService.getBooksByPublisher(publisher, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

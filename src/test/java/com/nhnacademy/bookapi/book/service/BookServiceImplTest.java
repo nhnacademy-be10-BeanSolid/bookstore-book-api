@@ -16,6 +16,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
@@ -133,6 +137,7 @@ class BookServiceImplTest {
     @DisplayName("작가로 도서 찾기")
     void getBooksByAuthorSuccessTest() {
         String author = book.getAuthor();
+
         Book book1 = Book.builder()
                 .title("타이틀")
                 .description("설명")
@@ -147,21 +152,24 @@ class BookServiceImplTest {
                 .stock(100)
                 .build();
         BookResponse response = BookResponse.of(book);
-        BookResponse response2 = BookResponse.of(book1);
+        BookResponse response1 = BookResponse.of(book1);
 
-        when(bookRepository.findBookResponsesByAuthor(author)).thenReturn(List.of(response, response2));
+        Pageable pageable = PageRequest.of(0, 10);
 
-        List<BookResponse> books = bookService.getBooksByAuthor(author);
+        when(bookRepository.findBookResponsesByAuthor(author, pageable))
+                .thenReturn(new PageImpl<>(List.of(response, response1), pageable, 2));
 
-        assertThat(books)
-                .isNotNull()
-                .hasSize(2);
+        Page<BookResponse> pageResult = bookService.getBooksByAuthor(author, pageable);
+
+        assertThat(pageResult).isNotNull();
+        assertThat(pageResult.getContent()).hasSize(2);
     }
 
     @Test
     @DisplayName("출판사로 도서 찾기")
     void getBooksByPublisherTest() {
         String publisher = book.getPublisher();
+
         Book book1 = Book.builder()
                 .title("타이틀")
                 .description("설명")
@@ -176,15 +184,17 @@ class BookServiceImplTest {
                 .stock(100)
                 .build();
         BookResponse response = BookResponse.of(book);
-        BookResponse response2 = BookResponse.of(book1);
+        BookResponse response1 = BookResponse.of(book1);
 
-        when(bookRepository.findBookDetailByPublisher(publisher)).thenReturn(List.of(response, response2));
+        Pageable pageable = PageRequest.of(0, 10);
 
-        List<BookResponse> books = bookService.getBooksByPublisher(publisher);
+        when(bookRepository.findBookDetailByPublisher(publisher, pageable))
+                .thenReturn(new PageImpl<>(List.of(response, response1), pageable, 2));
 
-        assertThat(books)
-                .isNotNull()
-                .hasSize(2);
+        Page<BookResponse> pageResult = bookService.getBooksByPublisher(publisher, pageable);
+
+        assertThat(pageResult).isNotNull();
+        assertThat(pageResult.getContent()).hasSize(2);
     }
 
     @Test

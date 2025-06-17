@@ -36,10 +36,10 @@ Content-Type: application/json
 GET http://localhost:10346/books/1
 
 ### 작가로 도서 찾기
-GET http://localhost:10346/authors/Lee
+GET http://localhost:10346/authors/Lee?page=0&size=2
 
 ### 출판사로 도서 찾기
-GET http://localhost:10346/publishers/pub1
+GET http://localhost:10346/publishers/pub1?page=0&size=2
 
 ### 도서 업데이트
 PATCH http://localhost:10346/books/1

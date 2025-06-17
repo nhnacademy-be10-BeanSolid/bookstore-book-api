@@ -15,6 +15,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
@@ -95,28 +99,66 @@ class BookControllerTest {
     @DisplayName("작가 전체 조회")
     void getAuthorTest() throws Exception{
         String author = book.getAuthor();
+        Book book1 = Book.builder()
+                .title("타이틀")
+                .description("설명")
+                .toc("목차")
+                .publisher("출판사")
+                .author(author)
+                .publishedDate(LocalDate.now())
+                .isbn("test000000000")
+                .originalPrice(10000)
+                .salePrice(5000)
+                .wrappable(false)
+                .stock(100)
+                .build();
         BookResponse response = BookResponse.of(book);
+        BookResponse response1 = BookResponse.of(book1);
 
-        given(bookService.getBooksByAuthor(author)).willReturn(List.of(response));
+        Pageable page = PageRequest.of(0, 10);
+        Page<BookResponse> pageResponse = new PageImpl<>(List.of(response1, response), page, 2);
 
-        mockMvc.perform(get("/authors/{author}", author))
+        given(bookService.getBooksByAuthor(author, page)).willReturn(pageResponse);
+
+        mockMvc.perform(get("/authors/{author}", author)
+                        .param("page", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].author").value(author));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].author").value(author));
     }
 
     @Test
     @DisplayName("출판사 전체 조회")
     void getBooksByPublisherTest() throws Exception{
         String publisher = book.getPublisher();
+        Book book1 = Book.builder()
+                .title("타이틀")
+                .description("설명")
+                .toc("목차")
+                .publisher(publisher)
+                .author("작가")
+                .publishedDate(LocalDate.now())
+                .isbn("test000000000")
+                .originalPrice(10000)
+                .salePrice(5000)
+                .wrappable(false)
+                .stock(100)
+                .build();
         BookResponse response = BookResponse.of(book);
+        BookResponse response1 = BookResponse.of(book1);
 
-        given(bookService.getBooksByPublisher(publisher)).willReturn(List.of(response));
+        Pageable page = PageRequest.of(0, 10);
+        Page<BookResponse> pageResponse = new PageImpl<>(List.of(response1, response), page, 2);
 
-        mockMvc.perform(get("/publishers/{publisher}", publisher))
+        given(bookService.getBooksByPublisher(publisher, page)).willReturn(pageResponse);
+
+        mockMvc.perform(get("/publishers/{publisher}", publisher)
+                        .param("page", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].publisher").value(publisher));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].publisher").value(publisher));
     }
 
 

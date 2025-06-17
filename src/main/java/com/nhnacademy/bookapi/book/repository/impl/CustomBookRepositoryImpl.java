@@ -11,11 +11,13 @@ import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implements CustomBookRepository {
 
@@ -39,33 +41,55 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
     }
 
     @Override
-    public List<BookResponse> findBookResponsesByAuthor(String author) {
+    public Page<BookResponse> findBookResponsesByAuthor(String author, Pageable pageable) {
         QBook book = QBook.book;
 
-        List<Book> books = from(book)
+        List<Book> books = queryFactory
+                .selectFrom(book)
                 .leftJoin(book.bookCategories).fetchJoin()
                 .leftJoin(book.bookTags).fetchJoin()
                 .where(book.author.eq(author))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
-        return books.stream()
+        long total = queryFactory
+                .select(book.count())
+                .from(book)
+                .where(book.author.eq(author))
+                .fetchOne();
+
+        List<BookResponse> content = books.stream()
                 .map(BookResponse::of)
-                .collect(Collectors.toList());
+                .toList();
+
+        return new PageImpl<>(content, pageable, total);
     }
 
     @Override
-    public List<BookResponse> findBookDetailByPublisher(String publisher) {
+    public Page<BookResponse> findBookDetailByPublisher(String publisher, Pageable pageable) {
         QBook book = QBook.book;
 
-        List<Book> books = from(book)
+        List<Book> books = queryFactory
+                .selectFrom(book)
                 .leftJoin(book.bookCategories).fetchJoin()
                 .leftJoin(book.bookTags).fetchJoin()
                 .where(book.publisher.eq(publisher))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
                 .fetch();
 
-        return books.stream()
+        long total = queryFactory
+                .select(book.count())
+                .from(book)
+                .where(book.publisher.eq(publisher))
+                .fetchOne();
+
+        List<BookResponse> content = books.stream()
                 .map(BookResponse::of)
-                .collect(Collectors.toList());
+                .toList();
+
+        return new PageImpl<>(content, pageable, total);
     }
 
     @Override

@@ -10,11 +10,12 @@ import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.book.service.BookService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -59,14 +60,14 @@ public class BookServiceImpl implements BookService {
     // 작가로 도서 찾기
     @Override
     @Transactional(readOnly = true)
-    public List<BookResponse> getBooksByAuthor(String author) {
-        return bookRepository.findBookResponsesByAuthor(author);
+    public Page<BookResponse> getBooksByAuthor(String author, Pageable pageable) {
+        return bookRepository.findBookResponsesByAuthor(author, pageable);
     }
 
     // 출판사로 도서 찾기
     @Override
-    public List<BookResponse> getBooksByPublisher(String publisher) {
-        return bookRepository.findBookDetailByPublisher(publisher);
+    public Page<BookResponse> getBooksByPublisher(String publisher, Pageable pageable) {
+        return bookRepository.findBookDetailByPublisher(publisher, pageable);
     }
 
     // 도서 업데이트
