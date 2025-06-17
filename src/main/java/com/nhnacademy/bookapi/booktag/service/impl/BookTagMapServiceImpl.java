@@ -27,11 +27,12 @@ public class BookTagMapServiceImpl implements BookTagMapService {
     // 도서에 태그 추가
     @Override
     public BookTagMapResponse createBookTag(Long bookId, BookTagMapCreateRequest request) {
+        Long tagId = request.tagId();
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
 
-        BookTag bookTag = bookTagRepository.findById(request.tagId())
-                .orElseThrow(() -> new BookTagNotFoundException(request.tagId()));
+        BookTag bookTag = bookTagRepository.findById(tagId)
+                .orElseThrow(() -> new BookTagNotFoundException(tagId));
 
         if (book.getBookTags().contains(bookTag)) {
             throw new BookTagMapAlreadyExistsException(bookId, request.tagId());
@@ -40,7 +41,8 @@ public class BookTagMapServiceImpl implements BookTagMapService {
         book.getBookTags().add(bookTag);
         bookRepository.save(book);
 
-        return new BookTagMapResponse(bookId, request.tagId());
+        return bookRepository.findBookTagMapResponseByBookIdAndTagId(bookId, tagId)
+                .orElseThrow(() -> new BookTagMapNotFoundException(bookId, tagId));
     }
 
     // 도서 태그 삭제

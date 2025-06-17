@@ -2,7 +2,6 @@ package com.nhnacademy.bookapi.book.controller;
 
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
-import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import com.nhnacademy.bookapi.advice.ValidationFailedException;
@@ -10,6 +9,8 @@ import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.book.service.BookSearchApiService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
@@ -32,20 +33,20 @@ public class BookController {
     }
 
     @GetMapping("/books/{id}")
-    public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
-        BookDetailResponse response = bookService.getBookDetailByBookId(id);
+    public ResponseEntity<BookResponse> getBookDetailById(@PathVariable Long id){
+        BookResponse response = bookService.getBookResponseByBookId(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/authors/{author}")
-    public ResponseEntity<List<BookDetailResponse>> getBooksByAuthor(@PathVariable String author) {
-        List<BookDetailResponse> response = bookService.getBooksByAuthor(author);
+    public ResponseEntity<Page<BookResponse>> getBooksByAuthor(@PathVariable String author, Pageable pageable) {
+        Page<BookResponse> response = bookService.getBooksByAuthor(author, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/publishers/{publisher}")
-    public ResponseEntity<List<BookDetailResponse>> getBooksByPublisher(@PathVariable String publisher) {
-        List<BookDetailResponse> response = bookService.getBooksByPublisher(publisher);
+    public ResponseEntity<Page<BookResponse>> getBooksByPublisher(@PathVariable String publisher, Pageable pageable) {
+        Page<BookResponse> response = bookService.getBooksByPublisher(publisher, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

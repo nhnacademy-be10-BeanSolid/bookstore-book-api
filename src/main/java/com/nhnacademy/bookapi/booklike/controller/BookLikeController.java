@@ -11,6 +11,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -40,7 +41,8 @@ public class BookLikeController {
             throw new ValidationFailedException();
         }
         BookLikeResponse response = bookLikeService.createBookLike(bookId, request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        URI location = URI.create("/books/" + bookId + "/bookLikes/" + response.bookLikeId());
+        return ResponseEntity.created(location).body(response);
     }
 
     // 마이페이지에서 삭제? 임시경로임  유저 아이디와 도서 아이디를 어떻게 받을지    헤더에 정보 저장?

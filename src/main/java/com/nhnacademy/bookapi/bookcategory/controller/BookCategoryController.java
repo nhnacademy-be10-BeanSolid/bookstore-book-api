@@ -35,10 +35,8 @@ public class BookCategoryController {
 
     @GetMapping("/{categoryId}")
     public ResponseEntity<BookCategoryResponse> getCategoryById(@PathVariable("categoryId") Long categoryId) {
-        BookCategory bookCategory = bookCategoryService.getCategoryById(categoryId);
-        BookCategoryResponse bookCategoryResponse = createBookCategoryResponse(bookCategory);
-
-        return ResponseEntity.ok(bookCategoryResponse);
+        BookCategoryResponse response = bookCategoryService.getCategoryById(categoryId);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
@@ -47,17 +45,10 @@ public class BookCategoryController {
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException();
         }
+        BookCategoryResponse response = bookCategoryService.createCategory(request);
+        URI location = URI.create("/categories/" + response.categoryId());
 
-        BookCategory parentCategory = getParentCategory(request.parentId());
-        BookCategory bookCategory = new BookCategory(request.name(), parentCategory);
-
-        BookCategory createdBookCategory = bookCategoryService.createCategory(bookCategory);
-
-        BookCategoryResponse bookCategoryResponse = createBookCategoryResponse(createdBookCategory);
-
-        URI location = URI.create("/categories/" + createdBookCategory.getCategoryId());
-
-        return ResponseEntity.created(location).body(bookCategoryResponse);
+        return ResponseEntity.created(location).body(response);
     }
 
     @PatchMapping("/{categoryId}")
@@ -67,11 +58,9 @@ public class BookCategoryController {
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException();
         }
+        BookCategoryResponse response = bookCategoryService.updateCategory(categoryId, request);
 
-        BookCategory parentCategory = getParentCategory(request.parentId());
-        BookCategory bookCategory = new BookCategory(request.name(), parentCategory);
-        BookCategory updatedBookCategory = bookCategoryService.updateCategory(categoryId, bookCategory);
-        return ResponseEntity.ok(createBookCategoryResponse(updatedBookCategory));
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{categoryId}")
@@ -91,11 +80,4 @@ public class BookCategoryController {
         );
     }
 
-    private BookCategory getParentCategory(Long request) {
-        BookCategory parentCategory = null;
-        if (request != null && bookCategoryService.existsCategory(request)) {
-            parentCategory = bookCategoryService.getCategoryById(request);
-        }
-        return parentCategory;
-    }
 }

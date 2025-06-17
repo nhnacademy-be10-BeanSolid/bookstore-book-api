@@ -1,6 +1,9 @@
 package com.nhnacademy.bookapi.booktag.service.impl;
 
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
+import com.nhnacademy.bookapi.booktag.domain.request.BookTagCreateRequest;
+import com.nhnacademy.bookapi.booktag.domain.request.BookTagUpdateRequest;
+import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
 import com.nhnacademy.bookapi.booktag.exception.BookTagAlreadyExistsException;
 import com.nhnacademy.bookapi.booktag.exception.BookTagNotFoundException;
 import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
@@ -10,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -19,33 +23,39 @@ public class BookTagServiceImpl implements BookTagService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookTag> getBookTags() {
-        return bookTagRepository.findAll();
+    public List<BookTagResponse> getBookTags() {
+        return bookTagRepository.findAllBookTagResponses();
     }
 
     @Override
     @Transactional(readOnly = true)
-    public BookTag getBookTag(Long tagId) {
-        return bookTagRepository.findById(tagId).orElseThrow(() -> new BookTagNotFoundException(tagId));
+    public BookTagResponse getBookTag(Long tagId) {
+        return bookTagRepository.findBookTagResponseById(tagId)
+                .orElseThrow(() -> new BookTagNotFoundException(tagId));
     }
 
     @Override
-    public BookTag createBookTag(BookTag bookTag) {
-        if(existsBookTag(bookTag.getName())) {
-            throw new BookTagAlreadyExistsException(bookTag.getName());
+    public BookTagResponse createBookTag(BookTagCreateRequest request) {
+        if(existsBookTag(request.name())) {
+            throw new BookTagAlreadyExistsException(request.name());
         }
-        return bookTagRepository.save(bookTag);
+
+        BookTag saved = bookTagRepository.save(new BookTag(request.name()));
+
+        return bookTagRepository.findBookTagResponseById(saved.getTagId())
+                .orElseThrow(() -> new BookTagNotFoundException(saved.getTagId()));
     }
 
     @Override
-    public BookTag updateBookTag(BookTag bookTag) {
-        BookTag tag = bookTagRepository.findById(bookTag.getTagId())
-                .orElseThrow(() -> new BookTagNotFoundException(bookTag.getTagId()));
-        if(existsBookTag(bookTag.getName())) {
-            throw new BookTagAlreadyExistsException(bookTag.getName());
+    public BookTagResponse updateBookTag(Long tagId ,BookTagUpdateRequest request) {
+        BookTag tag = bookTagRepository.findById(tagId)
+                .orElseThrow(() -> new BookTagNotFoundException(tagId));
+        if(existsBookTag(request.name())) {
+            throw new BookTagAlreadyExistsException(request.name());
         }
-        tag.setName(bookTag.getName());
-        return tag;
+        tag.setName(request.name());
+        return bookTagRepository.findBookTagResponseById(tagId)
+                .orElseThrow(() -> new BookTagNotFoundException(tagId));
     }
 
     @Override

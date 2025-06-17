@@ -2,7 +2,6 @@ package com.nhnacademy.bookapi.book.service.impl;
 
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
-import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
@@ -11,11 +10,12 @@ import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.book.service.BookService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -45,32 +45,29 @@ public class BookServiceImpl implements BookService {
                 .stock(request.stock())
                 .build();
         Book savedBook = bookRepository.save(book);
-        return BookResponse.of(savedBook);
+        return bookRepository.findBookResponseById(savedBook.getId())
+                .orElseThrow(() -> new BookNotFoundException(savedBook.getId()));
     }
 
     // 아이디로 도서 찾기
     @Override
     @Transactional(readOnly = true)
-    public BookDetailResponse getBookDetailByBookId(Long id) {
-        Book book = bookRepository.findById(id)
+    public BookResponse getBookResponseByBookId(Long id) {
+        return bookRepository.findBookResponseById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
-        return BookDetailResponse.of(book);
     }
-
 
     // 작가로 도서 찾기
     @Override
     @Transactional(readOnly = true)
-    public List<BookDetailResponse> getBooksByAuthor(String author) {
-        List<Book> books = bookRepository.findByAuthor(author);
-        return books.stream().map(BookDetailResponse::of).toList();
+    public Page<BookResponse> getBooksByAuthor(String author, Pageable pageable) {
+        return bookRepository.findBookResponsesByAuthor(author, pageable);
     }
 
     // 출판사로 도서 찾기
     @Override
-    public List<BookDetailResponse> getBooksByPublisher(String publisher) {
-        List<Book> books = bookRepository.findByPublisher(publisher);
-        return books.stream().map(BookDetailResponse::of).toList();
+    public Page<BookResponse> getBooksByPublisher(String publisher, Pageable pageable) {
+        return bookRepository.findBookDetailByPublisher(publisher, pageable);
     }
 
     // 도서 업데이트
@@ -113,7 +110,8 @@ public class BookServiceImpl implements BookService {
         }
         book.setUpdateAt(LocalDateTime.now());
 
-        return BookResponse.of(book);
+        return bookRepository.findBookResponseById(book.getId())
+                .orElseThrow(() -> new BookNotFoundException(id));
     }
 
     // 도서 삭제

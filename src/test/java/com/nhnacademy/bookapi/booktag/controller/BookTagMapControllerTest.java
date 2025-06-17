@@ -35,7 +35,7 @@ class BookTagMapControllerTest {
     Long tagId = 1L;
 
     @Test
-    @DisplayName("POST /books/{bookId}/tags")
+    @DisplayName("도서에 태그 추가")
     void createBookTagMapTest() throws Exception {
         BookTagMapCreateRequest request = new BookTagMapCreateRequest(tagId);
         BookTagMapResponse response = new BookTagMapResponse(bookId, tagId);
@@ -51,7 +51,7 @@ class BookTagMapControllerTest {
     }
 
     @Test
-    @DisplayName("POST /books/{bookId}/tags")
+    @DisplayName("도서에 태그 추가 - 유효성 검사 실패")
     void createBookTagMapValidFailTest() throws Exception {
         BookTagMapCreateRequest request = new BookTagMapCreateRequest(null);
 
@@ -62,7 +62,7 @@ class BookTagMapControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /books/{bookId}/tags/{tagId}")
+    @DisplayName("도서에서 태그 삭제")
     void deleteBookTagMapTest() throws Exception {
         doNothing().when(bookTagMapService).deleteBookTag(bookId, tagId);
 

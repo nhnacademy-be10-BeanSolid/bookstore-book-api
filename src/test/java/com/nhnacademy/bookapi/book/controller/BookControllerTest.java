@@ -6,7 +6,6 @@ import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
-import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.service.BookSearchApiService;
 import com.nhnacademy.bookapi.book.service.BookService;
@@ -16,12 +15,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -48,7 +50,6 @@ class BookControllerTest {
     BookSearchApiService bookSearchService;
 
     Book book;
-    BookCreateRequest request;
 
     @BeforeEach
     void setUp() {
@@ -66,12 +67,10 @@ class BookControllerTest {
                 .stock(100)
                 .build();
         ReflectionTestUtils.setField(book, "id", 1L);
-        request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
-                LocalDate.now(), "test123456789", 10000, 5000, false, 100);
     }
 
     @Test
-    @DisplayName("GET /books-search?query=")
+    @DisplayName("도서 검색 api 테스트")
     void bookServiceTest() throws Exception {
         String query = "포켓몬스터";
 
@@ -82,12 +81,12 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("GET /books/{bookId}")
+    @DisplayName("도서 id 단건 조회")
     void getBookTest() throws Exception{
         Long bookId = book.getId();
-        BookDetailResponse response = BookDetailResponse.of(book);
+        BookResponse response = BookResponse.of(book);
 
-        given(bookService.getBookDetailByBookId(bookId)).willReturn(response);
+        given(bookService.getBookResponseByBookId(bookId)).willReturn(response);
 
         mockMvc.perform(get("/books/{bookId}", bookId))
                 .andExpect(status().isOk())
@@ -97,45 +96,79 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("GET /authors/{author}")
+    @DisplayName("작가 전체 조회")
     void getAuthorTest() throws Exception{
         String author = book.getAuthor();
-        BookDetailResponse response = BookDetailResponse.of(book);
+        Book book1 = Book.builder()
+                .title("타이틀")
+                .description("설명")
+                .toc("목차")
+                .publisher("출판사")
+                .author(author)
+                .publishedDate(LocalDate.now())
+                .isbn("test000000000")
+                .originalPrice(10000)
+                .salePrice(5000)
+                .wrappable(false)
+                .stock(100)
+                .build();
+        BookResponse response = BookResponse.of(book);
+        BookResponse response1 = BookResponse.of(book1);
 
-        given(bookService.getBooksByAuthor(author)).willReturn(List.of(response));
+        Pageable page = PageRequest.of(0, 10);
+        Page<BookResponse> pageResponse = new PageImpl<>(List.of(response1, response), page, 2);
 
-        mockMvc.perform(get("/authors/{author}", author))
+        given(bookService.getBooksByAuthor(author, page)).willReturn(pageResponse);
+
+        mockMvc.perform(get("/authors/{author}", author)
+                        .param("page", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].author").value(author));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].author").value(author));
     }
 
     @Test
-    @DisplayName("GET /publishers/{publisher}")
+    @DisplayName("출판사 전체 조회")
     void getBooksByPublisherTest() throws Exception{
         String publisher = book.getPublisher();
-        BookDetailResponse response = BookDetailResponse.of(book);
+        Book book1 = Book.builder()
+                .title("타이틀")
+                .description("설명")
+                .toc("목차")
+                .publisher(publisher)
+                .author("작가")
+                .publishedDate(LocalDate.now())
+                .isbn("test000000000")
+                .originalPrice(10000)
+                .salePrice(5000)
+                .wrappable(false)
+                .stock(100)
+                .build();
+        BookResponse response = BookResponse.of(book);
+        BookResponse response1 = BookResponse.of(book1);
 
-        given(bookService.getBooksByPublisher(publisher)).willReturn(List.of(response));
+        Pageable page = PageRequest.of(0, 10);
+        Page<BookResponse> pageResponse = new PageImpl<>(List.of(response1, response), page, 2);
 
-        mockMvc.perform(get("/publishers/{publisher}", publisher))
+        given(bookService.getBooksByPublisher(publisher, page)).willReturn(pageResponse);
+
+        mockMvc.perform(get("/publishers/{publisher}", publisher)
+                        .param("page", "0")
+                        .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].publisher").value(publisher));
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].publisher").value(publisher));
     }
 
 
     @Test
-    @DisplayName("POST /books")
+    @DisplayName("도서 생성")
     void createBookTest() throws Exception{
-        BookResponse response = new BookResponse(
-                1L, "타이틀", "설명", "목차", "출판사", "작가",
-                LocalDate.now(), "test123456789",
-                10000, 8000, false, LocalDateTime.now(), LocalDateTime.now(),
-                BookStatus.ON_SALE, 10
-        );
+        BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
+                LocalDate.now(), "test000000000", 10000, 5000, false, 100);
 
-        given(bookService.createBook(any(BookCreateRequest.class))).willReturn(response);
+        given(bookService.createBook(any(BookCreateRequest.class))).willReturn(BookResponse.of(book));
 
         mockMvc.perform(post("/books")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -147,7 +180,7 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("POST /books - valid fail")
+    @DisplayName("도서 생성 - 유효성 검사 실패")
     void createBookValidationFailTest() throws Exception {
         // 재고량 -1로 지정
         BookCreateRequest badRequest = new BookCreateRequest(
@@ -162,7 +195,7 @@ class BookControllerTest {
 
 
     @Test
-    @DisplayName("PATCH /books/{id}")
+    @DisplayName("수정")
     void updateBookTest() throws Exception{
         Long id = book.getId();
         String updateTitle = "수정된 타이틀";
@@ -180,14 +213,14 @@ class BookControllerTest {
 
         mockMvc.perform(patch("/books/{id}", id)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.title").value(updateTitle))
                 .andExpect(jsonPath("$.status").value(BookStatus.SALE_END.name()));
     }
 
     @Test
-    @DisplayName("PATCH /books/{id} - valid fail")
+    @DisplayName("수정 - 유효성 검사 실패")
     void updateBookValidFailTest() throws Exception{
         BookUpdateRequest badRequest = new BookUpdateRequest();
         badRequest.setIsbn("1234567236827189317");
@@ -199,7 +232,7 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /books/{id}")
+    @DisplayName("삭제")
     void deleteBookSuccessTest() throws Exception {
         Long id = book.getId();
 

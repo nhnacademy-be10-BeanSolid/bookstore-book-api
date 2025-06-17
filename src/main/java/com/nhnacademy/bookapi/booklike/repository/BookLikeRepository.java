@@ -7,15 +7,11 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface BookLikeRepository extends JpaRepository<BookLike, Long> {
+public interface BookLikeRepository extends JpaRepository<BookLike, Long>, CustomBookLikeRepository {
 
     boolean existsByUserIdAndBookId(String userId, Long bookId);
 
     boolean existsByBookId(Long bookId);
-
-    List<BookLike> getBookLikesByUserId(String userId);
-
-    List<BookLike> getBookLikesByBookId(Long bookId);
 
     void deleteByUserIdAndBookId(String userId, Long bookId);
 

@@ -24,19 +24,14 @@ public class BookTagController {
 
     @GetMapping
     public ResponseEntity<List<BookTagResponse>> getBookTags() {
-        List<BookTag> bookTagList = bookTagService.getBookTags();
-        List<BookTagResponse> bookTagResponseList = new ArrayList<>();
-        bookTagList.forEach(bookTag ->
-            bookTagResponseList.add(new BookTagResponse(bookTag.getTagId(), bookTag.getName()))
-        );
-        return ResponseEntity.ok(bookTagResponseList);
+        List<BookTagResponse> response = bookTagService.getBookTags();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{tagId}")
     public ResponseEntity<BookTagResponse> getBookTag(@PathVariable Long tagId) {
-        BookTag bookTag = bookTagService.getBookTag(tagId);
-        BookTagResponse bookTagResponse = new BookTagResponse(bookTag.getTagId(), bookTag.getName());
-        return ResponseEntity.ok(bookTagResponse);
+        BookTagResponse response = bookTagService.getBookTag(tagId);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping
@@ -45,11 +40,9 @@ public class BookTagController {
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException();
         }
-        BookTag bookTag = new BookTag(request.name());
-        BookTag savedBookTag = bookTagService.createBookTag(bookTag);
-        BookTagResponse bookTagResponse = new BookTagResponse(savedBookTag.getTagId(), savedBookTag.getName());
-        URI location = URI.create("/book-tags/" + savedBookTag.getTagId());
-        return ResponseEntity.created(location).body(bookTagResponse);
+        BookTagResponse response = bookTagService.createBookTag(request);
+        URI location = URI.create("/book-tags/" + response.tagId());
+        return ResponseEntity.created(location).body(response);
     }
 
     @PatchMapping("/{tagId}")
@@ -58,11 +51,8 @@ public class BookTagController {
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException();
         }
-        BookTag bookTag = new BookTag(request.name());
-        bookTag.setTagId(tagId);
-        BookTag updatedBookTag = bookTagService.updateBookTag(bookTag);
-        BookTagResponse bookTagResponse = new BookTagResponse(updatedBookTag.getTagId(), updatedBookTag.getName());
-        return ResponseEntity.ok(bookTagResponse);
+        BookTagResponse response = bookTagService.updateBookTag(tagId, request);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/{tagId}")
