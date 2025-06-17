@@ -1,10 +1,13 @@
-package com.nhnacademy.bookapi.bookcategory.repository;
+package com.nhnacademy.bookapi.bookcategory.repository.impl;
 
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.QBookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
+import com.nhnacademy.bookapi.bookcategory.repository.CustomBookCategoryRepository;
 import com.querydsl.core.types.Projections;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+
+import java.util.Optional;
 
 public class CustomBookCategoryRepositoryImpl extends QuerydslRepositorySupport implements CustomBookCategoryRepository {
     public CustomBookCategoryRepositoryImpl() {
@@ -12,10 +15,10 @@ public class CustomBookCategoryRepositoryImpl extends QuerydslRepositorySupport 
     }
 
     @Override
-    public BookCategoryResponse findBookCategoryResponseById(Long id) {
+    public Optional<BookCategoryResponse> findBookCategoryResponseById(Long id) {
         QBookCategory bookCategory = QBookCategory.bookCategory;
 
-        return from(bookCategory)
+        BookCategoryResponse result = from(bookCategory)
                 .select(Projections.constructor(BookCategoryResponse.class,
                         bookCategory.categoryId,
                         bookCategory.parentCategory.categoryId,
@@ -25,5 +28,7 @@ public class CustomBookCategoryRepositoryImpl extends QuerydslRepositorySupport 
                 ))
                 .where(bookCategory.categoryId.eq(id))
                 .fetchOne();
+
+        return Optional.ofNullable(result);
     }
 }

@@ -38,7 +38,7 @@ class BookTagControllerTest {
     ObjectMapper objectMapper;
 
     @Test
-    @DisplayName("GET /book-tags - 전체 조회")
+    @DisplayName("전체 조회")
     void getBookTags() throws Exception {
         List<BookTagResponse> tags = List.of(
                 new BookTagResponse(1L, "tag1"),
@@ -55,7 +55,7 @@ class BookTagControllerTest {
     }
 
     @Test
-    @DisplayName("GET /book-tags/{tagId} - 단일 조회")
+    @DisplayName("단일 조회")
     void getBookTag() throws Exception {
         BookTagResponse response = new BookTagResponse(1L, "tag1");
         given(bookTagService.getBookTag(1L)).willReturn(response);
@@ -67,7 +67,7 @@ class BookTagControllerTest {
     }
 
     @Test
-    @DisplayName("POST /book-tags - 생성")
+    @DisplayName("태그 생성")
     void createBookTag() throws Exception {
         BookTagCreateRequest request = new BookTagCreateRequest("tag1");
         BookTagResponse response = new BookTagResponse(1L, "tag1");
@@ -83,7 +83,7 @@ class BookTagControllerTest {
     }
 
     @Test
-    @DisplayName("POST /book-tags - 생성 유효성 검사 실패")
+    @DisplayName("태그 생성 - 유효성 검사 실패")
     void createBookTagValidFailTest() throws Exception {
         BookTagCreateRequest request = new BookTagCreateRequest(null);
 
@@ -94,7 +94,7 @@ class BookTagControllerTest {
     }
 
     @Test
-    @DisplayName("PATCH /book-tags/{tagId} - 수정")
+    @DisplayName("태그 수정")
     void updateBookTag() throws Exception {
         BookTagUpdateRequest request = new BookTagUpdateRequest("tag2");
         BookTagResponse updateResponse = new BookTagResponse(1L, "tag2");
@@ -111,7 +111,7 @@ class BookTagControllerTest {
     }
 
     @Test
-    @DisplayName("PATCH /book-tags/{tagId} - 수정 유효성 검사 실패")
+    @DisplayName("태그 수정 - 유효성 검사 실패")
     void updateBookTagValidFailTest() throws Exception {
         BookTagUpdateRequest request = new BookTagUpdateRequest(null);
 
@@ -122,7 +122,7 @@ class BookTagControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /book-tags/{tagId} - 삭제")
+    @DisplayName("태그 삭제")
     void deleteBookTag() throws Exception {
         doNothing().when(bookTagService).deleteBookTag(1L);
 

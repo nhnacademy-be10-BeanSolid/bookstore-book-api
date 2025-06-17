@@ -1,15 +1,13 @@
 package com.nhnacademy.bookapi.booktag.repository;
 
-import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface CustomBookTagRepository {
 
-    BookTagResponse findBookTagResponseById(Long id);
+    Optional<BookTagResponse> findBookTagResponseById(Long id);
 
     List<BookTagResponse> findAllBookTagResponses();
-
-    BookTagMapResponse findBookTagMapResponseByBookId(Long bookId);
 }

@@ -13,10 +13,6 @@ public interface BookLikeRepository extends JpaRepository<BookLike, Long>, Custo
 
     boolean existsByBookId(Long bookId);
 
-//    List<BookLike> getBookLikesByUserId(String userId);
-//
-//    List<BookLike> getBookLikesByBookId(Long bookId);
-
     void deleteByUserIdAndBookId(String userId, Long bookId);
 
     void deleteByBookId(Long bookId);

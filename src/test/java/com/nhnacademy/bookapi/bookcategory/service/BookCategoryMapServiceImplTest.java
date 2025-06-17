@@ -60,10 +60,13 @@ class BookCategoryMapServiceImplTest {
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookCategoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
-        BookCategoryMapResponse response = bookCategoryMapService.createBookCategoryMap(bookId, request);
+        BookCategoryMapResponse response = new BookCategoryMapResponse(bookId, categoryId);
+        when(bookRepository.findBookCategoryMapResponseByBookIdAndCategoryId(bookId, categoryId))
+                .thenReturn(Optional.of(response));
+        BookCategoryMapResponse result = bookCategoryMapService.createBookCategoryMap(bookId, request);
 
-        assertThat(response.bookId()).isEqualTo(bookId);
-        assertThat(response.categoryId()).isEqualTo(categoryId);
+        assertThat(result.bookId()).isEqualTo(bookId);
+        assertThat(result.categoryId()).isEqualTo(categoryId);
     }
 
     @Test

@@ -30,7 +30,7 @@ public class BookTagServiceImpl implements BookTagService {
     @Override
     @Transactional(readOnly = true)
     public BookTagResponse getBookTag(Long tagId) {
-        return Optional.ofNullable(bookTagRepository.findBookTagResponseById(tagId))
+        return bookTagRepository.findBookTagResponseById(tagId)
                 .orElseThrow(() -> new BookTagNotFoundException(tagId));
     }
 
@@ -42,7 +42,8 @@ public class BookTagServiceImpl implements BookTagService {
 
         BookTag saved = bookTagRepository.save(new BookTag(request.name()));
 
-        return bookTagRepository.findBookTagResponseById(saved.getTagId());
+        return bookTagRepository.findBookTagResponseById(saved.getTagId())
+                .orElseThrow(() -> new BookTagNotFoundException(saved.getTagId()));
     }
 
     @Override
@@ -53,7 +54,8 @@ public class BookTagServiceImpl implements BookTagService {
             throw new BookTagAlreadyExistsException(request.name());
         }
         tag.setName(request.name());
-        return bookTagRepository.findBookTagResponseById(tagId);
+        return bookTagRepository.findBookTagResponseById(tagId)
+                .orElseThrow(() -> new BookTagNotFoundException(tagId));
     }
 
     @Override

@@ -39,15 +39,14 @@ public class BookLikeServiceImpl implements BookLikeService {
 
         BookLike savedBookLike = bookLikeRepository.save(new BookLike(userId, book));
 
-        return bookLikeRepository.findBookLikeResponseById(savedBookLike.getId());
+        return bookLikeRepository.findBookLikeResponseById(savedBookLike.getId())
+                .orElseThrow(() -> new BookLikeNotFoundException(savedBookLike.getId()));
     }
 
     // 유저별 좋아요 조회
     @Override
     @Transactional(readOnly = true)
     public List<BookLikeResponse> getBookLikesByUserId(String userId) {
-//        List<BookLike> bookLikes = bookLikeRepository.getBookLikesByUserId(userId);
-//        return bookLikes.stream().map(BookLikeResponse::of).toList();
         return bookLikeRepository.findBookLikesByUserId(userId);
     }
 
@@ -58,8 +57,6 @@ public class BookLikeServiceImpl implements BookLikeService {
         if(!bookLikeRepository.existsByBookId(bookId)) {
             throw new BookNotFoundException(bookId);
         }
-//        List<BookLike> bookLikes = bookLikeRepository.getBookLikesByBookId(bookId);
-//        return bookLikes.stream().map(BookLikeResponse::of).toList();
         return bookLikeRepository.findBookLikesByBookId(bookId);
     }
 

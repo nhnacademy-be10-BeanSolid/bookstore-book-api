@@ -61,10 +61,13 @@ class BookTagMapServiceImplTest {
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookTagRepository.findById(tagId)).thenReturn(Optional.of(tag));
 
-        BookTagMapResponse response = bookTagMapService.createBookTag(bookId, request);
+        BookTagMapResponse response = new BookTagMapResponse(bookId, tagId);
+        when(bookRepository.findBookTagMapResponseByBookIdAndTagId(bookId, tagId))
+                .thenReturn(Optional.of(response));
+        BookTagMapResponse result = bookTagMapService.createBookTag(bookId, request);
 
-        assertThat(response.bookId()).isEqualTo(bookId);
-        assertThat(response.tagId()).isEqualTo(tagId);
+        assertThat(result.bookId()).isEqualTo(bookId);
+        assertThat(result.tagId()).isEqualTo(tagId);
     }
 
     @Test

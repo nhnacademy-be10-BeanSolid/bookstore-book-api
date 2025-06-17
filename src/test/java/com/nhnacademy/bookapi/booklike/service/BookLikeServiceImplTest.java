@@ -69,7 +69,7 @@ class BookLikeServiceImplTest {
     }
 
     @Test
-    @DisplayName("좋아요 생성 성공")
+    @DisplayName("좋아요 생성")
     void createBookLikeSuccessTest() {
         BookLikeCreateRequest request = new BookLikeCreateRequest(userId);
 
@@ -78,7 +78,7 @@ class BookLikeServiceImplTest {
 
         BookLike savedBookLike = new BookLike(userId, book);
         when(bookLikeRepository.save(any(BookLike.class))).thenReturn(savedBookLike);
-        when(bookLikeRepository.findBookLikeResponseById(any())).thenReturn(BookLikeResponse.of(savedBookLike));
+        when(bookLikeRepository.findBookLikeResponseById(any())).thenReturn(Optional.of(BookLikeResponse.of(savedBookLike)));
 
         BookLikeResponse response = bookLikeService.createBookLike(book.getId(), request);
 
@@ -88,7 +88,7 @@ class BookLikeServiceImplTest {
     }
 
     @Test
-    @DisplayName("좋아요 생성 실패 - 이미 좋아요 한 경우")
+    @DisplayName("좋아요 생성 - 이미 좋아요 한 경우")
     void createBookLikeFailTest() {
         Long bookId = book.getId();
         BookLikeCreateRequest request = new BookLikeCreateRequest(userId);
@@ -155,7 +155,7 @@ class BookLikeServiceImplTest {
     }
 
     @Test
-    @DisplayName("유저와 도서 아이디에 해당하는 좋아요가 없어 실패")
+    @DisplayName("삭제 - 유저/도서에 해당하는 좋아요가 없는 경우")
     void deleteBookLikeByUserIdAndBookIdFailTest() {
         Long bookId = book.getId();
         when(bookLikeRepository.existsByUserIdAndBookId(userId, bookId)).thenReturn(false);

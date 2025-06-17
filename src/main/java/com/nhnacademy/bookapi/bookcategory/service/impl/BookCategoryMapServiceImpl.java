@@ -27,11 +27,12 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
     // 도서에 카테고리 추가
     @Override
     public BookCategoryMapResponse createBookCategoryMap(Long bookId , BookCategoryMapCreateRequest request) {
+        Long categoryId = request.categoryId();
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
 
         BookCategory category = bookCategoryRepository.findById(request.categoryId())
-                .orElseThrow(() -> new BookCategoryNotFoundException(request.categoryId()));
+                .orElseThrow(() -> new BookCategoryNotFoundException(categoryId));
 
         if (book.getBookCategories().contains(category)) {
             throw new BookCategoryMapAlreadyExistsException(bookId, request.categoryId());
@@ -40,7 +41,8 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
         book.getBookCategories().add(category);
         bookRepository.save(book);
 
-        return new BookCategoryMapResponse(bookId, request.categoryId());
+        return bookRepository.findBookCategoryMapResponseByBookIdAndCategoryId(bookId, categoryId)
+                .orElseThrow(() -> new BookCategoryMapNotFoundException(bookId,categoryId));
     }
 
     // 도서에서 카테고리 삭제

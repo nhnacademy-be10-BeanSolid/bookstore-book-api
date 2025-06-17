@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
+import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -60,11 +61,10 @@ class BookCategoryControllerTest {
     @Test
     @DisplayName("카테고리 단건 조회")
     void getCategoryById() throws Exception {
-        BookCategory parent = new BookCategory("Parent", null);
-        parent.setCategoryId(1L);
-        parent.setCreatedAt(LocalDateTime.now());
+        BookCategoryResponse response = new BookCategoryResponse(1L,
+                null, "Parent", LocalDateTime.now(), LocalDateTime.now());
 
-        given(bookCategoryService.getCategoryById(1L)).willReturn(parent);
+        given(bookCategoryService.getCategoryById(1L)).willReturn(response);
 
         mockMvc.perform(get("/categories/{categoryId}", 1L))
                 .andExpect(status().isOk())
@@ -76,11 +76,9 @@ class BookCategoryControllerTest {
     @DisplayName("카테고리 생성")
     void createCategory() throws Exception {
         BookCategoryCreateRequest request = new BookCategoryCreateRequest("NewCategory", null);
-        BookCategory created = new BookCategory("NewCategory", null);
-        created.setCategoryId(10L);
-        created.setCreatedAt(LocalDateTime.now());
-
-        given(bookCategoryService.createCategory(any(BookCategory.class))).willReturn(created);
+        BookCategoryResponse response = new BookCategoryResponse(10L,
+                null, "NewCategory", LocalDateTime.now(), LocalDateTime.now());
+        given(bookCategoryService.createCategory(request)).willReturn(response);
 
         mockMvc.perform(post("/categories")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -106,13 +104,10 @@ class BookCategoryControllerTest {
     @DisplayName("카테고리 수정")
     void updateCategory() throws Exception {
         BookCategoryUpdateRequest request = new BookCategoryUpdateRequest("Updated", null);
-        BookCategory updated = new BookCategory("Updated", null);
-        updated.setCategoryId(1L);
-        updated.setCreatedAt(LocalDateTime.now());
-        updated.setUpdatedAt(LocalDateTime.now());
+        BookCategoryResponse updated = new BookCategoryResponse(1L, null, "Updated", LocalDateTime.now(), LocalDateTime.now());
 
         given(bookCategoryService.updateCategory(eq(1L),
-                any(BookCategory.class))).willReturn(updated);
+                any(BookCategoryUpdateRequest.class))).willReturn(updated);
 
         mockMvc.perform(patch("/categories/1")
                     .contentType(MediaType.APPLICATION_JSON)
@@ -156,12 +151,11 @@ class BookCategoryControllerTest {
         // 자식 카테고리 생성 결과
         BookCategory child = new BookCategory("ChildCategory", parent);
         child.setCategoryId(2L);
-        child.setCreatedAt(LocalDateTime.now());
 
-        // 부모 카테고리 존재 여부 및 조회 목 세팅
-        given(bookCategoryService.existsCategory(1L)).willReturn(true);
-        given(bookCategoryService.getCategoryById(1L)).willReturn(parent);
-        given(bookCategoryService.createCategory(any(BookCategory.class))).willReturn(child);
+        BookCategoryResponse response = new BookCategoryResponse(2L, 1L, "ChildCategory", LocalDateTime.now(), LocalDateTime.now());
+
+        given(bookCategoryService.createCategory(any(BookCategoryCreateRequest.class)))
+                .willReturn(response);
 
         mockMvc.perform(post("/categories")
                         .contentType(MediaType.APPLICATION_JSON)

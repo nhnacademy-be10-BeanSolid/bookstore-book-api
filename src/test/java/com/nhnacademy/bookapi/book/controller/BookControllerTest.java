@@ -66,7 +66,7 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("GET /books-search?query=")
+    @DisplayName("도서 검색 api 테스트")
     void bookServiceTest() throws Exception {
         String query = "포켓몬스터";
 
@@ -77,7 +77,7 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("GET /books/{bookId}")
+    @DisplayName("도서 id 단건 조회")
     void getBookTest() throws Exception{
         Long bookId = book.getId();
         BookResponse response = BookResponse.of(book);
@@ -92,7 +92,7 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("GET /authors/{author}")
+    @DisplayName("작가 전체 조회")
     void getAuthorTest() throws Exception{
         String author = book.getAuthor();
         BookResponse response = BookResponse.of(book);
@@ -106,7 +106,7 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("GET /publishers/{publisher}")
+    @DisplayName("출판사 전체 조회")
     void getBooksByPublisherTest() throws Exception{
         String publisher = book.getPublisher();
         BookResponse response = BookResponse.of(book);
@@ -121,7 +121,7 @@ class BookControllerTest {
 
 
     @Test
-    @DisplayName("POST /books")
+    @DisplayName("도서 생성")
     void createBookTest() throws Exception{
         BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
                 LocalDate.now(), "test000000000", 10000, 5000, false, 100);
@@ -138,7 +138,7 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("POST /books - valid fail")
+    @DisplayName("도서 생성 - 유효성 검사 실패")
     void createBookValidationFailTest() throws Exception {
         // 재고량 -1로 지정
         BookCreateRequest badRequest = new BookCreateRequest(
@@ -153,7 +153,7 @@ class BookControllerTest {
 
 
     @Test
-    @DisplayName("PATCH /books/{id}")
+    @DisplayName("수정")
     void updateBookTest() throws Exception{
         Long id = book.getId();
         String updateTitle = "수정된 타이틀";
@@ -178,7 +178,7 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("PATCH /books/{id} - valid fail")
+    @DisplayName("수정 - 유효성 검사 실패")
     void updateBookValidFailTest() throws Exception{
         BookUpdateRequest badRequest = new BookUpdateRequest();
         badRequest.setIsbn("1234567236827189317");
@@ -190,7 +190,7 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /books/{id}")
+    @DisplayName("삭제")
     void deleteBookSuccessTest() throws Exception {
         Long id = book.getId();
 

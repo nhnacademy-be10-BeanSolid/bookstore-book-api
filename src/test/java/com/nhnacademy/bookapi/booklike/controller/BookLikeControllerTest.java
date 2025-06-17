@@ -17,6 +17,7 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -53,11 +54,12 @@ class BookLikeControllerTest {
     }
 
     @Test
-    @DisplayName("GET /books/{bookId}/bookLikes")
+    @DisplayName("좋아요 조회 - 도서 아이디")
     void getBookLikesByBookIdTest() throws Exception {
+        Long bookId = book.getId();
         BookLikeResponse response = BookLikeResponse.of(bookLike);
 
-        given(bookLikeService.getBookLikesByBookId(book.getId())).willReturn(List.of(response));
+        given(bookLikeService.getBookLikesByBookId(bookId)).willReturn(List.of(response));
 
         mockMvc.perform(get("/books/{bookId}/bookLikes", book.getId()))
                 .andExpect(status().isOk())
@@ -65,7 +67,7 @@ class BookLikeControllerTest {
     }
 
     @Test
-    @DisplayName("GET /users/{userId}/bookLikes")
+    @DisplayName("좋아요 조회 - 유저 아이디")
     void getBookLikesByUserIdTest() throws Exception {
         List<BookLikeResponse> responses = bookLikeService.getBookLikesByUserId(userId);
 
@@ -77,7 +79,7 @@ class BookLikeControllerTest {
     }
 
     @Test
-    @DisplayName("POST /books/{bookId}/bookLikes")
+    @DisplayName("좋아요 생성")
     void createBookLikeTest() throws Exception {
         Book newBook = new Book();
         ReflectionTestUtils.setField(newBook, "id", 2L);
@@ -97,7 +99,7 @@ class BookLikeControllerTest {
     }
 
     @Test
-    @DisplayName("POST /books/{bookId}/bookLikes - 유효성 검사 실패")
+    @DisplayName("좋아요 생성 - 유효성 검사 실패")
     void createBookLikeValidFailTest() throws Exception {
         BookLikeCreateRequest request = new BookLikeCreateRequest(null);
 
@@ -108,7 +110,7 @@ class BookLikeControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /books/{bookId}/bookLikes")
+    @DisplayName("삭제")
     void deleteBookLikeTest() throws Exception {
         doNothing().when(bookLikeService).deleteBookLikeByBookId(book.getId());
 
@@ -119,7 +121,7 @@ class BookLikeControllerTest {
     }
 
     @Test
-    @DisplayName("DELETE /users/{userId}/bookLikes/{bookId}")
+    @DisplayName("삭제 - 유저,도서 아이디")
     void deleteBookLikeByUserIdAndBookIdTest() throws Exception {
         doNothing().when(bookLikeService).deleteBookLikeByUserIdAndBookId(userId, book.getId());
 

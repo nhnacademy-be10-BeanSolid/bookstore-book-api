@@ -1,6 +1,9 @@
 package com.nhnacademy.bookapi.bookcategory.service.impl;
 
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
+import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
+import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
+import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryAlreadyExistsException;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
@@ -20,18 +23,26 @@ public class BookCategoryServiceImpl implements BookCategoryService {
     private final BookCategoryRepository bookCategoryRepository;
 
     @Override
-    public BookCategory createCategory(BookCategory bookCategory) {
-        if(existsCategory(bookCategory.getName())) {
-            throw new BookCategoryAlreadyExistsException(bookCategory.getName());
+    public BookCategoryResponse createCategory(BookCategoryCreateRequest request) {
+        if (existsCategory(request.name())) {
+            throw new BookCategoryAlreadyExistsException(request.name());
         }
-        return bookCategoryRepository.save(bookCategory);
+        BookCategory parent = null;
+        if (request.parentId() != null) {
+            parent = bookCategoryRepository.findById(request.parentId())
+                    .orElseThrow(() -> new BookCategoryNotFoundException(request.parentId()));
+        }
+        BookCategory saved = bookCategoryRepository.save(new BookCategory(request.name(), parent));
+
+        return bookCategoryRepository.findBookCategoryResponseById(saved.getCategoryId())
+                .orElseThrow(() -> new BookCategoryNotFoundException(saved.getCategoryId()));
     }
 
     @Override
     @Transactional(readOnly = true)
-    public BookCategory getCategoryById(Long categoryId) {
-        Optional<BookCategory> bookCategory = bookCategoryRepository.findById(categoryId);
-        return bookCategory.orElseThrow(() -> new BookCategoryNotFoundException(categoryId));
+    public BookCategoryResponse getCategoryById(Long categoryId) {
+        return bookCategoryRepository.findBookCategoryResponseById(categoryId)
+                .orElseThrow(() -> new BookCategoryNotFoundException(categoryId));
     }
 
     @Override
@@ -41,16 +52,23 @@ public class BookCategoryServiceImpl implements BookCategoryService {
     }
 
     @Override
-    public BookCategory updateCategory(Long categoryId, BookCategory bookCategory) {
-        Optional<BookCategory> bookCategoryOptional = bookCategoryRepository.findById(categoryId);
-        if(bookCategoryOptional.isPresent()) {
-            BookCategory bookCategoryToUpdate = bookCategoryOptional.get();
-            bookCategoryToUpdate.setName(bookCategory.getName());
-            bookCategoryToUpdate.setParentCategory(bookCategory.getParentCategory());
-            bookCategoryToUpdate.setUpdatedAt(LocalDateTime.now());
-            return bookCategoryRepository.save(bookCategoryToUpdate);
+    public BookCategoryResponse updateCategory(Long categoryId, BookCategoryUpdateRequest request) {
+        BookCategory category = bookCategoryRepository.findById(categoryId)
+                .orElseThrow(() -> new BookCategoryNotFoundException(categoryId));
+
+        BookCategory parent = null;
+        if (request.parentId() != null) {
+            parent = bookCategoryRepository.findById(request.parentId())
+                    .orElseThrow(() -> new BookCategoryNotFoundException(request.parentId()));
         }
-        throw new BookCategoryNotFoundException(categoryId);
+        category.setName(request.name());
+        category.setParentCategory(parent);
+        category.setUpdatedAt(LocalDateTime.now());
+
+        bookCategoryRepository.save(category);
+
+        return bookCategoryRepository.findBookCategoryResponseById(categoryId)
+                .orElseThrow(() -> new BookCategoryNotFoundException(categoryId));
     }
 
     @Override

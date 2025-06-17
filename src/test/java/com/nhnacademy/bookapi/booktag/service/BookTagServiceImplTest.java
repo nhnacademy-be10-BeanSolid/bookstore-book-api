@@ -34,7 +34,7 @@ class BookTagServiceImplTest {
     BookTagServiceImpl bookTagService;
 
     @Test
-    @DisplayName("getBookTags - 전체 조회")
+    @DisplayName("전체 조회")
     void getBookTags() {
         List<BookTagResponse> response = List.of(
                 new BookTagResponse(1L, "tag1"),
@@ -50,10 +50,10 @@ class BookTagServiceImplTest {
     }
 
     @Test
-    @DisplayName("getBookTag - 존재하는 태그 조회")
+    @DisplayName("태그 조회")
     void getBookTag_found() {
         BookTagResponse response = new BookTagResponse(1L, "tag1");
-        when(bookTagRepository.findBookTagResponseById(1L)).thenReturn(response);
+        when(bookTagRepository.findBookTagResponseById(1L)).thenReturn(Optional.of(response));
 
         BookTagResponse result = bookTagService.getBookTag(1L);
 
@@ -61,7 +61,7 @@ class BookTagServiceImplTest {
     }
 
     @Test
-    @DisplayName("createBookTag - 중복 이름 예외")
+    @DisplayName("태그 생성 - 이미 존재하는 태그")
     void createBookTag_duplicateName() {
         when(bookTagRepository.existsBookTagByName("tag1")).thenReturn(true);
 
@@ -71,7 +71,7 @@ class BookTagServiceImplTest {
     }
 
     @Test
-    @DisplayName("createBookTag - 정상 생성")
+    @DisplayName("태그 생성")
     void createBookTag_success() {
         BookTagCreateRequest request = new BookTagCreateRequest("tag1");
         when(bookTagRepository.existsBookTagByName("tag1")).thenReturn(false);
@@ -79,7 +79,7 @@ class BookTagServiceImplTest {
         BookTag saved = new BookTag(1L,"tag1");
 
         when(bookTagRepository.save(any(BookTag.class))).thenReturn(saved);
-        when(bookTagRepository.findBookTagResponseById(1L)).thenReturn(new BookTagResponse(1L, "tag1"));
+        when(bookTagRepository.findBookTagResponseById(1L)).thenReturn(Optional.of(new BookTagResponse(1L, "tag1")));
 
         BookTagResponse response = bookTagService.createBookTag(request);
 
@@ -88,7 +88,7 @@ class BookTagServiceImplTest {
     }
 
     @Test
-    @DisplayName("updateBookTag - 중복 이름 예외")
+    @DisplayName("업데이트 - 중복 이름")
     void updateBookTag_duplicateName() {
         BookTag tag = new BookTag(1L, "tag");
         BookTagUpdateRequest request = new BookTagUpdateRequest("tag1");
@@ -101,7 +101,7 @@ class BookTagServiceImplTest {
     }
 
     @Test
-    @DisplayName("updateBookTag - 정상 업데이트")
+    @DisplayName("업데이트")
     void updateBookTag_success() {
         BookTag tag = new BookTag(1L, "tag");
         BookTagUpdateRequest request = new BookTagUpdateRequest("tag1");
@@ -109,7 +109,7 @@ class BookTagServiceImplTest {
 
         when(bookTagRepository.findById(1L)).thenReturn(Optional.of(tag));
         when(bookTagRepository.existsBookTagByName("tag1")).thenReturn(false);
-        when(bookTagRepository.findBookTagResponseById(1L)).thenReturn(response);
+        when(bookTagRepository.findBookTagResponseById(1L)).thenReturn(Optional.of(response));
 
         BookTagResponse updatedResponse = bookTagService.updateBookTag(1L, request);
 
@@ -117,7 +117,7 @@ class BookTagServiceImplTest {
     }
 
     @Test
-    @DisplayName("deleteBookTag - 존재하지 않을 때 예외")
+    @DisplayName("삭제 - 존재하지 않는 태그")
     void deleteBookTag_notFound() {
         when(bookTagRepository.existsById(1L)).thenReturn(false);
 
@@ -126,7 +126,7 @@ class BookTagServiceImplTest {
     }
 
     @Test
-    @DisplayName("deleteBookTag - 정상 삭제")
+    @DisplayName("삭제")
     void deleteBookTag_success() {
         when(bookTagRepository.existsById(1L)).thenReturn(true);
 
@@ -136,7 +136,7 @@ class BookTagServiceImplTest {
     }
 
     @Test
-    @DisplayName("existsBookTag - id로 존재 여부")
+    @DisplayName("id로 존재 여부")
     void existsBookTagById() {
         when(bookTagRepository.existsById(1L)).thenReturn(true);
 
@@ -144,7 +144,7 @@ class BookTagServiceImplTest {
     }
 
     @Test
-    @DisplayName("existsBookTag - 이름으로 존재 여부")
+    @DisplayName("이름으로 존재 여부")
     void existsBookTagByName() {
         when(bookTagRepository.existsBookTagByName("tag1")).thenReturn(true);
 
