@@ -40,7 +40,7 @@ public class BookTagMapServiceImpl implements BookTagMapService {
         book.getBookTags().add(bookTag);
         bookRepository.save(book);
 
-        return new BookTagMapResponse(bookId, request.tagId());
+        return bookTagRepository.findBookTagMapResponseByBookId(bookId);
     }
 
     // 도서 태그 삭제

@@ -8,7 +8,7 @@ Content-Type: application/json
   "publisher": "pub1",
   "author": "Lee",
   "publishedDate": "2025-06-09",
-  "isbn": "isbn001111111",
+  "isbn": "isbn001111119",
   "originalPrice": 1000,
   "salePrice": 500,
   "wrappable": false,
@@ -25,7 +25,7 @@ Content-Type: application/json
   "publisher": "pub2",
   "author": "Lee",
   "publishedDate": "2025-06-09",
-  "isbn": "isbn001111112",
+  "isbn": "isbn001111116",
   "originalPrice": 1000,
   "salePrice": 1,
   "wrappable": true,
@@ -51,4 +51,4 @@ Content-Type: application/json
 }
 
 ### 도서 삭제
-DELETE http://localhost:10346/books/2
+DELETE http://localhost:10346/books/4

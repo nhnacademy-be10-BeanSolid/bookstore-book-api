@@ -2,7 +2,6 @@ package com.nhnacademy.bookapi.book.controller;
 
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
-import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import com.nhnacademy.bookapi.advice.ValidationFailedException;
@@ -32,20 +31,20 @@ public class BookController {
     }
 
     @GetMapping("/books/{id}")
-    public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
-        BookDetailResponse response = bookService.getBookDetailByBookId(id);
+    public ResponseEntity<BookResponse> getBookDetailById(@PathVariable Long id){
+        BookResponse response = bookService.getBookResponseByBookId(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/authors/{author}")
-    public ResponseEntity<List<BookDetailResponse>> getBooksByAuthor(@PathVariable String author) {
-        List<BookDetailResponse> response = bookService.getBooksByAuthor(author);
+    public ResponseEntity<List<BookResponse>> getBooksByAuthor(@PathVariable String author) {
+        List<BookResponse> response = bookService.getBooksByAuthor(author);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/publishers/{publisher}")
-    public ResponseEntity<List<BookDetailResponse>> getBooksByPublisher(@PathVariable String publisher) {
-        List<BookDetailResponse> response = bookService.getBooksByPublisher(publisher);
+    public ResponseEntity<List<BookResponse>> getBooksByPublisher(@PathVariable String publisher) {
+        List<BookResponse> response = bookService.getBooksByPublisher(publisher);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

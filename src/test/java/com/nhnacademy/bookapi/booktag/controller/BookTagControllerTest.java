@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagUpdateRequest;
+import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
 import com.nhnacademy.bookapi.booktag.service.BookTagService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -37,10 +40,11 @@ class BookTagControllerTest {
     @Test
     @DisplayName("GET /book-tags - 전체 조회")
     void getBookTags() throws Exception {
-        List<BookTag> tags = List.of(
-                new BookTag(1L, "tag1"),
-                new BookTag(2L, "tag2")
+        List<BookTagResponse> tags = List.of(
+                new BookTagResponse(1L, "tag1"),
+                new BookTagResponse(2L, "tag2")
         );
+
         given(bookTagService.getBookTags()).willReturn(tags);
 
         mockMvc.perform(get("/book-tags"))
@@ -53,8 +57,8 @@ class BookTagControllerTest {
     @Test
     @DisplayName("GET /book-tags/{tagId} - 단일 조회")
     void getBookTag() throws Exception {
-        BookTag tag = new BookTag(1L, "tag1");
-        given(bookTagService.getBookTag(1L)).willReturn(tag);
+        BookTagResponse response = new BookTagResponse(1L, "tag1");
+        given(bookTagService.getBookTag(1L)).willReturn(response);
 
         mockMvc.perform(get("/book-tags/1"))
                 .andExpect(status().isOk())
@@ -66,8 +70,8 @@ class BookTagControllerTest {
     @DisplayName("POST /book-tags - 생성")
     void createBookTag() throws Exception {
         BookTagCreateRequest request = new BookTagCreateRequest("tag1");
-        BookTag saved = new BookTag(1L, "tag1");
-        given(bookTagService.createBookTag(ArgumentMatchers.any(BookTag.class))).willReturn(saved);
+        BookTagResponse response = new BookTagResponse(1L, "tag1");
+        given(bookTagService.createBookTag(request)).willReturn(response);
 
         mockMvc.perform(post("/book-tags")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -93,10 +97,10 @@ class BookTagControllerTest {
     @DisplayName("PATCH /book-tags/{tagId} - 수정")
     void updateBookTag() throws Exception {
         BookTagUpdateRequest request = new BookTagUpdateRequest("tag2");
-        BookTag updated = new BookTag(1L, "tag2");
-        updated.setTagId(1L);
+        BookTagResponse updateResponse = new BookTagResponse(1L, "tag2");
 
-        given(bookTagService.updateBookTag(ArgumentMatchers.any(BookTag.class))).willReturn(updated);
+        given(bookTagService.updateBookTag(eq(1L), any(BookTagUpdateRequest.class)))
+                .willReturn(updateResponse);
 
         mockMvc.perform(patch("/book-tags/1")
                         .contentType(MediaType.APPLICATION_JSON)

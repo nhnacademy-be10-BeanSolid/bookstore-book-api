@@ -4,19 +4,22 @@ Content-Type: application/json
 
 {
   "userId": "user",
-  "bookId": 1
+  "bookId": 4
 }
 
 ### 책 좋아요 생성
-POST http://localhost:10346/books/2/bookLikes
+POST http://localhost:10346/books/4/bookLikes
 Content-Type: application/json
 
 {
   "userId": "user",
-  "bookId": 2
+  "bookId": 4
 }
 
 ### 좋아요 조회
+GET http://localhost:10346/books/1/bookLikes
+
+### 유서 아이디로 좋아요 조회
 GET http://localhost:10346/users/user/bookLikes
 
 ### 좋아요 삭제

@@ -41,10 +41,15 @@ class BookLikeServiceImplTest {
 
     Book book;
     BookLike bookLike;
+    BookLike bookLike1;
     String userId;
+    String userId1;
 
     @BeforeEach
     void setUp() {
+        userId = "user1";
+        userId1 = "user2";
+
         book = Book.builder()
                 .title("타이틀")
                 .description("설명")
@@ -60,6 +65,7 @@ class BookLikeServiceImplTest {
                 .build();
         ReflectionTestUtils.setField(book, "id", 1L);
         bookLike = new BookLike(userId, book);
+        bookLike1 = new BookLike(userId1, book);
     }
 
     @Test
@@ -67,23 +73,27 @@ class BookLikeServiceImplTest {
     void createBookLikeSuccessTest() {
         BookLikeCreateRequest request = new BookLikeCreateRequest(userId);
 
-        when(bookRepository.findById(book.getId())).thenReturn(Optional.ofNullable(book));
+        when(bookRepository.findById(book.getId())).thenReturn(Optional.of(book));
         when(bookLikeRepository.existsByUserIdAndBookId(userId, book.getId())).thenReturn(false);
+
+        BookLike savedBookLike = new BookLike(userId, book);
+        when(bookLikeRepository.save(any(BookLike.class))).thenReturn(savedBookLike);
+        when(bookLikeRepository.findBookLikeResponseById(any())).thenReturn(BookLikeResponse.of(savedBookLike));
 
         BookLikeResponse response = bookLikeService.createBookLike(book.getId(), request);
 
         assertThat(response).isNotNull();
-        assertThat(response.bookId()).isEqualTo(book.getId());
+        assertThat(response.bookId()).isEqualTo(1L);
         assertThat(response.userId()).isEqualTo(userId);
     }
 
     @Test
-    @DisplayName("좋아요 생성 실패")
+    @DisplayName("좋아요 생성 실패 - 이미 좋아요 한 경우")
     void createBookLikeFailTest() {
         Long bookId = book.getId();
         BookLikeCreateRequest request = new BookLikeCreateRequest(userId);
 
-        when(bookRepository.findById(book.getId())).thenReturn(Optional.ofNullable(book));
+        when(bookRepository.findById(book.getId())).thenReturn(Optional.of(book));
         when(bookLikeRepository.existsByUserIdAndBookId(userId, book.getId())).thenReturn(true);
 
         assertThatThrownBy(() -> bookLikeService.createBookLike(bookId, request))
@@ -93,25 +103,32 @@ class BookLikeServiceImplTest {
     @Test
     @DisplayName("유저아이디로 좋아요 리스트 조회")
     void getBookLikesByUserIdTest() {
-        when(bookLikeRepository.getBookLikesByUserId(userId)).thenReturn(List.of(bookLike));
+        BookLikeResponse response1 = BookLikeResponse.of(bookLike);
+        BookLikeResponse response2 = BookLikeResponse.of(bookLike1);
+
+        when(bookLikeRepository.findBookLikesByUserId(userId)).thenReturn(List.of(response1, response2));
+
         List<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByUserId(userId);
 
         assertThat(bookLikes)
                 .isNotNull()
-                .hasSize(1);
+                .hasSize(2);
         assertThat(bookLikes.get(0)).isEqualTo(BookLikeResponse.of(bookLike));
     }
 
     @Test
     @DisplayName("도서아이디로 좋아요 리스트 조회")
     void getBookLikesByBookIdTest() {
+        BookLikeResponse response1 = BookLikeResponse.of(bookLike);
+        BookLikeResponse response2 = BookLikeResponse.of(bookLike1);
+
         when(bookLikeRepository.existsByBookId(book.getId())).thenReturn(true);
-        when(bookLikeRepository.getBookLikesByBookId(book.getId())).thenReturn(List.of(bookLike));
+        when(bookLikeRepository.findBookLikesByBookId(book.getId())).thenReturn(List.of(response1, response2));
         List<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByBookId(book.getId());
 
         assertThat(bookLikes)
                 .isNotNull()
-                .hasSize(1);
+                .hasSize(2);
         assertThat(bookLikes.get(0)).isEqualTo(BookLikeResponse.of(bookLike));
     }
 
@@ -126,8 +143,8 @@ class BookLikeServiceImplTest {
     }
 
     @Test
-    @DisplayName("유저정보를 가지고 좋아요 삭제 테스트")
-    void deleteBookLikeByUserIdTest() {
+    @DisplayName("유저와 도서 아이디 가지고 좋아요 삭제 테스트")
+    void deleteBookLikeByUserIdAndBookIdTest() {
         Long bookId = book.getId();
         when(bookLikeRepository.existsByUserIdAndBookId(userId, bookId)).thenReturn(true);
 
@@ -138,8 +155,8 @@ class BookLikeServiceImplTest {
     }
 
     @Test
-    @DisplayName("유저와 도서 정보에 해당하는 좋아요가 없어 실패")
-    void deleteBookLikeByUserIdTFailTest() {
+    @DisplayName("유저와 도서 아이디에 해당하는 좋아요가 없어 실패")
+    void deleteBookLikeByUserIdAndBookIdFailTest() {
         Long bookId = book.getId();
         when(bookLikeRepository.existsByUserIdAndBookId(userId, bookId)).thenReturn(false);
 

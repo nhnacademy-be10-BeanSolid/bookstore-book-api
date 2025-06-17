@@ -1,17 +1,20 @@
 package com.nhnacademy.bookapi.booktag.service;
 
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
+import com.nhnacademy.bookapi.booktag.domain.request.BookTagCreateRequest;
+import com.nhnacademy.bookapi.booktag.domain.request.BookTagUpdateRequest;
+import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
 
 import java.util.List;
 
 public interface BookTagService {
-    List<BookTag> getBookTags();
+    List<BookTagResponse> getBookTags();
 
-    BookTag getBookTag(Long tagId);
+    BookTagResponse getBookTag(Long tagId);
 
-    BookTag createBookTag(BookTag bookTag);
+    BookTagResponse createBookTag(BookTagCreateRequest request);
 
-    BookTag updateBookTag(BookTag bookTag);
+    BookTagResponse updateBookTag(Long tagId, BookTagUpdateRequest request);
 
     void deleteBookTag(Long tagId);
 
