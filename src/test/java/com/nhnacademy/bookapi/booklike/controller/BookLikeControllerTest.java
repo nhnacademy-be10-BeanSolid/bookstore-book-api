@@ -90,6 +90,19 @@ class BookLikeControllerTest {
     }
 
     @Test
+    @DisplayName("좋아요 조회 - 헤더 비어있는 경우")
+    void getBookLikesByUserIdInvalidExceptionTest() throws Exception {
+        BookLikeResponse response = BookLikeResponse.of(bookLike);
+        List<BookLikeResponse> responses = List.of(response);
+
+        given(bookLikeService.getBookLikesByUserId(userId)).willReturn(responses);
+
+        mockMvc.perform(get("/users")
+                        .header("X-USER-ID", ""))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("좋아요 생성")
     void createBookLikeTest() throws Exception {
         Book newBook = new Book();
@@ -97,8 +110,7 @@ class BookLikeControllerTest {
 
         BookLikeResponse response = new BookLikeResponse(2L, LocalDateTime.now(), userId, newBook.getId());
 
-        given(bookLikeService.createBookLike(eq(newBook.getId()),
-                eq(userId))).willReturn(response);
+        given(bookLikeService.createBookLike(newBook.getId(), userId)).willReturn(response);
 
         mockMvc.perform(post("/books/{bookId}/bookLikes", newBook.getId())
                         .header("X-USER-ID", userId))
@@ -115,8 +127,7 @@ class BookLikeControllerTest {
 
         BookLikeResponse response = new BookLikeResponse(2L, LocalDateTime.now(), userId, newBook.getId());
 
-        given(bookLikeService.createBookLike(eq(newBook.getId()),
-                eq(userId))).willReturn(response);
+        given(bookLikeService.createBookLike(newBook.getId(), userId)).willReturn(response);
 
         mockMvc.perform(post("/books/{bookId}/bookLikes", newBook.getId()))
                 .andExpect(status().isInternalServerError()); // 수정해야함

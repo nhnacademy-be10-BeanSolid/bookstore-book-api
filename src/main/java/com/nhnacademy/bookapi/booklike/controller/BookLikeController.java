@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.booklike.controller;
 
+import com.nhnacademy.bookapi.advice.InvalidUserIdHeaderException;
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 import com.nhnacademy.bookapi.booklike.service.BookLikeService;
 import lombok.RequiredArgsConstructor;
@@ -17,8 +18,10 @@ public class BookLikeController {
     private final BookLikeService bookLikeService;
 
     @GetMapping("/users")
-    public ResponseEntity<List<BookLikeResponse>> getBookLikes1(@RequestHeader("X-USER-ID") String userId) {
-        // 현재 전역예외처리기에 묶여서 예외코드 안붙여주면 다 500으로 나감
+    public ResponseEntity<List<BookLikeResponse>> getBookLikes(@RequestHeader("X-USER-ID") String userId) {
+        if (userId == null || userId.isBlank()) {
+            throw new InvalidUserIdHeaderException();
+        }
         List<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByUserId(userId);
         return ResponseEntity.status(HttpStatus.OK).body(bookLikes);
     }
@@ -32,6 +35,9 @@ public class BookLikeController {
     @PostMapping("/books/{bookId}/bookLikes")
     public ResponseEntity<BookLikeResponse> createBookLike(@PathVariable Long bookId,
                                                            @RequestHeader("X-USER-ID") String userId) {
+        if (userId == null || userId.isBlank()) {
+            throw new InvalidUserIdHeaderException();
+        }
         BookLikeResponse response = bookLikeService.createBookLike(bookId, userId);
         URI location = URI.create("/books/" + bookId + "/bookLikes/" + response.bookLikeId());
         return ResponseEntity.created(location).body(response);
