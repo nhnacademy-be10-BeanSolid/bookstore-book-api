@@ -3,7 +3,6 @@ package com.nhnacademy.bookapi.booklike.service;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
-import com.nhnacademy.bookapi.booklike.domain.request.BookLikeCreateRequest;
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 import com.nhnacademy.bookapi.booklike.domain.BookLike;
 import com.nhnacademy.bookapi.booklike.exception.BookLikeAlreadyExistsException;
@@ -71,8 +70,6 @@ class BookLikeServiceImplTest {
     @Test
     @DisplayName("좋아요 생성")
     void createBookLikeSuccessTest() {
-        BookLikeCreateRequest request = new BookLikeCreateRequest(userId);
-
         when(bookRepository.findById(book.getId())).thenReturn(Optional.of(book));
         when(bookLikeRepository.existsByUserIdAndBookId(userId, book.getId())).thenReturn(false);
 
@@ -80,7 +77,7 @@ class BookLikeServiceImplTest {
         when(bookLikeRepository.save(any(BookLike.class))).thenReturn(savedBookLike);
         when(bookLikeRepository.findBookLikeResponseById(any())).thenReturn(Optional.of(BookLikeResponse.of(savedBookLike)));
 
-        BookLikeResponse response = bookLikeService.createBookLike(book.getId(), request);
+        BookLikeResponse response = bookLikeService.createBookLike(book.getId(), userId);
 
         assertThat(response).isNotNull();
         assertThat(response.bookId()).isEqualTo(1L);
@@ -91,12 +88,11 @@ class BookLikeServiceImplTest {
     @DisplayName("좋아요 생성 - 이미 좋아요 한 경우")
     void createBookLikeFailTest() {
         Long bookId = book.getId();
-        BookLikeCreateRequest request = new BookLikeCreateRequest(userId);
 
         when(bookRepository.findById(book.getId())).thenReturn(Optional.of(book));
         when(bookLikeRepository.existsByUserIdAndBookId(userId, book.getId())).thenReturn(true);
 
-        assertThatThrownBy(() -> bookLikeService.createBookLike(bookId, request))
+        assertThatThrownBy(() -> bookLikeService.createBookLike(bookId, userId))
                 .isInstanceOf(BookLikeAlreadyExistsException.class);
     }
 

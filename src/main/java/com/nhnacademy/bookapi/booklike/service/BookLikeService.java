@@ -1,13 +1,12 @@
 package com.nhnacademy.bookapi.booklike.service;
 
-import com.nhnacademy.bookapi.booklike.domain.request.BookLikeCreateRequest;
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 
 import java.util.List;
 
 public interface BookLikeService {
 
-    BookLikeResponse createBookLike(Long bookId, BookLikeCreateRequest request);
+    BookLikeResponse createBookLike(Long bookId, String userId);
 
     List<BookLikeResponse> getBookLikesByUserId(String userId);
 

@@ -1,14 +1,10 @@
 package com.nhnacademy.bookapi.booklike.controller;
 
-import com.nhnacademy.bookapi.advice.ValidationFailedException;
-import com.nhnacademy.bookapi.booklike.domain.request.BookLikeCreateRequest;
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 import com.nhnacademy.bookapi.booklike.service.BookLikeService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
@@ -20,9 +16,9 @@ public class BookLikeController {
 
     private final BookLikeService bookLikeService;
 
-    // 좋아요 누른 도서는 마이페이지에서 확인가능 > 임시 경로
-    @GetMapping("/users/{userId}/bookLikes")
-    public ResponseEntity<List<BookLikeResponse>> getBookLikes(@PathVariable String userId) {
+    @GetMapping("/users")
+    public ResponseEntity<List<BookLikeResponse>> getBookLikes1(@RequestHeader("X-USER-ID") String userId) {
+        // 현재 전역예외처리기에 묶여서 예외코드 안붙여주면 다 500으로 나감
         List<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByUserId(userId);
         return ResponseEntity.status(HttpStatus.OK).body(bookLikes);
     }
@@ -35,12 +31,8 @@ public class BookLikeController {
 
     @PostMapping("/books/{bookId}/bookLikes")
     public ResponseEntity<BookLikeResponse> createBookLike(@PathVariable Long bookId,
-                                                           @Valid @RequestBody BookLikeCreateRequest request,
-                                                           BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationFailedException();
-        }
-        BookLikeResponse response = bookLikeService.createBookLike(bookId, request);
+                                                           @RequestHeader("X-USER-ID") String userId) {
+        BookLikeResponse response = bookLikeService.createBookLike(bookId, userId);
         URI location = URI.create("/books/" + bookId + "/bookLikes/" + response.bookLikeId());
         return ResponseEntity.created(location).body(response);
     }

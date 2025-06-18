@@ -3,7 +3,6 @@ package com.nhnacademy.bookapi.booklike.service.lmpl;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
-import com.nhnacademy.bookapi.booklike.domain.request.BookLikeCreateRequest;
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 import com.nhnacademy.bookapi.booklike.domain.BookLike;
 import com.nhnacademy.bookapi.booklike.exception.BookLikeAlreadyExistsException;
@@ -28,8 +27,7 @@ public class BookLikeServiceImpl implements BookLikeService {
 
     // 도서 좋아요 생성
     @Override
-    public BookLikeResponse createBookLike(Long bookId, BookLikeCreateRequest request) {
-        String userId = request.userId();
+    public BookLikeResponse createBookLike(Long bookId, String userId) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
 
