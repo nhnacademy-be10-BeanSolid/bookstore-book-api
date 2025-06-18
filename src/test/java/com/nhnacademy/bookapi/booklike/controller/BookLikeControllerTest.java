@@ -1,6 +1,5 @@
 package com.nhnacademy.bookapi.booklike.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 import com.nhnacademy.bookapi.booklike.domain.BookLike;
@@ -17,7 +16,6 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -30,9 +28,6 @@ class BookLikeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    ObjectMapper objectMapper;
 
     @MockBean
     BookLikeService bookLikeService;

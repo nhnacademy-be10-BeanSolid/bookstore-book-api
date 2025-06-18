@@ -71,7 +71,9 @@ class BookCategoryServiceImplTest {
     void createCategory_alreadyExists() {
         when(bookCategoryRepository.existsByName("Parent")).thenReturn(true);
 
-        assertThatThrownBy(() -> bookCategoryService.createCategory(new BookCategoryCreateRequest("Parent", null)))
+        BookCategoryCreateRequest request = new BookCategoryCreateRequest("Parent", null);
+
+        assertThatThrownBy(() -> bookCategoryService.createCategory(request))
                 .isInstanceOf(BookCategoryAlreadyExistsException.class);
     }
 
@@ -108,9 +110,10 @@ class BookCategoryServiceImplTest {
 
         var result = bookCategoryService.getAllCategories();
 
-        assertThat(result.size()).isEqualTo(2);
-        assertThat(result).contains(parentCategory);
-        assertThat(result).contains(childCategory);
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .contains(parentCategory)
+                .contains(childCategory);
     }
 
     @Test

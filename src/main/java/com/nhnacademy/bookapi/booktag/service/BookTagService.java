@@ -1,6 +1,5 @@
 package com.nhnacademy.bookapi.booktag.service;
 
-import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagUpdateRequest;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
