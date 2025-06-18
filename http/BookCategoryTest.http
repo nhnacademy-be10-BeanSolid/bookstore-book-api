@@ -46,5 +46,5 @@ POST http://localhost:10346/books/1/categories
 Content-Type: application/json
 
 {
-  "categoryId": 1
+  "categoryId": 11
 }

@@ -7,6 +7,7 @@ import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryMapCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapAlreadyExistsException;
+import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapCreateException;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
@@ -30,6 +31,11 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
         Long categoryId = request.categoryId();
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
+
+        int categoryCount = bookRepository.countBookCategoryByBookId(bookId);
+        if (categoryCount >= 10) {
+            throw new BookCategoryMapCreateException(bookId, book.getTitle());
+        }
 
         BookCategory category = bookCategoryRepository.findById(request.categoryId())
                 .orElseThrow(() -> new BookCategoryNotFoundException(categoryId));

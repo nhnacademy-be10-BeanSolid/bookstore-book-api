@@ -9,6 +9,7 @@ import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.book.service.BookSearchApiService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
@@ -16,8 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class BookController {
@@ -40,13 +40,13 @@ public class BookController {
 
     @GetMapping("/authors/{author}")
     public ResponseEntity<Page<BookResponse>> getBooksByAuthor(@PathVariable String author, Pageable pageable) {
-        Page<BookResponse> response = bookService.getBooksByAuthor(author, pageable);
+        Page<BookResponse> response = bookService.getBooksResponseByAuthor(author, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @GetMapping("/publishers/{publisher}")
     public ResponseEntity<Page<BookResponse>> getBooksByPublisher(@PathVariable String publisher, Pageable pageable) {
-        Page<BookResponse> response = bookService.getBooksByPublisher(publisher, pageable);
+        Page<BookResponse> response = bookService.getBooksResponseByPublisher(publisher, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -75,5 +75,12 @@ public class BookController {
     public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
         bookService.deleteBook(bookId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<Page<BookResponse>> getBooksResponseByTag(@RequestParam String tag, Pageable pageable) {
+        log.info("컨트롤러 시작   Request to get Books by tag {}", tag);
+        Page<BookResponse> response = bookService.getBooksResponseByTag(tag, pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

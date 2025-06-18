@@ -15,11 +15,14 @@ public interface CustomBookRepository {
 
     Page<BookResponse> findBookResponsesByAuthor(String author, Pageable pageable);
 
-    Page<BookResponse> findBookDetailByPublisher(String publisher, Pageable pageable);
+    Page<BookResponse> findBookResponseByPublisher(String publisher, Pageable pageable);
 
     Optional<BookTagMapResponse> findBookTagMapResponseByBookIdAndTagId(Long bookId, Long tagId);
 
     Optional<BookCategoryMapResponse> findBookCategoryMapResponseByBookIdAndCategoryId(Long bookId, Long categoryId);
 
+    int countBookCategoryByBookId(Long bookId);
 
+    // 태그로 도서들 검색
+    Page<BookResponse> findBookResponseByTag(String tag, Pageable pageable);
 }
