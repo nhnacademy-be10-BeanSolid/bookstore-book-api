@@ -9,7 +9,10 @@ import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.book.service.BookService;
+import com.nhnacademy.bookapi.booktag.exception.BookTagNotFoundException;
+import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -20,9 +23,11 @@ import java.time.LocalDateTime;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
+    private final BookTagRepository tagRepository;
 
     // 도서 추가
     @Override
@@ -60,14 +65,14 @@ public class BookServiceImpl implements BookService {
     // 작가로 도서 찾기
     @Override
     @Transactional(readOnly = true)
-    public Page<BookResponse> getBooksByAuthor(String author, Pageable pageable) {
+    public Page<BookResponse> getBooksResponseByAuthor(String author, Pageable pageable) {
         return bookRepository.findBookResponsesByAuthor(author, pageable);
     }
 
     // 출판사로 도서 찾기
     @Override
-    public Page<BookResponse> getBooksByPublisher(String publisher, Pageable pageable) {
-        return bookRepository.findBookDetailByPublisher(publisher, pageable);
+    public Page<BookResponse> getBooksResponseByPublisher(String publisher, Pageable pageable) {
+        return bookRepository.findBookResponseByPublisher(publisher, pageable);
     }
 
     // 도서 업데이트
@@ -120,5 +125,16 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
         bookRepository.delete(book);
+    }
+
+    // 태그로 도서 검색
+    @Override
+    public Page<BookResponse> getBooksResponseByTag(String tag, Pageable pageable) {
+        log.info("태그 파라미터 {}", tag);
+        if (!tagRepository.existsBookTagByName(tag)) {
+            throw new BookTagNotFoundException(tag);
+        }
+        log.info("서비스 시작");
+        return bookRepository.findBookResponseByTag(tag, pageable);
     }
 }

@@ -31,4 +31,5 @@ public class CustomBookCategoryRepositoryImpl extends QuerydslRepositorySupport 
 
         return Optional.ofNullable(result);
     }
+
 }

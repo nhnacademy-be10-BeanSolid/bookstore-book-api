@@ -6,6 +6,7 @@ import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryMapCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapAlreadyExistsException;
+import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapCreateException;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.bookcategory.service.impl.BookCategoryMapServiceImpl;
@@ -58,6 +59,7 @@ class BookCategoryMapServiceImplTest {
         BookCategoryMapCreateRequest request = new BookCategoryMapCreateRequest(categoryId);
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        when(bookRepository.countBookCategoryByBookId(bookId)).thenReturn(1);
         when(bookCategoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
         BookCategoryMapResponse response = new BookCategoryMapResponse(bookId, categoryId);
@@ -70,8 +72,23 @@ class BookCategoryMapServiceImplTest {
     }
 
     @Test
-    @DisplayName("도서에 카테고리 추가 - 해당 카테고리가 존재하는 경우")
+    @DisplayName("도서에 카테고리 추가 - 해당 도서에 카테고리가 10개 이상인 경우")
     void createBookCategoryMapExceptionTest() {
+        Long bookId = book.getId();
+        Long categoryId = category.getCategoryId();
+
+        BookCategoryMapCreateRequest request = new BookCategoryMapCreateRequest(categoryId);
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        when(bookRepository.countBookCategoryByBookId(bookId)).thenReturn(10);
+
+        assertThatThrownBy(() -> bookCategoryMapService.createBookCategoryMap(bookId, request))
+                .isInstanceOf(BookCategoryMapCreateException.class);
+    }
+
+    @Test
+    @DisplayName("도서에 카테고리 추가 - 해당 카테고리가 존재하는 경우")
+    void createBookCategoryMapNotFoundExceptionTest() {
         Long bookId = book.getId();
         Long categoryId = category.getCategoryId();
 
@@ -82,6 +99,7 @@ class BookCategoryMapServiceImplTest {
         book.setBookCategories(bookCategorySet);
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        when(bookRepository.countBookCategoryByBookId(bookId)).thenReturn(1);
         when(bookCategoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
         assertThatThrownBy(() -> bookCategoryMapService.createBookCategoryMap(bookId, request))

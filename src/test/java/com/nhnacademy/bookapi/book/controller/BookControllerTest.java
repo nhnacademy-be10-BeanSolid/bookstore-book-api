@@ -9,6 +9,8 @@ import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.service.BookSearchApiService;
 import com.nhnacademy.bookapi.book.service.BookService;
+import com.nhnacademy.bookapi.booktag.domain.BookTag;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,13 +26,16 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -50,9 +55,14 @@ class BookControllerTest {
     BookSearchApiService bookSearchService;
 
     Book book;
+    BookTag tag;
 
     @BeforeEach
     void setUp() {
+        tag = new BookTag(1L, "Test");
+        Set<BookTag> tagSet = new HashSet<>();
+        tagSet.add(tag);
+
         book = Book.builder()
                 .title("타이틀")
                 .description("설명")
@@ -65,6 +75,7 @@ class BookControllerTest {
                 .salePrice(5000)
                 .wrappable(false)
                 .stock(100)
+                .bookTags(tagSet)
                 .build();
         ReflectionTestUtils.setField(book, "id", 1L);
     }
@@ -118,7 +129,7 @@ class BookControllerTest {
         Pageable page = PageRequest.of(0, 10);
         Page<BookResponse> pageResponse = new PageImpl<>(List.of(response1, response), page, 2);
 
-        given(bookService.getBooksByAuthor(author, page)).willReturn(pageResponse);
+        given(bookService.getBooksResponseByAuthor(author, page)).willReturn(pageResponse);
 
         mockMvc.perform(get("/authors/{author}", author)
                         .param("page", "0")
@@ -151,7 +162,7 @@ class BookControllerTest {
         Pageable page = PageRequest.of(0, 10);
         Page<BookResponse> pageResponse = new PageImpl<>(List.of(response1, response), page, 2);
 
-        given(bookService.getBooksByPublisher(publisher, page)).willReturn(pageResponse);
+        given(bookService.getBooksResponseByPublisher(publisher, page)).willReturn(pageResponse);
 
         mockMvc.perform(get("/publishers/{publisher}", publisher)
                         .param("page", "0")
@@ -161,6 +172,26 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.content[0].publisher").value(publisher));
     }
 
+    @Test
+    @DisplayName("태그로 도서 검색")
+    void getBooksResponseByTagTest() throws Exception{
+        String tagName = tag.getName();
+
+        BookResponse response = BookResponse.of(book);
+
+        Pageable page = PageRequest.of(0, 10);
+        Page<BookResponse> pageResponse = new PageImpl<>(List.of(response), page, 1);
+
+        given(bookService.getBooksResponseByTag(tagName, page)).willReturn(pageResponse);
+
+        mockMvc.perform(get("/search")
+                        .param("tag", tagName)
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.content[0].bookTags").value(Matchers.hasItem(tagName)));
+    }
 
     @Test
     @DisplayName("도서 생성")
@@ -241,4 +272,5 @@ class BookControllerTest {
         mockMvc.perform(delete("/books/{id}", id))
                 .andExpect(status().isNoContent());
     }
+
 }

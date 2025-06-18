@@ -8,7 +8,7 @@ Content-Type: application/json
   "publisher": "pub1",
   "author": "Lee",
   "publishedDate": "2025-06-09",
-  "isbn": "isbn001111119",
+  "isbn": "isbn001111117",
   "originalPrice": 1000,
   "salePrice": 500,
   "wrappable": false,
@@ -36,7 +36,7 @@ Content-Type: application/json
 GET http://localhost:10346/books/1
 
 ### 작가로 도서 찾기
-GET http://localhost:10346/authors/Lee?page=0&size=2
+GET http://localhost:10346/authors/Lee
 
 ### 출판사로 도서 찾기
 GET http://localhost:10346/publishers/pub1?page=0&size=2
@@ -52,3 +52,6 @@ Content-Type: application/json
 
 ### 도서 삭제
 DELETE http://localhost:10346/books/4
+
+### 태그로 도서 검색
+GET http://localhost:10346/search?tag=테스트

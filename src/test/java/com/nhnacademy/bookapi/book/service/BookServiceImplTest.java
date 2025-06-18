@@ -9,6 +9,8 @@ import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.book.service.impl.BookServiceImpl;
+import com.nhnacademy.bookapi.booktag.exception.BookTagNotFoundException;
+import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +38,8 @@ class BookServiceImplTest {
 
     @Mock
     private BookRepository bookRepository;
+    @Mock
+    private BookTagRepository bookTagRepository;
 
     @InjectMocks
     private BookServiceImpl bookService;
@@ -132,10 +136,9 @@ class BookServiceImplTest {
                 .isInstanceOf(BookNotFoundException.class);
     }
 
-
     @Test
     @DisplayName("작가로 도서 찾기")
-    void getBooksByAuthorSuccessTest() {
+    void getBooksResponseByAuthorSuccessTest() {
         String author = book.getAuthor();
 
         Book book1 = Book.builder()
@@ -159,7 +162,7 @@ class BookServiceImplTest {
         when(bookRepository.findBookResponsesByAuthor(author, pageable))
                 .thenReturn(new PageImpl<>(List.of(response, response1), pageable, 2));
 
-        Page<BookResponse> pageResult = bookService.getBooksByAuthor(author, pageable);
+        Page<BookResponse> pageResult = bookService.getBooksResponseByAuthor(author, pageable);
 
         assertThat(pageResult).isNotNull();
         assertThat(pageResult.getContent()).hasSize(2);
@@ -167,7 +170,7 @@ class BookServiceImplTest {
 
     @Test
     @DisplayName("출판사로 도서 찾기")
-    void getBooksByPublisherTest() {
+    void getBooksResponseByPublisherTest() {
         String publisher = book.getPublisher();
 
         Book book1 = Book.builder()
@@ -188,10 +191,10 @@ class BookServiceImplTest {
 
         Pageable pageable = PageRequest.of(0, 10);
 
-        when(bookRepository.findBookDetailByPublisher(publisher, pageable))
+        when(bookRepository.findBookResponseByPublisher(publisher, pageable))
                 .thenReturn(new PageImpl<>(List.of(response, response1), pageable, 2));
 
-        Page<BookResponse> pageResult = bookService.getBooksByPublisher(publisher, pageable);
+        Page<BookResponse> pageResult = bookService.getBooksResponseByPublisher(publisher, pageable);
 
         assertThat(pageResult).isNotNull();
         assertThat(pageResult.getContent()).hasSize(2);
@@ -251,5 +254,34 @@ class BookServiceImplTest {
 
         assertThatThrownBy(() -> bookService.deleteBook(id))
                 .isInstanceOf(BookNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("태그로 도서 검색")
+    void getBooksResponseByTagSuccessTest() {
+        String tagName = "existTag";
+        when(bookTagRepository.existsBookTagByName(tagName)).thenReturn(true);
+
+        BookResponse response = BookResponse.of(book);
+
+        Pageable pageable = PageRequest.of(0, 10);
+        when(bookRepository.findBookResponseByTag(tagName, pageable))
+                .thenReturn(new PageImpl<>(List.of(response), pageable, 1));
+
+        Page<BookResponse> pageResult = bookService.getBooksResponseByTag(tagName, pageable);
+
+        assertThat(pageResult).isNotNull();
+        assertThat(pageResult.getContent()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("태그로 도서 검색 실패")
+    void getBooksResponseByTagFailTest() {
+        String tagName = "notExistTag";
+        when(bookTagRepository.existsBookTagByName(tagName)).thenReturn(false);
+
+        Pageable pageable = PageRequest.of(0, 10);
+        assertThatThrownBy(() -> bookService.getBooksResponseByTag(tagName, pageable))
+                .isInstanceOf(BookTagNotFoundException.class);
     }
 }

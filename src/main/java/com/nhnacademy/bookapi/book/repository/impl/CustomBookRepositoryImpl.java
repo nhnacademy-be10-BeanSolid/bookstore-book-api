@@ -11,6 +11,7 @@ import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +19,9 @@ import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
+@Slf4j
 public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implements CustomBookRepository {
 
     private final JPAQueryFactory queryFactory;
@@ -31,7 +34,8 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
     public Optional<BookResponse> findBookResponseById(Long id) {
         QBook book = QBook.book;
 
-        Book result = from(book)
+        Book result = queryFactory
+                .selectFrom(book)
                 .leftJoin(book.bookCategories).fetchJoin()
                 .leftJoin(book.bookTags).fetchJoin()
                 .where(book.id.eq(id))
@@ -53,21 +57,21 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        List<BookResponse> content = books.stream()
+                .map(BookResponse::of)
+                .toList();
+
         long total = queryFactory
                 .select(book.count())
                 .from(book)
                 .where(book.author.eq(author))
                 .fetchOne();
 
-        List<BookResponse> content = books.stream()
-                .map(BookResponse::of)
-                .toList();
-
         return new PageImpl<>(content, pageable, total);
     }
 
     @Override
-    public Page<BookResponse> findBookDetailByPublisher(String publisher, Pageable pageable) {
+    public Page<BookResponse> findBookResponseByPublisher(String publisher, Pageable pageable) {
         QBook book = QBook.book;
 
         List<Book> books = queryFactory
@@ -79,15 +83,15 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        List<BookResponse> content = books.stream()
+                .map(BookResponse::of)
+                .toList();
+
         long total = queryFactory
                 .select(book.count())
                 .from(book)
                 .where(book.publisher.eq(publisher))
                 .fetchOne();
-
-        List<BookResponse> content = books.stream()
-                .map(BookResponse::of)
-                .toList();
 
         return new PageImpl<>(content, pageable, total);
     }
@@ -125,5 +129,58 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
                         .where(book.id.eq(bookId).and(category.categoryId.eq(categoryId)))
                         .fetchOne()
         );
+    }
+
+    // 해당 도서에 카테고리 몇개 존재하는지 확인
+    @Override
+    public int countBookCategoryByBookId(Long bookId) {
+        QBook book = QBook.book;
+
+        Book result = queryFactory
+                .selectFrom(book)
+                .leftJoin(book.bookCategories).fetchJoin()
+                .where(book.id.eq(bookId))
+                .fetchOne();
+
+        return Optional.ofNullable(result)
+                .map(Book::getBookCategories)
+                .map(Set::size)
+                .orElse(0);
+    }
+
+    @Override
+    public Page<BookResponse> findBookResponseByTag(String tag, Pageable pageable) {
+        QBook book = QBook.book;
+        QBookTag tags = QBookTag.bookTag;
+
+        Long tagId = queryFactory
+                .select(tags.tagId)
+                .from(tags)
+                .where(tags.name.eq(tag))
+                .fetchOne();
+
+        log.info("tagId: {}", tagId);
+
+        List<Book> books = queryFactory
+                .selectFrom(book)
+                .join(book.bookTags, tags).fetchJoin()
+                .leftJoin(book.bookCategories).fetchJoin()
+                .where(tags.tagId.eq(tagId))
+                .fetch();
+
+        log.info("books: {}", books);
+
+        List<BookResponse> content = books.stream()
+                .map(BookResponse::of)
+                .toList();
+
+        long total = queryFactory
+                .select(book.count())
+                .from(book)
+                .join(book.bookTags, tags)
+                .where(tags.tagId.eq(tagId))
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total);
     }
 }
