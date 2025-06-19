@@ -34,19 +34,19 @@ public record BookResponse(
     BookStatus status,
     int stock,
 
-    List<String> bookCategories,
-    List<String> bookTags
+    Set<String> bookCategories,
+    Set<String> bookTags
 ) {
 public static BookResponse of(Book book) {
-    List<String> categories = book.getBookCategories()
+    Set<String> categories = book.getBookCategories()
             .stream()
             .map(BookCategory::getName)
-            .toList();
+            .collect(Collectors.toSet());
 
-    List<String> tags = book.getBookTags()
+    Set<String> tags = book.getBookTags()
             .stream()
             .map(BookTag::getName)
-            .toList();
+            .collect(Collectors.toSet());
 
     return new BookResponse(
             book.getId(),

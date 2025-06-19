@@ -10,7 +10,6 @@ import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.book.service.BookService;
-import com.nhnacademy.bookapi.booktag.exception.BookTagNotFoundException;
 import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -132,10 +131,6 @@ public class BookServiceImpl implements BookService {
     @Override
     public Page<BookResponse> getBooksResponseByTag(String tag, Pageable pageable) {
         log.info("태그 파라미터 {}", tag);
-        if (!tagRepository.existsBookTagByName(tag)) {
-            throw new BookTagNotFoundException(tag);
-        }
-        log.info("서비스 시작");
         return bookRepository.findBookResponseByTag(tag, pageable);
     }
 

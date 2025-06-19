@@ -10,6 +10,8 @@ import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public record BookDetailResponse(
 
@@ -33,25 +35,26 @@ public record BookDetailResponse(
         BookStatus status,
         int stock,
 
-        List<String> bookCategories,
-        List<String> bookTags,
-        List<String> likedUsers
+        Set<String> bookCategories,
+        Set<String> bookTags,
+        Set<String> likedUsers
 ) {
     public static BookDetailResponse of(Book book) {
-        List<String> categories = book.getBookCategories()
+        Set<String> categories = book.getBookCategories()
                 .stream()
                 .map(BookCategory::getName)
-                .toList();
+                .collect(Collectors.toSet());
 
-        List<String> tags = book.getBookTags()
+        Set<String> tags = book.getBookTags()
                 .stream()
                 .map(BookTag::getName)
-                .toList();
+                .collect(Collectors.toSet());
 
-        List<String> likeUsers = book.getBookLikes()
+        Set<String> likeUsers = book.getBookLikes()
                 .stream()
                 .map(BookLike::getUserId)
-                .toList();
+                .distinct()
+                .collect(Collectors.toSet());
 
         return new BookDetailResponse(
                 book.getId(),
