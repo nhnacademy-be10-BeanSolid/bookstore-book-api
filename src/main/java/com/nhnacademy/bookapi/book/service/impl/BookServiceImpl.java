@@ -145,4 +145,9 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findBookDetailResponseByBookId(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
     }
+
+    // 도서 이름(타이틀)로 검색
+    public Page<BookResponse> getBookResponseByTitle(String title, Pageable pageable) {
+        return bookRepository.findBookResponseByTitle(title, pageable);
+    }
 }

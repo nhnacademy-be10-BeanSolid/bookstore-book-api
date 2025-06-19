@@ -84,4 +84,10 @@ public class BookController {
         Page<BookResponse> response = bookService.getBooksResponseByTag(tag, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @GetMapping("/searcht")
+    public ResponseEntity<Page<BookResponse>> getBooksResponseByTitle(@RequestParam String title, Pageable pageable) {
+        Page<BookResponse> response = bookService.getBookResponseByTitle(title, pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }

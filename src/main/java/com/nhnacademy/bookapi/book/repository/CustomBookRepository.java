@@ -13,19 +13,22 @@ import java.util.Optional;
 public interface CustomBookRepository {
 
     Optional<BookResponse> findBookResponseById(Long id);
+    // 도서 상세 정보
+    Optional<BookDetailResponse> findBookDetailResponseByBookId(Long bookId);
 
     Page<BookResponse> findBookResponsesByAuthor(String author, Pageable pageable);
 
     Page<BookResponse> findBookResponseByPublisher(String publisher, Pageable pageable);
+
+    // 태그로 도서들 검색
+    Page<BookResponse> findBookResponseByTag(String tag, Pageable pageable);
+
+    // 도서 이름으로 검색
+    Page<BookResponse> findBookResponseByTitle(String title, Pageable pageable);
 
     Optional<BookTagMapResponse> findBookTagMapResponseByBookIdAndTagId(Long bookId, Long tagId);
 
     Optional<BookCategoryMapResponse> findBookCategoryMapResponseByBookIdAndCategoryId(Long bookId, Long categoryId);
 
     int countBookCategoryByBookId(Long bookId);
-
-    // 태그로 도서들 검색
-    Page<BookResponse> findBookResponseByTag(String tag, Pageable pageable);
-
-    Optional<BookDetailResponse> findBookDetailResponseByBookId(Long bookId);
 }

@@ -25,4 +25,6 @@ public interface BookService {
 
     BookDetailResponse getBookDetailResponseByBookId(Long id);
 
+    // 책 제목으로 검색
+    Page<BookResponse> getBookResponseByTitle(String title, Pageable pageable);
 }
