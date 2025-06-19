@@ -144,9 +144,22 @@ class BookLikeControllerTest {
     void deleteBookLikeByUserIdAndBookIdTest() throws Exception {
         doNothing().when(bookLikeService).deleteBookLikeByUserIdAndBookId(userId, book.getId());
 
-        mockMvc.perform(delete("/users/{userId}/bookLikes/{bookId}", userId, book.getId()))
+        mockMvc.perform(delete("/users")
+                        .header("X-USER-ID", userId)
+                        .param("bookId", String.valueOf(book.getId())))
                 .andExpect(status().isNoContent());
 
         verify(bookLikeService).deleteBookLikeByUserIdAndBookId(userId, book.getId());
+    }
+
+    @Test
+    @DisplayName("유저,도서 아이디 삭제 - 헤더 없는 경우")
+    void deleteBookLikeByUserIdAndBookIdExceptionTest() throws Exception {
+        doNothing().when(bookLikeService).deleteBookLikeByUserIdAndBookId(userId, book.getId());
+
+        mockMvc.perform(delete("/users")
+                        .param("bookId", String.valueOf(book.getId())))
+                .andExpect(status().isInternalServerError());
+
     }
 }

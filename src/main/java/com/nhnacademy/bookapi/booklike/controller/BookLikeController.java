@@ -17,6 +17,7 @@ public class BookLikeController {
 
     private final BookLikeService bookLikeService;
 
+    // 마이페이지에서 좋아요 확인
     @GetMapping("/users")
     public ResponseEntity<List<BookLikeResponse>> getBookLikes(@RequestHeader("X-USER-ID") String userId) {
         if (userId == null || userId.isBlank()) {
@@ -43,9 +44,13 @@ public class BookLikeController {
         return ResponseEntity.created(location).body(response);
     }
 
-    // 마이페이지에서 삭제? 임시경로임  유저 아이디와 도서 아이디를 어떻게 받을지    헤더에 정보 저장?
-    @DeleteMapping("/users/{userId}/bookLikes/{bookId}")
-    public ResponseEntity<Void> deleteBookLikeByUserIdAndBookId(@PathVariable String userId, @PathVariable Long bookId) {
+    // 마이페이지에서 삭제
+    @DeleteMapping("/users")
+    public ResponseEntity<Void> deleteBookLikeByUserIdAndBookId(@RequestHeader("X-USER-ID") String userId,
+                                                                @RequestParam(value = "bookId", required = false) Long bookId) {
+        if (userId == null || userId.isBlank()) {
+            throw new InvalidUserIdHeaderException();
+        }
         bookLikeService.deleteBookLikeByUserIdAndBookId(userId, bookId);
         return ResponseEntity.noContent().build();
     }
