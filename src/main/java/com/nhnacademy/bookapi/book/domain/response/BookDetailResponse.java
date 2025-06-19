@@ -1,0 +1,76 @@
+package com.nhnacademy.bookapi.book.domain.response;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.nhnacademy.bookapi.book.domain.Book;
+import com.nhnacademy.bookapi.book.domain.BookStatus;
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
+import com.nhnacademy.bookapi.booklike.domain.BookLike;
+import com.nhnacademy.bookapi.booktag.domain.BookTag;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.List;
+
+public record BookDetailResponse(
+
+        Long id,
+        String title,
+        String description,
+        String toc,
+        String publisher,
+        String author,
+        LocalDate publishedDate,
+        String isbn,
+        int originalPrice,
+        int salePrice,
+        Boolean wrappable,
+
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        LocalDateTime createAt,
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+        LocalDateTime updateAt,
+
+        BookStatus status,
+        int stock,
+
+        List<String> bookCategories,
+        List<String> bookTags,
+        List<String> likedUsers
+) {
+    public static BookDetailResponse of(Book book) {
+        List<String> categories = book.getBookCategories()
+                .stream()
+                .map(BookCategory::getName)
+                .toList();
+
+        List<String> tags = book.getBookTags()
+                .stream()
+                .map(BookTag::getName)
+                .toList();
+
+        List<String> likeUsers = book.getBookLikes()
+                .stream()
+                .map(BookLike::getUserId)
+                .toList();
+
+        return new BookDetailResponse(
+                book.getId(),
+                book.getTitle(),
+                book.getDescription(),
+                book.getToc(),
+                book.getPublisher(),
+                book.getAuthor(),
+                book.getPublishedDate(),
+                book.getIsbn(),
+                book.getOriginalPrice(),
+                book.getSalePrice(),
+                book.isWrappable(),
+                book.getCreateAt(),
+                book.getUpdateAt(),
+                book.getStatus(),
+                book.getStock(),
+                categories,
+                tags,
+                likeUsers);
+    }
+}

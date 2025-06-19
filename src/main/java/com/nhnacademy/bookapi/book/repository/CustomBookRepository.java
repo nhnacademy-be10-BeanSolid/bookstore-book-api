@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.book.repository;
 
 
+import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Page;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
@@ -25,4 +26,6 @@ public interface CustomBookRepository {
 
     // 태그로 도서들 검색
     Page<BookResponse> findBookResponseByTag(String tag, Pageable pageable);
+
+    Optional<BookDetailResponse> findBookDetailResponseByBookId(Long bookId);
 }

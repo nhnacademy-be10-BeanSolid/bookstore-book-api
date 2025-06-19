@@ -2,6 +2,7 @@ package com.nhnacademy.bookapi.book.controller;
 
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
+import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import com.nhnacademy.bookapi.advice.ValidationFailedException;
@@ -33,8 +34,8 @@ public class BookController {
     }
 
     @GetMapping("/books/{id}")
-    public ResponseEntity<BookResponse> getBookDetailById(@PathVariable Long id){
-        BookResponse response = bookService.getBookResponseByBookId(id);
+    public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
+        BookDetailResponse response = bookService.getBookDetailResponseByBookId(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

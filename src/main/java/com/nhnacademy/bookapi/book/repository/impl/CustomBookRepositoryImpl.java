@@ -2,10 +2,12 @@ package com.nhnacademy.bookapi.book.repository.impl;
 
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.QBook;
+import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.repository.CustomBookRepository;
 import com.nhnacademy.bookapi.bookcategory.domain.QBookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
+import com.nhnacademy.bookapi.booklike.domain.QBookLike;
 import com.nhnacademy.bookapi.booktag.domain.QBookTag;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.querydsl.core.types.Projections;
@@ -184,5 +186,24 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total);
+    }
+
+    @Override
+    public Optional<BookDetailResponse> findBookDetailResponseByBookId(Long bookId) {
+        QBook book = QBook.book;
+        QBookTag tag = QBookTag.bookTag;
+        QBookCategory category = QBookCategory.bookCategory;
+        QBookLike likes = QBookLike.bookLike;
+
+        Book result = queryFactory
+                .selectFrom(book)
+                .leftJoin(book.bookTags, tag).fetchJoin()
+                .leftJoin(book.bookCategories, category).fetchJoin()
+                .leftJoin(book.bookLikes, likes).fetchJoin()
+                .where(book.id.eq(bookId))
+                .distinct()
+                .fetchOne();
+
+        return Optional.ofNullable(result).map(BookDetailResponse::of);
     }
 }

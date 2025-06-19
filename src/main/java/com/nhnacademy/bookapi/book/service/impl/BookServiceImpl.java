@@ -2,6 +2,7 @@ package com.nhnacademy.bookapi.book.service.impl;
 
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
+import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
@@ -136,5 +137,12 @@ public class BookServiceImpl implements BookService {
         }
         log.info("서비스 시작");
         return bookRepository.findBookResponseByTag(tag, pageable);
+    }
+
+    // 도서 상세정보 (좋아요한 유저까지 포함)
+    @Override
+    public BookDetailResponse getBookDetailResponseByBookId(Long id) {
+        return bookRepository.findBookDetailResponseByBookId(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
     }
 }

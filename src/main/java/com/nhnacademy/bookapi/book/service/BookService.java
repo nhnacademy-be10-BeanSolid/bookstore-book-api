@@ -2,6 +2,7 @@ package com.nhnacademy.bookapi.book.service;
 
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
+import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,5 +22,7 @@ public interface BookService {
     void deleteBook(Long id);
 
     Page<BookResponse> getBooksResponseByTag(String tag, Pageable pageable);
+
+    BookDetailResponse getBookDetailResponseByBookId(Long id);
 
 }
