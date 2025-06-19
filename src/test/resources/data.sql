@@ -1,7 +1,7 @@
-insert into book (book_id, title, author, publisher, publisher_at, isbn, price_original, price_sale, is_gift_wrappable, create_at, status, stock)
+insert into book (book_id, title, description,  author, publisher, pulisher_at, isbn, price_original, price_sale, is_gift_wrappable, create_at, status, stock)
 values
-    (1, '테스트책1', '김', '출판사', '2020-02-02', '0000000000000', 30000, 25000, true, '2020-03-03 14:30:00', 'on_sale', 200),
-    (2, '테스트책2', '김', '출판사', '2020-02-02', '0000000000001', 35000, 33000, true, '2020-03-03 14:30:00', 'on_sale', 100);
+    (1, '테스트책1', '설명12','김', '출판사', '2020-02-02', '0000000000000', 30000, 25000, true, '2020-03-03 14:30:00', 'on_sale', 200),
+    (2, '테스트책2', '설명34','김', '출판사', '2020-02-02', '0000000000001', 35000, 33000, true, '2020-03-03 14:30:00', 'on_sale', 100);
 
 insert into book_tag (tag_id, name)
 values
@@ -27,3 +27,9 @@ insert into book_category_map (book_id, category_id)
 values
     (1,2),
     (1,3);
+
+insert into book_like (book_like_id, book_id, user_id, liked_at)
+values
+    (1,1, '유저1', '2023-01-01 10:00:00'),
+    (2,1, '유저2', '2023-01-01 10:00:00');
+

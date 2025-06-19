@@ -2,6 +2,7 @@ package com.nhnacademy.bookapi.book.controller;
 
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
+import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import com.nhnacademy.bookapi.advice.ValidationFailedException;
@@ -33,8 +34,8 @@ public class BookController {
     }
 
     @GetMapping("/books/{id}")
-    public ResponseEntity<BookResponse> getBookDetailById(@PathVariable Long id){
-        BookResponse response = bookService.getBookResponseByBookId(id);
+    public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
+        BookDetailResponse response = bookService.getBookDetailResponseByBookId(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -81,6 +82,18 @@ public class BookController {
     public ResponseEntity<Page<BookResponse>> getBooksResponseByTag(@RequestParam String tag, Pageable pageable) {
         log.info("컨트롤러 시작   Request to get Books by tag {}", tag);
         Page<BookResponse> response = bookService.getBooksResponseByTag(tag, pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/searcht")
+    public ResponseEntity<Page<BookResponse>> getBooksResponseByTitle(@RequestParam String title, Pageable pageable) {
+        Page<BookResponse> response = bookService.getBookResponseByTitle(title, pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/searchd")
+    public ResponseEntity<Page<BookResponse>> getBooksResponseByDescription(@RequestParam String description, Pageable pageable) {
+        Page<BookResponse> response = bookService.getBookResponseByDescription(description, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

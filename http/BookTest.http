@@ -25,14 +25,15 @@ Content-Type: application/json
   "publisher": "pub2",
   "author": "Lee",
   "publishedDate": "2025-06-09",
-  "isbn": "isbn001111116",
+  "isbn": "isbn001111127",
   "originalPrice": 1000,
   "salePrice": 1,
   "wrappable": true,
-  "stock": 100
+  "stock": 100,
+  "categoryIds": [1, 2]
 }
 
-### ID로 도서 찾기(상세정보)
+### ID로 도서 찾기(상세정보, 좋아요한 유저아이디까지)
 GET http://localhost:10346/books/1
 
 ### 작가로 도서 찾기

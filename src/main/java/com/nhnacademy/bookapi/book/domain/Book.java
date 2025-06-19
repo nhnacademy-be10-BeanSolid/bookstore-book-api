@@ -8,9 +8,7 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Builder
@@ -40,7 +38,7 @@ public class Book {
     @Column(nullable = false)
     private String publisher;
 
-    @Column(name = "publisher_at", nullable = false)
+    @Column(name = "pulisher_at", nullable = false)
     private LocalDate publishedDate;
 
     @Column(nullable = false)
@@ -89,5 +87,5 @@ public class Book {
     private Set<BookCategory> bookCategories = new HashSet<>();
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BookLike> bookLikes = new ArrayList<>();
+    private Set<BookLike> bookLikes = new HashSet<>();
 }

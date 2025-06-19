@@ -2,6 +2,7 @@ package com.nhnacademy.bookapi.book.service;
 
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
+import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,4 +23,11 @@ public interface BookService {
 
     Page<BookResponse> getBooksResponseByTag(String tag, Pageable pageable);
 
+    BookDetailResponse getBookDetailResponseByBookId(Long id);
+
+    // 도서 제목으로 검색
+    Page<BookResponse> getBookResponseByTitle(String title, Pageable pageable);
+
+    // 도서 설명으로 검색
+    Page<BookResponse> getBookResponseByDescription(String description, Pageable pageable);
 }

@@ -8,6 +8,7 @@ import com.nhnacademy.bookapi.booktag.domain.BookTag;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,6 @@ public record BookResponse(
     int stock,
 
     Set<String> bookCategories,
-
     Set<String> bookTags
 ) {
 public static BookResponse of(Book book) {

@@ -3,6 +3,7 @@ package com.nhnacademy.bookapi.book.domain.request;
 import jakarta.validation.constraints.*;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 public record BookCreateRequest(
 
@@ -39,5 +40,8 @@ public record BookCreateRequest(
         Boolean wrappable,
 
         @PositiveOrZero
-        Integer stock
+        Integer stock,
+
+        @NotEmpty
+        Set<Long> categoryIds
 ) {}
