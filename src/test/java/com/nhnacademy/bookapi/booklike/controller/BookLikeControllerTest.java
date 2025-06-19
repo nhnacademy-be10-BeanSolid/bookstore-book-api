@@ -129,24 +129,12 @@ class BookLikeControllerTest {
     }
 
     @Test
-    @DisplayName("삭제")
-    void deleteBookLikeTest() throws Exception {
-        doNothing().when(bookLikeService).deleteBookLikeByBookId(book.getId());
-
-        mockMvc.perform(delete("/books/{bookId}/bookLikes", book.getId()))
-                .andExpect(status().isNoContent());
-
-        verify(bookLikeService).deleteBookLikeByBookId(book.getId());
-    }
-
-    @Test
     @DisplayName("삭제 - 유저,도서 아이디")
     void deleteBookLikeByUserIdAndBookIdTest() throws Exception {
         doNothing().when(bookLikeService).deleteBookLikeByUserIdAndBookId(userId, book.getId());
 
-        mockMvc.perform(delete("/users")
-                        .header("X-USER-ID", userId)
-                        .param("bookId", String.valueOf(book.getId())))
+        mockMvc.perform(delete("/books/{bookId}/bookLikes", book.getId())
+                        .header("X-USER-ID", userId))
                 .andExpect(status().isNoContent());
 
         verify(bookLikeService).deleteBookLikeByUserIdAndBookId(userId, book.getId());
@@ -157,8 +145,7 @@ class BookLikeControllerTest {
     void deleteBookLikeByUserIdAndBookIdExceptionTest() throws Exception {
         doNothing().when(bookLikeService).deleteBookLikeByUserIdAndBookId(userId, book.getId());
 
-        mockMvc.perform(delete("/users")
-                        .param("bookId", String.valueOf(book.getId())))
+        mockMvc.perform(delete("/books/{bookId}/bookLikes", book.getId()))
                 .andExpect(status().isInternalServerError());
 
     }

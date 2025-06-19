@@ -44,21 +44,13 @@ public class BookLikeController {
         return ResponseEntity.created(location).body(response);
     }
 
-    // 마이페이지에서 삭제
-    @DeleteMapping("/users")
+    @DeleteMapping("/books/{bookId}/bookLikes")
     public ResponseEntity<Void> deleteBookLikeByUserIdAndBookId(@RequestHeader("X-USER-ID") String userId,
-                                                                @RequestParam(value = "bookId", required = false) Long bookId) {
+                                                                @PathVariable Long bookId) {
         if (userId == null || userId.isBlank()) {
             throw new InvalidUserIdHeaderException();
         }
         bookLikeService.deleteBookLikeByUserIdAndBookId(userId, bookId);
-        return ResponseEntity.noContent().build();
-    }
-
-    // 도서 아이디로 해당 도서에 대한 좋아요 전체 삭제
-    @DeleteMapping("/books/{bookId}/bookLikes")
-    public ResponseEntity<Void> deleteBookLikesByBookId(@PathVariable Long bookId) {
-        bookLikeService.deleteBookLikeByBookId(bookId);
         return ResponseEntity.noContent().build();
     }
 }
