@@ -26,6 +26,9 @@ public interface CustomBookRepository {
     // 도서 이름으로 검색
     Page<BookResponse> findBookResponseByTitle(String title, Pageable pageable);
 
+    // 도서 설명으로 검색
+    Page<BookResponse> findBookResponseByDescription(String description, Pageable pageable);
+
     Optional<BookTagMapResponse> findBookTagMapResponseByBookIdAndTagId(Long bookId, Long tagId);
 
     Optional<BookCategoryMapResponse> findBookCategoryMapResponseByBookIdAndCategoryId(Long bookId, Long categoryId);

@@ -124,6 +124,10 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
     public Page<BookResponse> findBookResponseByTitle(String title, Pageable pageable) {
         QBook book = QBook.book;
 
+        if(title == null || title.isEmpty()) {
+            return Page.empty(pageable);
+        }
+
         List<Book> books = queryFactory
                 .selectFrom(book)
                 .where(book.title.containsIgnoreCase(title))
@@ -139,6 +143,35 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
                 .select(book.count())
                 .from(book)
                 .where(book.title.containsIgnoreCase(title))
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
+    }
+
+    // 도서 설명으로 검색
+    @Override
+    public Page<BookResponse> findBookResponseByDescription(String description, Pageable pageable) {
+        QBook book = QBook.book;
+
+        if (description == null || description.isBlank()) {
+            return Page.empty(pageable);  // 빈 페이지 반환
+        }
+
+        List<Book> books = queryFactory
+                .selectFrom(book)
+                .where(book.description.containsIgnoreCase(description))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        List<BookResponse> content = books.stream()
+                .map(BookResponse::of)
+                .toList();
+
+        Long total = queryFactory
+                .select(book.count())
+                .from(book)
+                .where(book.description.containsIgnoreCase(description))
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0);

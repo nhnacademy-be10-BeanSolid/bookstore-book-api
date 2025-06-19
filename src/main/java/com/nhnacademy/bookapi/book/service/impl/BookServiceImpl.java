@@ -150,4 +150,10 @@ public class BookServiceImpl implements BookService {
     public Page<BookResponse> getBookResponseByTitle(String title, Pageable pageable) {
         return bookRepository.findBookResponseByTitle(title, pageable);
     }
+
+    // 도서 설명으로 검색
+    @Override
+    public Page<BookResponse> getBookResponseByDescription(String description, Pageable pageable) {
+        return bookRepository.findBookResponseByDescription(description, pageable);
+    }
 }

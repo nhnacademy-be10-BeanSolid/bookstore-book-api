@@ -90,4 +90,10 @@ public class BookController {
         Page<BookResponse> response = bookService.getBookResponseByTitle(title, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @GetMapping("/searchd")
+    public ResponseEntity<Page<BookResponse>> getBooksResponseByDescription(@RequestParam String description, Pageable pageable) {
+        Page<BookResponse> response = bookService.getBookResponseByDescription(description, pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }
