@@ -10,8 +10,9 @@ import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.book.service.impl.BookServiceImpl;
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
+import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.booklike.domain.BookLike;
-import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,7 +43,7 @@ class BookServiceImplTest {
     @Mock
     private BookRepository bookRepository;
     @Mock
-    private BookTagRepository bookTagRepository;
+    private BookCategoryRepository bookCategoryRepository;
 
     @InjectMocks
     private BookServiceImpl bookService;
@@ -70,8 +71,16 @@ class BookServiceImplTest {
     @Test
     @DisplayName("추가 성공")
     void createBookSuccessTest() {
+        Set<Long> categoryIds = Set.of(1L);
+
         BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
-                LocalDate.now(), "test123456789", 10000, 5000, false, 100);
+                LocalDate.now(), "test123456789", 10000, 5000, false, 100, categoryIds);
+        BookCategory category = new BookCategory("소설", null);
+        ReflectionTestUtils.setField(category,"categoryId", 1L);
+
+        when(bookRepository.existsByIsbn("test123456789")).thenReturn(false);
+        when(bookCategoryRepository.findById(1L)).thenReturn(Optional.of(category));
+
         Book savedBook = Book.builder()
                 .title("타이틀")
                 .description("설명")
@@ -84,11 +93,11 @@ class BookServiceImplTest {
                 .salePrice(5000)
                 .wrappable(false)
                 .stock(100)
+                .bookCategories(Set.of(category))
                 .build();
         ReflectionTestUtils.setField(savedBook, "id", 2L);
         BookResponse bookResponse = BookResponse.of(savedBook);
 
-        when(bookRepository.existsByIsbn("test123456789")).thenReturn(false);
         when(bookRepository.save(any(Book.class))).thenReturn(savedBook);
         when(bookRepository.findBookResponseById(2L)).thenReturn(Optional.of(bookResponse));
 
@@ -98,13 +107,14 @@ class BookServiceImplTest {
         assertThat(response.title()).isEqualTo("타이틀");
         assertThat(response.isbn()).isEqualTo("test123456789");
         assertThat(response.author()).isEqualTo("작가");
+        assertThat(response.bookCategories()).contains("소설");
     }
 
     @Test
     @DisplayName("추가 실패")
     void createBookFailTest() {
         BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
-                LocalDate.now(), "test123456789", 10000, 5000, false, 100);
+                LocalDate.now(), "test123456789", 10000, 5000, false, 100, new HashSet<>());
 
         when(bookRepository.existsByIsbn("test123456789")).thenReturn(true);
 

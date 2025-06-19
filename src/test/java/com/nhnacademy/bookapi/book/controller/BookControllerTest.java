@@ -10,6 +10,7 @@ import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.service.BookSearchApiService;
 import com.nhnacademy.bookapi.book.service.BookService;
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.booklike.domain.BookLike;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import org.hamcrest.Matchers;
@@ -57,12 +58,19 @@ class BookControllerTest {
 
     Book book;
     BookTag tag;
+    BookCategory category;
 
     @BeforeEach
     void setUp() {
-        tag = new BookTag(1L, "Test");
-        Set<BookTag> tagSet = new HashSet<>();
-        tagSet.add(tag);
+        category = new BookCategory("소설", null);
+        ReflectionTestUtils.setField(category,"categoryId", 1L);
+        Set<BookCategory> categories = new HashSet<>();
+        categories.add(category);
+
+        tag = new BookTag("Test");
+        ReflectionTestUtils.setField(tag,"tagId", 1L);
+        Set<BookTag> tags = new HashSet<>();
+        tags.add(tag);
 
         book = Book.builder()
                 .title("타이틀")
@@ -76,7 +84,8 @@ class BookControllerTest {
                 .salePrice(5000)
                 .wrappable(false)
                 .stock(100)
-                .bookTags(tagSet)
+                .bookCategories(categories)
+                .bookTags(tags)
                 .bookLikes(new HashSet<>())
                 .build();
         Set<BookLike> bookLikes = book.getBookLikes();
@@ -201,8 +210,10 @@ class BookControllerTest {
     @Test
     @DisplayName("도서 생성")
     void createBookTest() throws Exception{
+        Set<Long> categoryIds = Set.of(1L);
+
         BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
-                LocalDate.now(), "test000000000", 10000, 5000, false, 100);
+                LocalDate.now(), "test000000000", 10000, 5000, false, 100, categoryIds);
 
         given(bookService.createBook(any(BookCreateRequest.class))).willReturn(BookResponse.of(book));
 
@@ -212,23 +223,25 @@ class BookControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.title").value("타이틀"))
                 .andExpect(jsonPath("$.isbn").value("test000000000"))
-                .andExpect(jsonPath("$.author").value("작가"));
+                .andExpect(jsonPath("$.author").value("작가"))
+                .andExpect(jsonPath("$.bookCategories").value(Matchers.hasItem("소설")));
     }
 
     @Test
     @DisplayName("도서 생성 - 유효성 검사 실패")
     void createBookValidationFailTest() throws Exception {
+        Set<Long> categoryIds = Set.of(1L);
+
         // 재고량 -1로 지정
         BookCreateRequest badRequest = new BookCreateRequest(
                 "타이틀", "설명", "목차", "출판사", "작가",
-                LocalDate.now(), "test123456789", 10000, 5000, false, -1);
+                LocalDate.now(), "test123456789", 10000, 5000, false, -1, categoryIds);
 
         mockMvc.perform(post("/books")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(badRequest)))
                 .andExpect(status().isBadRequest());
     }
-
 
     @Test
     @DisplayName("수정")
