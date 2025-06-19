@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @ActiveProfiles("test")
-public class CustomBookRepositoryImplTest {
+class CustomBookRepositoryImplTest {
 
     @Autowired
     private CustomBookRepositoryImpl customBookRepository;
@@ -102,7 +102,7 @@ public class CustomBookRepositoryImplTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<BookResponse> result = customBookRepository.findBookResponseByTitle("", pageable);
 
-        assertThat(result.getContent()).hasSize(0);
+        assertThat(result.getContent()).isEmpty();
     }
 
     @Test
@@ -124,7 +124,7 @@ public class CustomBookRepositoryImplTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<BookResponse> result = customBookRepository.findBookResponseByDescription("", pageable);
 
-        assertThat(result.getContent()).hasSize(0);
+        assertThat(result.getContent()).isEmpty();
     }
 
     @Test
@@ -170,7 +170,7 @@ public class CustomBookRepositoryImplTest {
     void countBookCategoryByBookIdNotFoundTest() {
         int result = customBookRepository.countBookCategoryByBookId(3L);
 
-        assertThat(result).isEqualTo(0);
+        assertThat(result).isZero();
     }
 
     @Test
@@ -191,7 +191,7 @@ public class CustomBookRepositoryImplTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<BookResponse> result = customBookRepository.findBookResponseByTag("", pageable);
 
-        assertThat(result.getContent()).hasSize(0);
+        assertThat(result.getContent()).isEmpty();
     }
 }
 

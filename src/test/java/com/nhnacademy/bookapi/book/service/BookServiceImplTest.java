@@ -165,7 +165,7 @@ class BookServiceImplTest {
         BookDetailResponse actualResponse = bookService.getBookDetailResponseByBookId(id);
 
         assertThat(actualResponse).isNotNull();
-        assertThat(actualResponse.likedUsers().size()).isEqualTo(1);
+        assertThat(actualResponse.likedUsers()).hasSize(1);
     }
 
     @Test

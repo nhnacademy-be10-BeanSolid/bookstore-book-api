@@ -110,8 +110,8 @@ class BookCategoryServiceImplTest {
 
         var result = bookCategoryService.getAllCategories();
 
-        assertThat(result).hasSize(2);
         assertThat(result)
+                .hasSize(2)
                 .contains(parentCategory)
                 .contains(childCategory);
     }
