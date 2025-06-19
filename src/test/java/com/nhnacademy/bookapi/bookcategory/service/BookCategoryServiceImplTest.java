@@ -19,7 +19,8 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -51,9 +52,9 @@ class BookCategoryServiceImplTest {
 
         Long parentId = parentCategory.getParentCategory() != null ? parentCategory.getParentCategory().getCategoryId() : null;
 
-        BookCategoryResponse response = new BookCategoryResponse(parentCategory.getCategoryId(),
+        BookCategoryResponse response = new BookCategoryResponse(1L,
                 parentId,
-                parentCategory.getName(),
+                "Parent",
                 parentCategory.getCreatedAt(),
                 parentCategory.getUpdatedAt());
 
@@ -63,16 +64,17 @@ class BookCategoryServiceImplTest {
 
         BookCategoryResponse result = bookCategoryService.createCategory(request);
 
-        assertEquals("Parent", result.categoryName());
+        assertThat(result).isEqualTo(response);
     }
 
     @Test
     void createCategory_alreadyExists() {
         when(bookCategoryRepository.existsByName("Parent")).thenReturn(true);
 
-        assertThrows(BookCategoryAlreadyExistsException.class,
-                () -> bookCategoryService.createCategory(new BookCategoryCreateRequest("Parent", null))
-        );
+        BookCategoryCreateRequest request = new BookCategoryCreateRequest("Parent", null);
+
+        assertThatThrownBy(() -> bookCategoryService.createCategory(request))
+                .isInstanceOf(BookCategoryAlreadyExistsException.class);
     }
 
     @Test
@@ -90,15 +92,16 @@ class BookCategoryServiceImplTest {
 
         BookCategoryResponse result = bookCategoryService.getCategoryById(1L);
 
-        assertEquals(1L, result.categoryId());
-        assertEquals("Parent", result.categoryName());
+        assertThat(result.categoryId()).isEqualTo(1L);
+        assertThat(result.categoryName()).isEqualTo("Parent");
     }
 
     @Test
     void getCategoryById_notFound() {
         when(bookCategoryRepository.findBookCategoryResponseById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(BookCategoryNotFoundException.class, () -> bookCategoryService.getCategoryById(99L));
+        assertThatThrownBy(() -> bookCategoryService.getCategoryById(99L))
+                .isInstanceOf(BookCategoryNotFoundException.class);
     }
 
     @Test
@@ -107,9 +110,10 @@ class BookCategoryServiceImplTest {
 
         var result = bookCategoryService.getAllCategories();
 
-        assertEquals(2, result.size());
-        assertTrue(result.contains(parentCategory));
-        assertTrue(result.contains(childCategory));
+        assertThat(result).hasSize(2);
+        assertThat(result)
+                .contains(parentCategory)
+                .contains(childCategory);
     }
 
     @Test
@@ -122,8 +126,8 @@ class BookCategoryServiceImplTest {
         when(bookCategoryRepository.findBookCategoryResponseById(1L)).thenReturn(Optional.of(response));
         BookCategoryResponse result = bookCategoryService.updateCategory(1L, request);
 
-        assertEquals("Updated", result.categoryName());
-        assertNotNull(result.updatedAt());
+        assertThat(result.categoryName()).isEqualTo("Updated");
+        assertThat(result.updatedAt()).isNotNull();
         verify(bookCategoryRepository).save(parentCategory);
     }
 
@@ -133,7 +137,8 @@ class BookCategoryServiceImplTest {
 
         when(bookCategoryRepository.findById(99L)).thenReturn(Optional.empty());
 
-        assertThrows(BookCategoryNotFoundException.class, () -> bookCategoryService.updateCategory(99L, request));
+        assertThatThrownBy(() -> bookCategoryService.updateCategory(99L, request))
+                .isInstanceOf(BookCategoryNotFoundException.class);
     }
 
     @Test
@@ -150,20 +155,21 @@ class BookCategoryServiceImplTest {
     void deleteCategory_notFound() {
         when(bookCategoryRepository.existsById(99L)).thenReturn(false);
 
-        assertThrows(BookCategoryNotFoundException.class, () -> bookCategoryService.deleteCategory(99L));
+        assertThatThrownBy(() -> bookCategoryService.deleteCategory(99L))
+                .isInstanceOf(BookCategoryNotFoundException.class);
     }
 
     @Test
     void existsCategory_byName() {
         when(bookCategoryRepository.existsByName("Parent")).thenReturn(true);
 
-        assertTrue(bookCategoryService.existsCategory("Parent"));
+        assertThat(bookCategoryService.existsCategory("Parent")).isTrue();
     }
 
     @Test
     void existsCategory_ById() {
         when(bookCategoryRepository.existsById(1L)).thenReturn(true);
 
-        assertTrue(bookCategoryService.existsCategory(1L));
+        assertThat(bookCategoryService.existsCategory(1L)).isTrue();
     }
 }

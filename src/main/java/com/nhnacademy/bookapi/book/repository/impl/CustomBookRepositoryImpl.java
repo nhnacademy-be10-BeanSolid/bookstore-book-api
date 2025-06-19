@@ -16,12 +16,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
+@Repository
 public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implements CustomBookRepository {
 
     private final JPAQueryFactory queryFactory;

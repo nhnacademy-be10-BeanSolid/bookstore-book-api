@@ -13,7 +13,9 @@ import java.util.List;
 @Getter
 @Setter
 public class BookCategory {
+
     @Id
+    @Column(name = "category_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long categoryId;
 
@@ -27,10 +29,10 @@ public class BookCategory {
     @Column(nullable = false, length = 100)
     private String name;
 
-    @Column(nullable = false, columnDefinition = "DATETIME")
+    @Column(name = "created_at", nullable = false, columnDefinition = "DATETIME")
     private LocalDateTime createdAt;
 
-    @Column(columnDefinition = "DATETIME")
+    @Column(name = "updated_at", columnDefinition = "DATETIME")
     private LocalDateTime updatedAt;
 
     public BookCategory(String name, BookCategory parentCategory) {

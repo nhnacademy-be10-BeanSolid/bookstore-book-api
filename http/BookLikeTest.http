@@ -1,23 +1,23 @@
-### 책 좋아요 생성
+### 책 좋아요 생성 - 헤더 x
 POST http://localhost:10346/books/1/bookLikes
 Content-Type: application/json
 
 {
   "userId": "user",
-  "bookId": 4
+  "bookId": 1
 }
 
-### 책 좋아요 생성
-POST http://localhost:10346/books/4/bookLikes
+### 책 좋아요 생성 - 헤더 o
+POST http://localhost:10346/books/1/bookLikes
 Content-Type: application/json
-
-{
-  "userId": "user",
-  "bookId": 4
-}
+X-USER-ID: user
 
 ### 좋아요 조회
 GET http://localhost:10346/books/1/bookLikes
+
+### 좋아요 조회
+GET http://localhost:10346/users
+X-USER-ID: user
 
 ### 유서 아이디로 좋아요 조회
 GET http://localhost:10346/users/user/bookLikes

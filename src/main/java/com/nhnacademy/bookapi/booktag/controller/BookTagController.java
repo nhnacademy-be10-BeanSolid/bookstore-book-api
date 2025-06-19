@@ -1,7 +1,6 @@
 package com.nhnacademy.bookapi.booktag.controller;
 
 import com.nhnacademy.bookapi.advice.ValidationFailedException;
-import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagUpdateRequest;
@@ -13,7 +12,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController

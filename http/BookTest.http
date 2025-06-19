@@ -51,7 +51,7 @@ Content-Type: application/json
 }
 
 ### 도서 삭제
-DELETE http://localhost:10346/books/4
+DELETE http://localhost:10346/books/1
 
 ### 태그로 도서 검색
 GET http://localhost:10346/search?tag=테스트
