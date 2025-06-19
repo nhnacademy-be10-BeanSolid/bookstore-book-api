@@ -62,12 +62,11 @@ public class CustomBookRepositoryImplTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<BookResponse> result = customBookRepository.findBookResponsesByAuthor("김", pageable);
 
-        assertThat(result).isNotNull();
-        assertThat(result.getContent()).hasSize(2);
-
         BookResponse first = result.getContent().get(0);
         BookResponse second = result.getContent().get(1);
 
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(2);
         assertThat(first.author()).isEqualTo("김");
         assertThat(second.author()).isEqualTo("김");
     }
@@ -77,12 +76,11 @@ public class CustomBookRepositoryImplTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<BookResponse> result = customBookRepository.findBookResponseByPublisher("출판사", pageable);
 
-        assertThat(result).isNotNull();
-        assertThat(result.getContent()).hasSize(2);
-
         BookResponse first = result.getContent().get(0);
         BookResponse second = result.getContent().get(1);
 
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(2);
         assertThat(first.publisher()).isEqualTo("출판사");
         assertThat(second.publisher()).isEqualTo("출판사");
     }
@@ -92,11 +90,10 @@ public class CustomBookRepositoryImplTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<BookResponse> result = customBookRepository.findBookResponseByTitle("테스트책1", pageable);
 
-        assertThat(result).isNotNull();
-        assertThat(result.getContent()).hasSize(1);
-
         BookResponse first = result.getContent().getFirst();
 
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(1);
         assertThat(first.title()).contains("테스트책1");
     }
 
@@ -113,12 +110,11 @@ public class CustomBookRepositoryImplTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<BookResponse> result = customBookRepository.findBookResponseByDescription("설명", pageable);
 
-        assertThat(result).isNotNull();
-        assertThat(result.getContent()).hasSize(2);
-
         BookResponse first = result.getContent().get(0);
         BookResponse second = result.getContent().get(1);
 
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(2);
         assertThat(first.description()).contains("설명");
         assertThat(second.description()).contains("설명");
     }
@@ -181,13 +177,11 @@ public class CustomBookRepositoryImplTest {
     void findBookResponseByTagTest() {
         Pageable pageable = PageRequest.of(0, 10);
         Page<BookResponse> result = customBookRepository.findBookResponseByTag("태그1", pageable);
-
-        assertThat(result).isNotNull();
-        assertThat(result.getContent()).hasSize(2);
-
         BookResponse first = result.getContent().get(0);
         BookResponse second = result.getContent().get(1);
 
+        assertThat(result).isNotNull();
+        assertThat(result.getContent()).hasSize(2);
         assertThat(first.bookTags()).contains("태그1");
         assertThat(second.bookTags()).contains("태그1");
     }

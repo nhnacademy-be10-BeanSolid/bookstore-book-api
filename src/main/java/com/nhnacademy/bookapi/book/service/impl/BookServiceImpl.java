@@ -54,7 +54,7 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new BookNotFoundException(savedBook.getId()));
     }
 
-    // 아이디로 도서 찾기
+    // 아이디로 도서 검색
     @Override
     @Transactional(readOnly = true)
     public BookResponse getBookResponseByBookId(Long id) {
@@ -62,17 +62,42 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new BookNotFoundException(id));
     }
 
-    // 작가로 도서 찾기
+    // 도서 상세정보 (좋아요한 유저까지 포함)
+    @Override
+    public BookDetailResponse getBookDetailResponseByBookId(Long id) {
+        return bookRepository.findBookDetailResponseByBookId(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
+    }
+
+    // 작가로 도서 검색
     @Override
     @Transactional(readOnly = true)
     public Page<BookResponse> getBooksResponseByAuthor(String author, Pageable pageable) {
         return bookRepository.findBookResponsesByAuthor(author, pageable);
     }
 
-    // 출판사로 도서 찾기
+    // 출판사로 도서 검색
     @Override
     public Page<BookResponse> getBooksResponseByPublisher(String publisher, Pageable pageable) {
         return bookRepository.findBookResponseByPublisher(publisher, pageable);
+    }
+
+    // 태그로 도서 검색
+    @Override
+    public Page<BookResponse> getBooksResponseByTag(String tag, Pageable pageable) {
+        log.info("태그 파라미터 {}", tag);
+        return bookRepository.findBookResponseByTag(tag, pageable);
+    }
+
+    // 도서 이름(타이틀)로 검색
+    public Page<BookResponse> getBookResponseByTitle(String title, Pageable pageable) {
+        return bookRepository.findBookResponseByTitle(title, pageable);
+    }
+
+    // 도서 설명으로 검색
+    @Override
+    public Page<BookResponse> getBookResponseByDescription(String description, Pageable pageable) {
+        return bookRepository.findBookResponseByDescription(description, pageable);
     }
 
     // 도서 업데이트
@@ -125,30 +150,5 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
         bookRepository.delete(book);
-    }
-
-    // 태그로 도서 검색
-    @Override
-    public Page<BookResponse> getBooksResponseByTag(String tag, Pageable pageable) {
-        log.info("태그 파라미터 {}", tag);
-        return bookRepository.findBookResponseByTag(tag, pageable);
-    }
-
-    // 도서 상세정보 (좋아요한 유저까지 포함)
-    @Override
-    public BookDetailResponse getBookDetailResponseByBookId(Long id) {
-        return bookRepository.findBookDetailResponseByBookId(id)
-                .orElseThrow(() -> new BookNotFoundException(id));
-    }
-
-    // 도서 이름(타이틀)로 검색
-    public Page<BookResponse> getBookResponseByTitle(String title, Pageable pageable) {
-        return bookRepository.findBookResponseByTitle(title, pageable);
-    }
-
-    // 도서 설명으로 검색
-    @Override
-    public Page<BookResponse> getBookResponseByDescription(String description, Pageable pageable) {
-        return bookRepository.findBookResponseByDescription(description, pageable);
     }
 }

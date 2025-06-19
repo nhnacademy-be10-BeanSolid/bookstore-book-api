@@ -3,13 +3,14 @@ package com.nhnacademy.bookapi.book.service;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
+import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.book.service.impl.BookServiceImpl;
-import com.nhnacademy.bookapi.booktag.exception.BookTagNotFoundException;
+import com.nhnacademy.bookapi.booklike.domain.BookLike;
 import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -25,8 +26,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -61,7 +64,7 @@ class BookServiceImplTest {
                 .wrappable(false)
                 .stock(100)
                 .build();
-        bookRepository.save(book);
+        ReflectionTestUtils.setField(book,"id", 1L);
     }
 
     @Test
@@ -92,9 +95,9 @@ class BookServiceImplTest {
         BookResponse response = bookService.createBook(request);
 
         assertThat(response).isNotNull();
-        assertThat(response.title()).isEqualTo(request.title());
-        assertThat(response.isbn()).isEqualTo(request.isbn());
-        assertThat(response.author()).isEqualTo(request.author());
+        assertThat(response.title()).isEqualTo("타이틀");
+        assertThat(response.isbn()).isEqualTo("test123456789");
+        assertThat(response.author()).isEqualTo("작가");
     }
 
     @Test
@@ -110,9 +113,10 @@ class BookServiceImplTest {
     }
 
     @Test
-    @DisplayName("아이디로 도서 찾기 성공")
-    void getBookDetailByBookIdSuccessTest() {
+    @DisplayName("일반 정보 조회")
+    void getBookResponseByBookIdSuccessTest() {
         Long id = book.getId();
+
         BookResponse response = BookResponse.of(book);
 
         when(bookRepository.findBookResponseById(id)).thenReturn(Optional.of(response));
@@ -120,14 +124,14 @@ class BookServiceImplTest {
         BookResponse actualResponse = bookService.getBookResponseByBookId(id);
 
         assertThat(actualResponse).isNotNull();
-        assertThat(actualResponse.title()).isEqualTo(book.getTitle());
-        assertThat(actualResponse.isbn()).isEqualTo(book.getIsbn());
-        assertThat(actualResponse.author()).isEqualTo(book.getAuthor());
+        assertThat(actualResponse.title()).isEqualTo("타이틀");
+        assertThat(actualResponse.isbn()).isEqualTo("test000000000");
+        assertThat(actualResponse.author()).isEqualTo("작가");
     }
 
     @Test
-    @DisplayName("아이디로 도서 찾기 실패")
-    void getBookDetailByBookIdFailTest() {
+    @DisplayName("조회 실패")
+    void getBookResponseByBookIdFailTest() {
         Long id = book.getId();
 
         when(bookRepository.findBookResponseById(id)).thenReturn(Optional.empty());
@@ -137,8 +141,37 @@ class BookServiceImplTest {
     }
 
     @Test
-    @DisplayName("작가로 도서 찾기")
-    void getBooksResponseByAuthorSuccessTest() {
+    @DisplayName("상세 정보 조회")
+    void getBookDetailResponseByBookIdSuccessTest() {
+        Long id = book.getId();
+        Set<BookLike> likedUsers = new HashSet<>();
+        likedUsers.add(new BookLike("user", book));
+        book.setBookLikes(likedUsers);
+
+        BookDetailResponse response = BookDetailResponse.of(book);
+
+        when(bookRepository.findBookDetailResponseByBookId(id)).thenReturn(Optional.of(response));
+
+        BookDetailResponse actualResponse = bookService.getBookDetailResponseByBookId(id);
+
+        assertThat(actualResponse).isNotNull();
+        assertThat(actualResponse.likedUsers().size()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("조회 실패")
+    void getBookDetailResponseByBookIdFailTest() {
+        Long id = book.getId();
+
+        when(bookRepository.findBookDetailResponseByBookId(id)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookService.getBookDetailResponseByBookId(id))
+                .isInstanceOf(BookNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("작가로 도서 검색")
+    void getBooksResponseByAuthorTest() {
         String author = book.getAuthor();
 
         Book book1 = Book.builder()
@@ -169,7 +202,7 @@ class BookServiceImplTest {
     }
 
     @Test
-    @DisplayName("출판사로 도서 찾기")
+    @DisplayName("출판사로 도서 검색")
     void getBooksResponseByPublisherTest() {
         String publisher = book.getPublisher();
 
@@ -201,6 +234,76 @@ class BookServiceImplTest {
     }
 
     @Test
+    @DisplayName("태그로 도서 검색")
+    void getBooksResponseByTagTest() {
+        String tagName = "existTag";
+
+        BookResponse response = BookResponse.of(book);
+
+        Pageable pageable = PageRequest.of(0, 10);
+        when(bookRepository.findBookResponseByTag(tagName, pageable))
+                .thenReturn(new PageImpl<>(List.of(response), pageable, 1));
+
+        Page<BookResponse> pageResult = bookService.getBooksResponseByTag(tagName, pageable);
+
+        assertThat(pageResult).isNotNull();
+        assertThat(pageResult.getContent()).hasSize(1);
+    }
+
+    @Test
+    @DisplayName("제목으로 도서 검색")
+    void getBooksResponseByTitleTest() {
+        String title = "타이틀";
+
+        Book book1 = Book.builder()
+                .title("타이틀123")
+                .description("설명")
+                .toc("목차")
+                .publisher("출판사")
+                .author("작가")
+                .publishedDate(LocalDate.now())
+                .isbn("test000000000")
+                .originalPrice(10000)
+                .salePrice(5000)
+                .wrappable(false)
+                .stock(100)
+                .build();
+        BookResponse response = BookResponse.of(book);
+        BookResponse response1 = BookResponse.of(book1);
+
+        Pageable pageable = PageRequest.of(0, 10);
+        when(bookRepository.findBookResponseByTitle(title, pageable))
+                .thenReturn(new PageImpl<>(List.of(response, response1), pageable, 2));
+
+        Page<BookResponse> pageResult = bookService.getBookResponseByTitle(title, pageable);
+        BookResponse result = pageResult.getContent().get(0);
+        BookResponse result1 = pageResult.getContent().get(1);
+
+        assertThat(pageResult).isNotNull();
+        assertThat(pageResult.getContent()).hasSize(2);
+        assertThat(result.title()).contains("타이틀");
+        assertThat(result1.title()).contains("타이틀");
+    }
+
+    @Test
+    @DisplayName("설명으로 도서 검색")
+    void getBooksResponseByDescriptionTest() {
+        String description = "설명";
+
+        BookResponse response = BookResponse.of(book);
+
+        Pageable pageable = PageRequest.of(0, 10);
+        when(bookRepository.findBookResponseByDescription(description, pageable))
+                .thenReturn(new PageImpl<>(List.of(response), pageable, 1));
+
+        Page<BookResponse> pageResult = bookService.getBookResponseByDescription(description, pageable);
+        BookResponse result = pageResult.getContent().getFirst();
+
+        assertThat(result).isNotNull();
+        assertThat(result.description()).contains("설명");
+    }
+
+    @Test
     @DisplayName("업데이트 성공")
     void updateBookSuccessTest() {
         Long id = book.getId();
@@ -219,7 +322,7 @@ class BookServiceImplTest {
         BookResponse actualResponse = bookService.updateBook(id, request);
 
         assertThat(actualResponse).isNotNull();
-        assertThat(actualResponse.title()).isEqualTo(request.getTitle());
+        assertThat(actualResponse.title()).isEqualTo("수정합니다");
         assertThat(actualResponse.status()).isEqualTo(BookStatus.SALE_END);
     }
 
@@ -254,34 +357,5 @@ class BookServiceImplTest {
 
         assertThatThrownBy(() -> bookService.deleteBook(id))
                 .isInstanceOf(BookNotFoundException.class);
-    }
-
-    @Test
-    @DisplayName("태그로 도서 검색")
-    void getBooksResponseByTagSuccessTest() {
-        String tagName = "existTag";
-        when(bookTagRepository.existsBookTagByName(tagName)).thenReturn(true);
-
-        BookResponse response = BookResponse.of(book);
-
-        Pageable pageable = PageRequest.of(0, 10);
-        when(bookRepository.findBookResponseByTag(tagName, pageable))
-                .thenReturn(new PageImpl<>(List.of(response), pageable, 1));
-
-        Page<BookResponse> pageResult = bookService.getBooksResponseByTag(tagName, pageable);
-
-        assertThat(pageResult).isNotNull();
-        assertThat(pageResult.getContent()).hasSize(1);
-    }
-
-    @Test
-    @DisplayName("태그로 도서 검색 실패")
-    void getBooksResponseByTagFailTest() {
-        String tagName = "notExistTag";
-        when(bookTagRepository.existsBookTagByName(tagName)).thenReturn(false);
-
-        Pageable pageable = PageRequest.of(0, 10);
-        assertThatThrownBy(() -> bookService.getBooksResponseByTag(tagName, pageable))
-                .isInstanceOf(BookTagNotFoundException.class);
     }
 }

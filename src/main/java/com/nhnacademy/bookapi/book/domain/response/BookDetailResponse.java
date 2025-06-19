@@ -53,7 +53,6 @@ public record BookDetailResponse(
         Set<String> likeUsers = book.getBookLikes()
                 .stream()
                 .map(BookLike::getUserId)
-                .distinct()
                 .collect(Collectors.toSet());
 
         return new BookDetailResponse(

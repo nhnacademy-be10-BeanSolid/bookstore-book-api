@@ -2,6 +2,7 @@ package com.nhnacademy.bookapi.book.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.bookapi.book.domain.Book;
+import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
@@ -9,6 +10,7 @@ import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.service.BookSearchApiService;
 import com.nhnacademy.bookapi.book.service.BookService;
+import com.nhnacademy.bookapi.booklike.domain.BookLike;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,7 +77,10 @@ class BookControllerTest {
                 .wrappable(false)
                 .stock(100)
                 .bookTags(tagSet)
+                .bookLikes(new HashSet<>())
                 .build();
+        Set<BookLike> bookLikes = book.getBookLikes();
+        bookLikes.add(new BookLike("user", book));
         ReflectionTestUtils.setField(book, "id", 1L);
     }
 
@@ -91,18 +96,19 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("도서 id 단건 조회")
+    @DisplayName("도서 상세정보 조회")
     void getBookTest() throws Exception{
         Long bookId = book.getId();
-        BookResponse response = BookResponse.of(book);
+        BookDetailResponse response = BookDetailResponse.of(book);
 
-        given(bookService.getBookResponseByBookId(bookId)).willReturn(response);
+        given(bookService.getBookDetailResponseByBookId(bookId)).willReturn(response);
 
         mockMvc.perform(get("/books/{bookId}", bookId))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value(response.title()))
-                .andExpect(jsonPath("$.isbn").value(response.isbn()))
-                .andExpect(jsonPath("$.author").value(response.author()));
+                .andExpect(jsonPath("$.title").value("타이틀"))
+                .andExpect(jsonPath("$.isbn").value("test000000000"))
+                .andExpect(jsonPath("$.author").value("작가"))
+                .andExpect(jsonPath("$.likedUsers").value(Matchers.hasItems("user")));
     }
 
     @Test
@@ -135,7 +141,7 @@ class BookControllerTest {
                         .param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].author").value(author));
+                .andExpect(jsonPath("$.content[0].author").value("작가"));
     }
 
     @Test
@@ -168,7 +174,7 @@ class BookControllerTest {
                         .param("size", "10"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].publisher").value(publisher));
+                .andExpect(jsonPath("$.content[0].publisher").value("출판사"));
     }
 
     @Test
@@ -204,9 +210,9 @@ class BookControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.title").value(request.title()))
-                .andExpect(jsonPath("$.isbn").value(request.isbn()))
-                .andExpect(jsonPath("$.author").value(request.author()));
+                .andExpect(jsonPath("$.title").value("타이틀"))
+                .andExpect(jsonPath("$.isbn").value("test000000000"))
+                .andExpect(jsonPath("$.author").value("작가"));
     }
 
     @Test
@@ -245,7 +251,7 @@ class BookControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updateRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value(updateTitle))
+                .andExpect(jsonPath("$.title").value("수정된 타이틀"))
                 .andExpect(jsonPath("$.status").value(BookStatus.SALE_END.name()));
     }
 
