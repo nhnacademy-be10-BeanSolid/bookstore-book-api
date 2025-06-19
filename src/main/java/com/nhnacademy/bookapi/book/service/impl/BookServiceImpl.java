@@ -10,7 +10,9 @@ import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.book.service.BookService;
-import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
+import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
+import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,6 +21,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +31,7 @@ import java.time.LocalDateTime;
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
-    private final BookTagRepository tagRepository;
+    private final BookCategoryRepository bookCategoryRepository;
 
     // 도서 추가
     @Override
@@ -35,6 +39,11 @@ public class BookServiceImpl implements BookService {
         if(bookRepository.existsByIsbn(request.isbn())) {
             throw new BookAlreadyExistsException(request.isbn());
         }
+
+        Set<BookCategory> categories = request.categoryIds().stream()
+                .map(id -> bookCategoryRepository.findById(id)
+                        .orElseThrow(() -> new BookCategoryNotFoundException(id)))
+                .collect(Collectors.toSet());
 
         Book book = Book.builder()
                 .title(request.title())
@@ -48,6 +57,7 @@ public class BookServiceImpl implements BookService {
                 .salePrice(request.salePrice())
                 .wrappable(request.wrappable())
                 .stock(request.stock())
+                .bookCategories(categories)
                 .build();
         Book savedBook = bookRepository.save(book);
         return bookRepository.findBookResponseById(savedBook.getId())

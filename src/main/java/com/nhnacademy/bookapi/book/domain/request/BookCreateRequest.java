@@ -40,5 +40,8 @@ public record BookCreateRequest(
         Boolean wrappable,
 
         @PositiveOrZero
-        Integer stock
+        Integer stock,
+
+        @NotEmpty
+        Set<Long> categoryIds
 ) {}
