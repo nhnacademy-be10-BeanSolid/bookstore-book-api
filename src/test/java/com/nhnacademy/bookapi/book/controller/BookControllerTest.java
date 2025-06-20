@@ -130,7 +130,7 @@ class BookControllerTest {
                 .publisher("출판사")
                 .author("작가")
                 .publishedDate(LocalDate.now())
-                .isbn("test000000000")
+                .isbn("test000000001")
                 .originalPrice(10000)
                 .salePrice(5000)
                 .wrappable(false)

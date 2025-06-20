@@ -78,6 +78,37 @@ class BookCategoryServiceImplTest {
     }
 
     @Test
+    void createCategory_success_withParentId() {
+        BookCategoryCreateRequest request = new BookCategoryCreateRequest("Child", 1L);
+
+        BookCategoryResponse response = new BookCategoryResponse(2L,
+                1L, "Child", childCategory.getCreatedAt(), null);
+
+        when(bookCategoryRepository.existsByName("Child")).thenReturn(false);
+        when(bookCategoryRepository.findById(1L)).thenReturn(Optional.of(parentCategory));
+        when(bookCategoryRepository.save(any(BookCategory.class))).thenReturn(childCategory);
+        when(bookCategoryRepository.findBookCategoryResponseById(2L)).thenReturn(Optional.of(response));
+
+        BookCategoryResponse result = bookCategoryService.createCategory(request);
+
+        assertThat(result.categoryId()).isEqualTo(2L);
+        assertThat(result.parentId()).isEqualTo(1L);
+    }
+
+
+    @Test
+    void createCategory_InvalidParentId() {
+        BookCategoryCreateRequest request = new BookCategoryCreateRequest("Child", 999L);
+
+        when(bookCategoryRepository.existsByName("Child")).thenReturn(false);
+        when(bookCategoryRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookCategoryService.createCategory(request))
+                .isInstanceOf(BookCategoryNotFoundException.class);
+    }
+
+
+    @Test
     void getCategoryById() {
         Long parentId = parentCategory.getParentCategory() != null ? parentCategory.getParentCategory().getCategoryId() : null;
 
