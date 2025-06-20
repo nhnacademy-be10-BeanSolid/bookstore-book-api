@@ -102,7 +102,7 @@ class BookLikeServiceImplTest {
         BookLikeResponse response1 = BookLikeResponse.of(bookLike);
         BookLikeResponse response2 = BookLikeResponse.of(bookLike1);
 
-        when(bookLikeRepository.findBookLikesByUserId(userId)).thenReturn(List.of(response1, response2));
+        when(bookLikeRepository.findBookLikeResponsesByUserId(userId)).thenReturn(List.of(response1, response2));
 
         List<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByUserId(userId);
 
@@ -119,7 +119,7 @@ class BookLikeServiceImplTest {
         BookLikeResponse response2 = BookLikeResponse.of(bookLike1);
 
         when(bookLikeRepository.existsByBookId(book.getId())).thenReturn(true);
-        when(bookLikeRepository.findBookLikesByBookId(book.getId())).thenReturn(List.of(response1, response2));
+        when(bookLikeRepository.findBookLikeResponsesByBookId(book.getId())).thenReturn(List.of(response1, response2));
         List<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByBookId(book.getId());
 
         assertThat(bookLikes)

@@ -25,12 +25,8 @@ public class BookCategoryController {
 
     @GetMapping
     public ResponseEntity<List<BookCategoryResponse>> getAllCategories() {
-        List<BookCategory> bookCategoryList = bookCategoryService.getAllCategories();
-        List<BookCategoryResponse> bookCategoryResponseList = new ArrayList<>();
-        for (BookCategory bookCategory : bookCategoryList) {
-            bookCategoryResponseList.add(createBookCategoryResponse(bookCategory));
-        }
-        return ResponseEntity.ok(bookCategoryResponseList);
+        List<BookCategoryResponse> bookCategoryList = bookCategoryService.getAllCategories();
+        return ResponseEntity.ok(bookCategoryList);
     }
 
     @GetMapping("/{categoryId}")
@@ -67,17 +63,6 @@ public class BookCategoryController {
     public ResponseEntity<Void> deleteCategory(@PathVariable("categoryId") Long categoryId) {
         bookCategoryService.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
-    }
-
-    private static BookCategoryResponse createBookCategoryResponse(BookCategory bookCategory) {
-        return new BookCategoryResponse(
-                bookCategory.getCategoryId(),
-                bookCategory.getParentCategory() != null ?
-                bookCategory.getParentCategory().getCategoryId() : null,
-                bookCategory.getName(),
-                bookCategory.getCreatedAt(),
-                bookCategory.getUpdatedAt()
-        );
     }
 
 }

@@ -16,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -79,9 +79,7 @@ class BookCategoryServiceImplTest {
 
     @Test
     void getCategoryById() {
-        Long parentId = parentCategory.getParentCategory() != null
-                ? parentCategory.getParentCategory().getCategoryId()
-                : null;
+        Long parentId = parentCategory.getParentCategory() != null ? parentCategory.getParentCategory().getCategoryId() : null;
 
         BookCategoryResponse bookCategoryResponse = new BookCategoryResponse(parentCategory.getCategoryId(),
                 parentId,
@@ -106,14 +104,29 @@ class BookCategoryServiceImplTest {
 
     @Test
     void getAllCategories() {
-        when(bookCategoryRepository.findAll()).thenReturn(Arrays.asList(parentCategory, childCategory));
+        BookCategoryResponse parentResponse = new BookCategoryResponse(
+                parentCategory.getCategoryId(),
+                null,
+                parentCategory.getName(),
+                parentCategory.getCreatedAt(),
+                parentCategory.getUpdatedAt()
+        );
 
-        var result = bookCategoryService.getAllCategories();
+        BookCategoryResponse childResponse = new BookCategoryResponse(
+                childCategory.getCategoryId(),
+                childCategory.getParentCategory().getCategoryId(),
+                childCategory.getName(),
+                childCategory.getCreatedAt(),
+                childCategory.getUpdatedAt()
+        );
+
+        when(bookCategoryRepository.findAllBookCategoryResponse()).thenReturn(List.of(parentResponse, childResponse));
+
+        List<BookCategoryResponse> result = bookCategoryService.getAllCategories();
 
         assertThat(result)
                 .hasSize(2)
-                .contains(parentCategory)
-                .contains(childCategory);
+                .containsExactlyInAnyOrder(parentResponse, childResponse);
     }
 
     @Test

@@ -39,17 +39,13 @@ class BookCategoryControllerTest {
     @Test
     @DisplayName("카테고리 전체 조회")
     void getAllCategories() throws Exception {
-        BookCategory parent = new BookCategory("Parent", null);
-        parent.setCategoryId(1L);
-        parent.setCreatedAt(LocalDateTime.now());
+        BookCategoryResponse parentResponse = new BookCategoryResponse(1L,
+                null, "Parent", LocalDateTime.now(), LocalDateTime.now());
 
-        BookCategory child = new BookCategory("Child", null);
-        child.setCategoryId(2L);
-        child.setCreatedAt(LocalDateTime.now());
+        BookCategoryResponse childResponse = new BookCategoryResponse(2L,
+                1L, "Child", LocalDateTime.now(), LocalDateTime.now());
 
-        List<BookCategory> categories = Arrays.asList(parent, child);
-
-        given(bookCategoryService.getAllCategories()).willReturn(categories);
+        given(bookCategoryService.getAllCategories()).willReturn(List.of(parentResponse, childResponse));
 
         mockMvc.perform(get("/categories"))
                 .andExpect(status().isOk())

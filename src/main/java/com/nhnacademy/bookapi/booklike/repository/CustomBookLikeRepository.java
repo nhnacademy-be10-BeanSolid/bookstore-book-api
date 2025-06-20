@@ -9,7 +9,7 @@ public interface CustomBookLikeRepository {
 
     Optional<BookLikeResponse> findBookLikeResponseById(Long id);
 
-    List<BookLikeResponse> findBookLikesByBookId(Long bookId);
+    List<BookLikeResponse> findBookLikeResponsesByBookId(Long bookId);
 
-    List<BookLikeResponse> findBookLikesByUserId(String userId);
+    List<BookLikeResponse> findBookLikeResponsesByUserId(String userId);
 }

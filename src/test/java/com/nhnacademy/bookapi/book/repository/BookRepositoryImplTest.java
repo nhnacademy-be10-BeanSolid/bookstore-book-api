@@ -2,7 +2,6 @@ package com.nhnacademy.bookapi.book.repository;
 
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
-import com.nhnacademy.bookapi.book.repository.impl.CustomBookRepositoryImpl;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import org.junit.jupiter.api.Test;
@@ -19,14 +18,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @ActiveProfiles("test")
-class CustomBookRepositoryImplTest {
+class BookRepositoryImplTest {
 
     @Autowired
-    private CustomBookRepositoryImpl customBookRepository;
+    private BookRepository bookRepository;
 
     @Test
     void findBookResponseByIdTest() {
-        Optional<BookResponse> result = customBookRepository.findBookResponseById(1L);
+        Optional<BookResponse> result = bookRepository.findBookResponseById(1L);
 
         assertThat(result).isPresent();
         assertThat(result.get().title()).isEqualTo("테스트책1");
@@ -36,14 +35,14 @@ class CustomBookRepositoryImplTest {
 
     @Test
     void findBookResponseByIdNotFoundTest() {
-        Optional<BookResponse> result = customBookRepository.findBookResponseById(3L);
+        Optional<BookResponse> result = bookRepository.findBookResponseById(3L);
 
         assertThat(result).isNotPresent();
     }
 
     @Test
     void findBookDetailResponseByBookIdTest() {
-        Optional<BookDetailResponse> result = customBookRepository.findBookDetailResponseByBookId(1L);
+        Optional<BookDetailResponse> result = bookRepository.findBookDetailResponseByBookId(1L);
 
         assertThat(result).isPresent();
         assertThat(result.get().title()).isEqualTo("테스트책1");
@@ -52,7 +51,7 @@ class CustomBookRepositoryImplTest {
 
     @Test
     void findBookDetailResponseByBookIdNotFoundTest() {
-        Optional<BookDetailResponse> result = customBookRepository.findBookDetailResponseByBookId(3L);
+        Optional<BookDetailResponse> result = bookRepository.findBookDetailResponseByBookId(3L);
 
         assertThat(result).isNotPresent();
     }
@@ -60,7 +59,7 @@ class CustomBookRepositoryImplTest {
     @Test
     void findBookResponseByAuthorTest() {
         Pageable pageable = PageRequest.of(0, 10);
-        Page<BookResponse> result = customBookRepository.findBookResponsesByAuthor("김", pageable);
+        Page<BookResponse> result = bookRepository.findBookResponsesByAuthor("김", pageable);
 
         BookResponse first = result.getContent().get(0);
         BookResponse second = result.getContent().get(1);
@@ -74,7 +73,7 @@ class CustomBookRepositoryImplTest {
     @Test
     void findBookResponseByPublisherTest() {
         Pageable pageable = PageRequest.of(0, 10);
-        Page<BookResponse> result = customBookRepository.findBookResponseByPublisher("출판사", pageable);
+        Page<BookResponse> result = bookRepository.findBookResponseByPublisher("출판사", pageable);
 
         BookResponse first = result.getContent().get(0);
         BookResponse second = result.getContent().get(1);
@@ -88,7 +87,7 @@ class CustomBookRepositoryImplTest {
     @Test
     void findBookResponseByTitleTest() {
         Pageable pageable = PageRequest.of(0, 10);
-        Page<BookResponse> result = customBookRepository.findBookResponseByTitle("테스트책1", pageable);
+        Page<BookResponse> result = bookRepository.findBookResponseByTitle("테스트책1", pageable);
 
         BookResponse first = result.getContent().getFirst();
 
@@ -100,7 +99,7 @@ class CustomBookRepositoryImplTest {
     @Test
     void findBookResponseByTitleReturnEmptyPageTest() {
         Pageable pageable = PageRequest.of(0, 10);
-        Page<BookResponse> result = customBookRepository.findBookResponseByTitle("", pageable);
+        Page<BookResponse> result = bookRepository.findBookResponseByTitle("", pageable);
 
         assertThat(result.getContent()).isEmpty();
     }
@@ -108,7 +107,7 @@ class CustomBookRepositoryImplTest {
     @Test
     void findBookResponseByDescriptionTest() {
         Pageable pageable = PageRequest.of(0, 10);
-        Page<BookResponse> result = customBookRepository.findBookResponseByDescription("설명", pageable);
+        Page<BookResponse> result = bookRepository.findBookResponseByDescription("설명", pageable);
 
         BookResponse first = result.getContent().get(0);
         BookResponse second = result.getContent().get(1);
@@ -122,14 +121,14 @@ class CustomBookRepositoryImplTest {
     @Test
     void findBookResponseByDescriptionReturnEmptyPageTest() {
         Pageable pageable = PageRequest.of(0, 10);
-        Page<BookResponse> result = customBookRepository.findBookResponseByDescription("", pageable);
+        Page<BookResponse> result = bookRepository.findBookResponseByDescription("", pageable);
 
         assertThat(result.getContent()).isEmpty();
     }
 
     @Test
     void findBookTagMapResponseByBookIdAndTagIdTest() {
-        Optional<BookTagMapResponse> result = customBookRepository.findBookTagMapResponseByBookIdAndTagId(1L, 1L);
+        Optional<BookTagMapResponse> result = bookRepository.findBookTagMapResponseByBookIdAndTagId(1L, 1L);
 
         assertThat(result).isPresent();
         assertThat(result.get().bookId()).isEqualTo(1L);
@@ -138,14 +137,14 @@ class CustomBookRepositoryImplTest {
 
     @Test
     void findBookTagMapResponseByBookIdAndTagIdNotFoundTest() {
-        Optional<BookTagMapResponse> result = customBookRepository.findBookTagMapResponseByBookIdAndTagId(3L, 1L);
+        Optional<BookTagMapResponse> result = bookRepository.findBookTagMapResponseByBookIdAndTagId(3L, 1L);
 
         assertThat(result).isNotPresent();
     }
 
     @Test
     void findBookCategoryResponseByBookIdAndCategoryIdTest() {
-        Optional<BookCategoryMapResponse> result = customBookRepository.findBookCategoryMapResponseByBookIdAndCategoryId(1L, 2L);
+        Optional<BookCategoryMapResponse> result = bookRepository.findBookCategoryMapResponseByBookIdAndCategoryId(1L, 2L);
 
         assertThat(result).isPresent();
         assertThat(result.get().bookId()).isEqualTo(1L);
@@ -154,21 +153,21 @@ class CustomBookRepositoryImplTest {
 
     @Test
     void findBookCategoryResponseByBookIdAndCategoryIdNotFoundTest() {
-        Optional<BookCategoryMapResponse> result = customBookRepository.findBookCategoryMapResponseByBookIdAndCategoryId(3L, 2L);
+        Optional<BookCategoryMapResponse> result = bookRepository.findBookCategoryMapResponseByBookIdAndCategoryId(3L, 2L);
 
         assertThat(result).isNotPresent();
     }
 
     @Test
     void countBookCategoryByBookIdTest() {
-        int result = customBookRepository.countBookCategoryByBookId(1L);
+        int result = bookRepository.countBookCategoryByBookId(1L);
 
         assertThat(result).isEqualTo(2);
     }
 
     @Test
     void countBookCategoryByBookIdNotFoundTest() {
-        int result = customBookRepository.countBookCategoryByBookId(3L);
+        int result = bookRepository.countBookCategoryByBookId(3L);
 
         assertThat(result).isZero();
     }
@@ -176,7 +175,7 @@ class CustomBookRepositoryImplTest {
     @Test
     void findBookResponseByTagTest() {
         Pageable pageable = PageRequest.of(0, 10);
-        Page<BookResponse> result = customBookRepository.findBookResponseByTag("태그1", pageable);
+        Page<BookResponse> result = bookRepository.findBookResponseByTag("태그1", pageable);
         BookResponse first = result.getContent().get(0);
         BookResponse second = result.getContent().get(1);
 
@@ -189,7 +188,7 @@ class CustomBookRepositoryImplTest {
     @Test
     void findBookResponseByTagReturnEmptyPageTest() {
         Pageable pageable = PageRequest.of(0, 10);
-        Page<BookResponse> result = customBookRepository.findBookResponseByTag("", pageable);
+        Page<BookResponse> result = bookRepository.findBookResponseByTag("", pageable);
 
         assertThat(result.getContent()).isEmpty();
     }

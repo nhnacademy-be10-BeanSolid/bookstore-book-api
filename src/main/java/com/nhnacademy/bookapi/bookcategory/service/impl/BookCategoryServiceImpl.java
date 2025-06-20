@@ -47,8 +47,8 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookCategory> getAllCategories() {
-        return bookCategoryRepository.findAll();
+    public List<BookCategoryResponse> getAllCategories() {
+        return bookCategoryRepository.findAllBookCategoryResponse();
     }
 
     @Override

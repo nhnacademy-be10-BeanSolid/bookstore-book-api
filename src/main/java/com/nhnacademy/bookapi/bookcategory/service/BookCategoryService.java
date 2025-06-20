@@ -15,7 +15,7 @@ public interface BookCategoryService {
     BookCategoryResponse getCategoryById(Long categoryId);
 
     // 전체 조회(Read)
-    List<BookCategory> getAllCategories();
+    List<BookCategoryResponse> getAllCategories();
 
     // 수정(Update)
     BookCategoryResponse updateCategory(Long categoryId, BookCategoryUpdateRequest request);
