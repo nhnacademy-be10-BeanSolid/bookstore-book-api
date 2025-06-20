@@ -34,7 +34,7 @@ public class CustomBookLikeRepositoryImpl extends QuerydslRepositorySupport impl
     }
 
     @Override
-    public List<BookLikeResponse> findBookLikesByBookId(Long bookId) {
+    public List<BookLikeResponse> findBookLikeResponsesByBookId(Long bookId) {
         QBookLike bookLike = QBookLike.bookLike;
 
         return from(bookLike)
@@ -49,7 +49,7 @@ public class CustomBookLikeRepositoryImpl extends QuerydslRepositorySupport impl
     }
 
     @Override
-    public List<BookLikeResponse> findBookLikesByUserId(String userId) {
+    public List<BookLikeResponse> findBookLikeResponsesByUserId(String userId) {
         QBookLike bookLike = QBookLike.bookLike;
 
         return from(bookLike)

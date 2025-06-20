@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @Transactional
@@ -47,8 +46,8 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookCategory> getAllCategories() {
-        return bookCategoryRepository.findAll();
+    public List<BookCategoryResponse> getAllCategories() {
+        return bookCategoryRepository.findAllBookCategoryResponse();
     }
 
     @Override

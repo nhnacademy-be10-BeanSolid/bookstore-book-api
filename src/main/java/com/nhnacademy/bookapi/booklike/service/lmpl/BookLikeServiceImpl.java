@@ -14,7 +14,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,7 +44,7 @@ public class BookLikeServiceImpl implements BookLikeService {
     @Override
     @Transactional(readOnly = true)
     public List<BookLikeResponse> getBookLikesByUserId(String userId) {
-        return bookLikeRepository.findBookLikesByUserId(userId);
+        return bookLikeRepository.findBookLikeResponsesByUserId(userId);
     }
 
     // 도서별 좋아요 조회
@@ -55,7 +54,7 @@ public class BookLikeServiceImpl implements BookLikeService {
         if(!bookLikeRepository.existsByBookId(bookId)) {
             throw new BookNotFoundException(bookId);
         }
-        return bookLikeRepository.findBookLikesByBookId(bookId);
+        return bookLikeRepository.findBookLikeResponsesByBookId(bookId);
     }
 
     // 유저 아이디와 도서 아이디로 좋아요 삭제

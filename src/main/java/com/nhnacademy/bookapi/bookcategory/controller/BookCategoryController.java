@@ -1,7 +1,6 @@
 package com.nhnacademy.bookapi.bookcategory.controller;
 
 import com.nhnacademy.bookapi.advice.ValidationFailedException;
-import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
@@ -13,7 +12,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -25,12 +23,8 @@ public class BookCategoryController {
 
     @GetMapping
     public ResponseEntity<List<BookCategoryResponse>> getAllCategories() {
-        List<BookCategory> bookCategoryList = bookCategoryService.getAllCategories();
-        List<BookCategoryResponse> bookCategoryResponseList = new ArrayList<>();
-        for (BookCategory bookCategory : bookCategoryList) {
-            bookCategoryResponseList.add(createBookCategoryResponse(bookCategory));
-        }
-        return ResponseEntity.ok(bookCategoryResponseList);
+        List<BookCategoryResponse> bookCategoryList = bookCategoryService.getAllCategories();
+        return ResponseEntity.ok(bookCategoryList);
     }
 
     @GetMapping("/{categoryId}")
@@ -67,17 +61,6 @@ public class BookCategoryController {
     public ResponseEntity<Void> deleteCategory(@PathVariable("categoryId") Long categoryId) {
         bookCategoryService.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
-    }
-
-    private static BookCategoryResponse createBookCategoryResponse(BookCategory bookCategory) {
-        return new BookCategoryResponse(
-                bookCategory.getCategoryId(),
-                bookCategory.getParentCategory() != null ?
-                bookCategory.getParentCategory().getCategoryId() : null,
-                bookCategory.getName(),
-                bookCategory.getCreatedAt(),
-                bookCategory.getUpdatedAt()
-        );
     }
 
 }

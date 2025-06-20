@@ -56,3 +56,6 @@ DELETE http://localhost:10346/books/1
 
 ### 태그로 도서 검색
 GET http://localhost:10346/search?tag=테스트
+
+### 샵 메인페이지 도서 출력
+GET http://localhost:10346/shop

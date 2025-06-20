@@ -32,8 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -49,21 +48,26 @@ class BookServiceImplTest {
     private BookServiceImpl bookService;
 
     Book book;
+    BookCategory bookCategory;
 
     @BeforeEach
     void setUp() {
+        bookCategory = new BookCategory("소설", null);
+        ReflectionTestUtils.setField(bookCategory,"categoryId", 1L);
+
         book = Book.builder()
                 .title("타이틀")
                 .description("설명")
                 .toc("목차")
                 .publisher("출판사")
                 .author("작가")
-                .publishedDate(LocalDate.now())
+                .publishedDate(LocalDate.of(2020,10,19))
                 .isbn("test000000000")
                 .originalPrice(10000)
                 .salePrice(5000)
                 .wrappable(false)
                 .stock(100)
+                .bookCategories(Set.of(bookCategory))
                 .build();
         ReflectionTestUtils.setField(book,"id", 1L);
     }
@@ -71,43 +75,23 @@ class BookServiceImplTest {
     @Test
     @DisplayName("추가 성공")
     void createBookSuccessTest() {
-        Set<Long> categoryIds = Set.of(1L);
-
         BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
-                LocalDate.now(), "test123456789", 10000, 5000, false, 100, categoryIds);
-        BookCategory category = new BookCategory("소설", null);
-        ReflectionTestUtils.setField(category,"categoryId", 1L);
+                LocalDate.of(2020,10,19) , "test000000000", 10000, 5000, false, 100, Set.of(1L));
 
-        when(bookRepository.existsByIsbn("test123456789")).thenReturn(false);
-        when(bookCategoryRepository.findById(1L)).thenReturn(Optional.of(category));
+        when(bookRepository.existsByIsbn("test000000000")).thenReturn(false);
+        when(bookCategoryRepository.findById(1L)).thenReturn(Optional.of(bookCategory));
 
-        Book savedBook = Book.builder()
-                .title("타이틀")
-                .description("설명")
-                .toc("목차")
-                .publisher("출판사")
-                .author("작가")
-                .publishedDate(LocalDate.now())
-                .isbn("test123456789")
-                .originalPrice(10000)
-                .salePrice(5000)
-                .wrappable(false)
-                .stock(100)
-                .bookCategories(Set.of(category))
-                .build();
-        ReflectionTestUtils.setField(savedBook, "id", 2L);
-        BookResponse bookResponse = BookResponse.of(savedBook);
+        BookResponse bookResponse = BookResponse.from(book);
 
-        when(bookRepository.save(any(Book.class))).thenReturn(savedBook);
-        when(bookRepository.findBookResponseById(2L)).thenReturn(Optional.of(bookResponse));
+        when(bookRepository.save(any(Book.class))).thenReturn(book);
+        when(bookRepository.findBookResponseById(1L)).thenReturn(Optional.of(bookResponse));
 
         BookResponse response = bookService.createBook(request);
-
         assertThat(response).isNotNull();
         assertThat(response.title()).isEqualTo("타이틀");
-        assertThat(response.isbn()).isEqualTo("test123456789");
-        assertThat(response.author()).isEqualTo("작가");
+        assertThat(response.isbn()).isEqualTo("test000000000");
         assertThat(response.bookCategories()).contains("소설");
+        assertThat(response.publishedDate()).isEqualTo(LocalDate.of(2020,10,19));
     }
 
     @Test
@@ -127,7 +111,7 @@ class BookServiceImplTest {
     void getBookResponseByBookIdSuccessTest() {
         Long id = book.getId();
 
-        BookResponse response = BookResponse.of(book);
+        BookResponse response = BookResponse.from(book);
 
         when(bookRepository.findBookResponseById(id)).thenReturn(Optional.of(response));
 
@@ -158,7 +142,7 @@ class BookServiceImplTest {
         likedUsers.add(new BookLike("user", book));
         book.setBookLikes(likedUsers);
 
-        BookDetailResponse response = BookDetailResponse.of(book);
+        BookDetailResponse response = BookDetailResponse.from(book);
 
         when(bookRepository.findBookDetailResponseByBookId(id)).thenReturn(Optional.of(response));
 
@@ -180,6 +164,53 @@ class BookServiceImplTest {
     }
 
     @Test
+    @DisplayName("전체 도서 검색")
+    void getAllBooksTest() {
+        Book book1 = Book.builder()
+                .title("타이틀")
+                .description("설명")
+                .toc("목차")
+                .publisher("출판사")
+                .author("작가")
+                .publishedDate(LocalDate.now())
+                .isbn("test000000000")
+                .originalPrice(10000)
+                .salePrice(5000)
+                .wrappable(false)
+                .stock(100)
+                .build();
+        Book book2 = Book.builder()
+                .title("타이틀")
+                .description("설명")
+                .toc("목차")
+                .publisher("출판사")
+                .author("작가")
+                .publishedDate(LocalDate.now())
+                .isbn("test00000001")
+                .originalPrice(10000)
+                .salePrice(5000)
+                .wrappable(false)
+                .stock(100)
+                .build();
+        BookResponse response1 = BookResponse.from(book);
+        BookResponse response2 = BookResponse.from(book1);
+        BookResponse response3 = BookResponse.from(book2);
+
+        Pageable pageable = PageRequest.of(0, 9);
+
+        when(bookRepository.findAllBookResponses(pageable))
+                .thenReturn(new PageImpl<>(List.of(response1, response2, response3), pageable, 3));
+
+        Page<BookResponse> pageResult = bookService.getAllBooks(pageable);
+
+        assertThat(pageResult).isNotNull();
+        assertThat(pageResult).hasSize(3);
+        assertThat(pageResult.getContent().get(0)).isEqualTo(response1);
+        assertThat(pageResult.getContent().get(1)).isEqualTo(response2);
+        assertThat(pageResult.getContent().get(2)).isEqualTo(response3);
+    }
+
+    @Test
     @DisplayName("작가로 도서 검색")
     void getBooksResponseByAuthorTest() {
         String author = book.getAuthor();
@@ -197,8 +228,8 @@ class BookServiceImplTest {
                 .wrappable(false)
                 .stock(100)
                 .build();
-        BookResponse response = BookResponse.of(book);
-        BookResponse response1 = BookResponse.of(book1);
+        BookResponse response = BookResponse.from(book);
+        BookResponse response1 = BookResponse.from(book1);
 
         Pageable pageable = PageRequest.of(0, 10);
 
@@ -229,8 +260,8 @@ class BookServiceImplTest {
                 .wrappable(false)
                 .stock(100)
                 .build();
-        BookResponse response = BookResponse.of(book);
-        BookResponse response1 = BookResponse.of(book1);
+        BookResponse response = BookResponse.from(book);
+        BookResponse response1 = BookResponse.from(book1);
 
         Pageable pageable = PageRequest.of(0, 10);
 
@@ -248,7 +279,7 @@ class BookServiceImplTest {
     void getBooksResponseByTagTest() {
         String tagName = "existTag";
 
-        BookResponse response = BookResponse.of(book);
+        BookResponse response = BookResponse.from(book);
 
         Pageable pageable = PageRequest.of(0, 10);
         when(bookRepository.findBookResponseByTag(tagName, pageable))
@@ -278,8 +309,8 @@ class BookServiceImplTest {
                 .wrappable(false)
                 .stock(100)
                 .build();
-        BookResponse response = BookResponse.of(book);
-        BookResponse response1 = BookResponse.of(book1);
+        BookResponse response = BookResponse.from(book);
+        BookResponse response1 = BookResponse.from(book1);
 
         Pageable pageable = PageRequest.of(0, 10);
         when(bookRepository.findBookResponseByTitle(title, pageable))
@@ -300,7 +331,7 @@ class BookServiceImplTest {
     void getBooksResponseByDescriptionTest() {
         String description = "설명";
 
-        BookResponse response = BookResponse.of(book);
+        BookResponse response = BookResponse.from(book);
 
         Pageable pageable = PageRequest.of(0, 10);
         when(bookRepository.findBookResponseByDescription(description, pageable))
@@ -320,19 +351,31 @@ class BookServiceImplTest {
         when(bookRepository.findById(id)).thenReturn(Optional.of(book));
 
         BookUpdateRequest request = new BookUpdateRequest();
-        request.setTitle("수정합니다");
+        request.setTitle("새 타이틀");
+        request.setDescription("새 설명");
+        request.setToc("새 목차");
+        request.setPublisher("새 출판사");
+        request.setAuthor("새 작가");
         request.setStatus("sale_end");
 
         book.setTitle(request.getTitle());
+        book.setDescription(request.getDescription());
+        book.setToc(request.getToc());
+        book.setPublisher(request.getPublisher());
+        book.setAuthor(request.getAuthor());
         book.setStatus(BookStatus.from(request.getStatus()));
 
-        BookResponse response = BookResponse.of(book);
+        BookResponse response = BookResponse.from(book);
         when(bookRepository.findBookResponseById(id)).thenReturn(Optional.of(response));
 
         BookResponse actualResponse = bookService.updateBook(id, request);
 
         assertThat(actualResponse).isNotNull();
-        assertThat(actualResponse.title()).isEqualTo("수정합니다");
+        assertThat(actualResponse.title()).isEqualTo("새 타이틀");
+        assertThat(actualResponse.description()).isEqualTo("새 설명");
+        assertThat(actualResponse.toc()).isEqualTo("새 목차");
+        assertThat(actualResponse.publisher()).isEqualTo("새 출판사");
+        assertThat(actualResponse.author()).isEqualTo("새 작가");
         assertThat(actualResponse.status()).isEqualTo(BookStatus.SALE_END);
     }
 

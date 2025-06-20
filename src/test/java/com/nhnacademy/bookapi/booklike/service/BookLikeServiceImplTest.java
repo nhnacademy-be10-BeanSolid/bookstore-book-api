@@ -75,7 +75,7 @@ class BookLikeServiceImplTest {
 
         BookLike savedBookLike = new BookLike(userId, book);
         when(bookLikeRepository.save(any(BookLike.class))).thenReturn(savedBookLike);
-        when(bookLikeRepository.findBookLikeResponseById(any())).thenReturn(Optional.of(BookLikeResponse.of(savedBookLike)));
+        when(bookLikeRepository.findBookLikeResponseById(any())).thenReturn(Optional.of(BookLikeResponse.from(savedBookLike)));
 
         BookLikeResponse response = bookLikeService.createBookLike(book.getId(), userId);
 
@@ -99,33 +99,33 @@ class BookLikeServiceImplTest {
     @Test
     @DisplayName("유저아이디로 좋아요 리스트 조회")
     void getBookLikesByUserIdTest() {
-        BookLikeResponse response1 = BookLikeResponse.of(bookLike);
-        BookLikeResponse response2 = BookLikeResponse.of(bookLike1);
+        BookLikeResponse response1 = BookLikeResponse.from(bookLike);
+        BookLikeResponse response2 = BookLikeResponse.from(bookLike1);
 
-        when(bookLikeRepository.findBookLikesByUserId(userId)).thenReturn(List.of(response1, response2));
+        when(bookLikeRepository.findBookLikeResponsesByUserId(userId)).thenReturn(List.of(response1, response2));
 
         List<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByUserId(userId);
 
         assertThat(bookLikes)
                 .isNotNull()
                 .hasSize(2);
-        assertThat(bookLikes.get(0)).isEqualTo(BookLikeResponse.of(bookLike));
+        assertThat(bookLikes.get(0)).isEqualTo(BookLikeResponse.from(bookLike));
     }
 
     @Test
     @DisplayName("도서아이디로 좋아요 리스트 조회")
     void getBookLikesByBookIdTest() {
-        BookLikeResponse response1 = BookLikeResponse.of(bookLike);
-        BookLikeResponse response2 = BookLikeResponse.of(bookLike1);
+        BookLikeResponse response1 = BookLikeResponse.from(bookLike);
+        BookLikeResponse response2 = BookLikeResponse.from(bookLike1);
 
         when(bookLikeRepository.existsByBookId(book.getId())).thenReturn(true);
-        when(bookLikeRepository.findBookLikesByBookId(book.getId())).thenReturn(List.of(response1, response2));
+        when(bookLikeRepository.findBookLikeResponsesByBookId(book.getId())).thenReturn(List.of(response1, response2));
         List<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByBookId(book.getId());
 
         assertThat(bookLikes)
                 .isNotNull()
                 .hasSize(2);
-        assertThat(bookLikes.get(0)).isEqualTo(BookLikeResponse.of(bookLike));
+        assertThat(bookLikes.get(0)).isEqualTo(BookLikeResponse.from(bookLike));
     }
 
     @Test

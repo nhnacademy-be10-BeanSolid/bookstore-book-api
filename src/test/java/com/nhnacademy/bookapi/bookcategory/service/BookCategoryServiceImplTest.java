@@ -16,7 +16,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -78,10 +78,39 @@ class BookCategoryServiceImplTest {
     }
 
     @Test
+    void createCategory_success_withParentId() {
+        BookCategoryCreateRequest request = new BookCategoryCreateRequest("Child", 1L);
+
+        BookCategoryResponse response = new BookCategoryResponse(2L,
+                1L, "Child", childCategory.getCreatedAt(), null);
+
+        when(bookCategoryRepository.existsByName("Child")).thenReturn(false);
+        when(bookCategoryRepository.findById(1L)).thenReturn(Optional.of(parentCategory));
+        when(bookCategoryRepository.save(any(BookCategory.class))).thenReturn(childCategory);
+        when(bookCategoryRepository.findBookCategoryResponseById(2L)).thenReturn(Optional.of(response));
+
+        BookCategoryResponse result = bookCategoryService.createCategory(request);
+
+        assertThat(result.categoryId()).isEqualTo(2L);
+        assertThat(result.parentId()).isEqualTo(1L);
+    }
+
+
+    @Test
+    void createCategory_InvalidParentId() {
+        BookCategoryCreateRequest request = new BookCategoryCreateRequest("Child", 999L);
+
+        when(bookCategoryRepository.existsByName("Child")).thenReturn(false);
+        when(bookCategoryRepository.findById(999L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookCategoryService.createCategory(request))
+                .isInstanceOf(BookCategoryNotFoundException.class);
+    }
+
+
+    @Test
     void getCategoryById() {
-        Long parentId = parentCategory.getParentCategory() != null
-                ? parentCategory.getParentCategory().getCategoryId()
-                : null;
+        Long parentId = parentCategory.getParentCategory() != null ? parentCategory.getParentCategory().getCategoryId() : null;
 
         BookCategoryResponse bookCategoryResponse = new BookCategoryResponse(parentCategory.getCategoryId(),
                 parentId,
@@ -106,14 +135,29 @@ class BookCategoryServiceImplTest {
 
     @Test
     void getAllCategories() {
-        when(bookCategoryRepository.findAll()).thenReturn(Arrays.asList(parentCategory, childCategory));
+        BookCategoryResponse parentResponse = new BookCategoryResponse(
+                parentCategory.getCategoryId(),
+                null,
+                parentCategory.getName(),
+                parentCategory.getCreatedAt(),
+                parentCategory.getUpdatedAt()
+        );
 
-        var result = bookCategoryService.getAllCategories();
+        BookCategoryResponse childResponse = new BookCategoryResponse(
+                childCategory.getCategoryId(),
+                childCategory.getParentCategory().getCategoryId(),
+                childCategory.getName(),
+                childCategory.getCreatedAt(),
+                childCategory.getUpdatedAt()
+        );
+
+        when(bookCategoryRepository.findAllBookCategoryResponse()).thenReturn(List.of(parentResponse, childResponse));
+
+        List<BookCategoryResponse> result = bookCategoryService.getAllCategories();
 
         assertThat(result)
                 .hasSize(2)
-                .contains(parentCategory)
-                .contains(childCategory);
+                .containsExactlyInAnyOrder(parentResponse, childResponse);
     }
 
     @Test

@@ -85,15 +85,21 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/searcht")
-    public ResponseEntity<Page<BookResponse>> getBooksResponseByTitle(@RequestParam String title, Pageable pageable) {
-        Page<BookResponse> response = bookService.getBookResponseByTitle(title, pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
+//    @GetMapping("/searcht")
+//    public ResponseEntity<Page<BookResponse>> getBooksResponseByTitle(@RequestParam String title, Pageable pageable) {
+//        Page<BookResponse> response = bookService.getBookResponseByTitle(title, pageable);
+//        return ResponseEntity.status(HttpStatus.OK).body(response);
+//    }
+//
+//    @GetMapping("/searchd")
+//    public ResponseEntity<Page<BookResponse>> getBooksResponseByDescription(@RequestParam String description, Pageable pageable) {
+//        Page<BookResponse> response = bookService.getBookResponseByDescription(description, pageable);
+//        return ResponseEntity.status(HttpStatus.OK).body(response);
+//    }
 
-    @GetMapping("/searchd")
-    public ResponseEntity<Page<BookResponse>> getBooksResponseByDescription(@RequestParam String description, Pageable pageable) {
-        Page<BookResponse> response = bookService.getBookResponseByDescription(description, pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    @GetMapping("/books")
+    public ResponseEntity<Page<BookResponse>> getAllBookResponse(Pageable pageable) {
+        Page<BookResponse> responses = bookService.getAllBooks(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 }

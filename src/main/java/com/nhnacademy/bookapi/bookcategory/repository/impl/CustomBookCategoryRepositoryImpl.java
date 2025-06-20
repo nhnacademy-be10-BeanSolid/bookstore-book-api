@@ -7,6 +7,7 @@ import com.nhnacademy.bookapi.bookcategory.repository.CustomBookCategoryReposito
 import com.querydsl.core.types.Projections;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
+import java.util.List;
 import java.util.Optional;
 
 public class CustomBookCategoryRepositoryImpl extends QuerydslRepositorySupport implements CustomBookCategoryRepository {
@@ -30,5 +31,20 @@ public class CustomBookCategoryRepositoryImpl extends QuerydslRepositorySupport 
                 .fetchOne();
 
         return Optional.ofNullable(result);
+    }
+
+    @Override
+    public List<BookCategoryResponse> findAllBookCategoryResponse() {
+        QBookCategory bookCategory = QBookCategory.bookCategory;
+
+        return from(bookCategory)
+                .select(Projections.constructor(BookCategoryResponse.class,
+                        bookCategory.categoryId,
+                        bookCategory.parentCategory.categoryId,
+                        bookCategory.name,
+                        bookCategory.createdAt,
+                        bookCategory.updatedAt
+                ))
+                .fetch();
     }
 }
