@@ -10,7 +10,7 @@ public record BookLikeResponse(
         String userId,
         Long bookId
 ) {
-    public static BookLikeResponse of(BookLike bookLike) {
+    public static BookLikeResponse from(BookLike bookLike) {
         return new BookLikeResponse(
                 bookLike.getId(),
                 bookLike.getLikedAt(),

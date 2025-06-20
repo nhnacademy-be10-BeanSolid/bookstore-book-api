@@ -23,8 +23,9 @@ class BookLikeRepositoryImplTest {
         Optional<BookLikeResponse> result = bookLikeRepository.findBookLikeResponseById(1L);
 
         assertThat(result).isPresent();
-        assertThat(result.get().bookId()).isEqualTo(1L);
+        assertThat(result.get().bookLikeId()).isEqualTo(1L);
         assertThat(result.get().userId()).isEqualTo("유저1");
+        assertThat(result.get().likedAt()).isNotNull();
     }
 
     @Test

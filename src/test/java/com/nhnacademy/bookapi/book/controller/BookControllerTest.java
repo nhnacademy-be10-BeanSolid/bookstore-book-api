@@ -108,7 +108,7 @@ class BookControllerTest {
     @DisplayName("도서 상세정보 조회")
     void getBookTest() throws Exception{
         Long bookId = book.getId();
-        BookDetailResponse response = BookDetailResponse.of(book);
+        BookDetailResponse response = BookDetailResponse.from(book);
 
         given(bookService.getBookDetailResponseByBookId(bookId)).willReturn(response);
 
@@ -121,9 +121,43 @@ class BookControllerTest {
     }
 
     @Test
+    @DisplayName("도서 전체 조회")
+    void getAllBookResponseTest() throws Exception{
+        Book book1 = Book.builder()
+                .title("타이틀")
+                .description("설명")
+                .toc("목차")
+                .publisher("출판사")
+                .author("작가")
+                .publishedDate(LocalDate.now())
+                .isbn("test000000000")
+                .originalPrice(10000)
+                .salePrice(5000)
+                .wrappable(false)
+                .stock(100)
+                .bookCategories(Set.of(category))
+                .bookTags(Set.of(tag))
+                .build();
+
+        BookResponse response1 = BookResponse.from(book);
+        BookResponse response2 = BookResponse.from(book1);
+
+        Pageable page = PageRequest.of(0, 10);
+        Page<BookResponse> pageResult = new PageImpl<>(List.of(response1, response2), page, 2);
+
+        given(bookService.getAllBooks(page)).willReturn(pageResult);
+
+        mockMvc.perform(get("/books")
+                        .param("page", "0")
+                        .param("size", "10"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.totalElements").value(2));
+    }
+
+    @Test
     @DisplayName("작가 전체 조회")
     void getAuthorTest() throws Exception{
-        String author = book.getAuthor();
+        String author = book.getAuthor(); // 작가
         Book book1 = Book.builder()
                 .title("타이틀")
                 .description("설명")
@@ -131,14 +165,16 @@ class BookControllerTest {
                 .publisher("출판사")
                 .author(author)
                 .publishedDate(LocalDate.now())
-                .isbn("test000000000")
+                .isbn("test000000001")
                 .originalPrice(10000)
                 .salePrice(5000)
                 .wrappable(false)
                 .stock(100)
+                .bookCategories(Set.of(category))
+                .bookTags(Set.of(tag))
                 .build();
-        BookResponse response = BookResponse.of(book);
-        BookResponse response1 = BookResponse.of(book1);
+        BookResponse response = BookResponse.from(book);
+        BookResponse response1 = BookResponse.from(book1);
 
         Pageable page = PageRequest.of(0, 10);
         Page<BookResponse> pageResponse = new PageImpl<>(List.of(response1, response), page, 2);
@@ -149,14 +185,14 @@ class BookControllerTest {
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.totalElements").value(2))
                 .andExpect(jsonPath("$.content[0].author").value("작가"));
     }
 
     @Test
     @DisplayName("출판사 전체 조회")
     void getBooksByPublisherTest() throws Exception{
-        String publisher = book.getPublisher();
+        String publisher = book.getPublisher(); // 출판사
         Book book1 = Book.builder()
                 .title("타이틀")
                 .description("설명")
@@ -164,14 +200,16 @@ class BookControllerTest {
                 .publisher(publisher)
                 .author("작가")
                 .publishedDate(LocalDate.now())
-                .isbn("test000000000")
+                .isbn("test000000001")
                 .originalPrice(10000)
                 .salePrice(5000)
                 .wrappable(false)
                 .stock(100)
+                .bookCategories(Set.of(category))
+                .bookTags(Set.of(tag))
                 .build();
-        BookResponse response = BookResponse.of(book);
-        BookResponse response1 = BookResponse.of(book1);
+        BookResponse response = BookResponse.from(book);
+        BookResponse response1 = BookResponse.from(book1);
 
         Pageable page = PageRequest.of(0, 10);
         Page<BookResponse> pageResponse = new PageImpl<>(List.of(response1, response), page, 2);
@@ -182,16 +220,16 @@ class BookControllerTest {
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.totalElements").value(2))
                 .andExpect(jsonPath("$.content[0].publisher").value("출판사"));
     }
 
     @Test
     @DisplayName("태그로 도서 검색")
     void getBooksResponseByTagTest() throws Exception{
-        String tagName = tag.getName();
+        String tagName = tag.getName(); // 태그
 
-        BookResponse response = BookResponse.of(book);
+        BookResponse response = BookResponse.from(book);
 
         Pageable page = PageRequest.of(0, 10);
         Page<BookResponse> pageResponse = new PageImpl<>(List.of(response), page, 1);
@@ -203,7 +241,7 @@ class BookControllerTest {
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content").isArray())
+                .andExpect(jsonPath("$.totalElements").value(1))
                 .andExpect(jsonPath("$.content[0].bookTags").value(Matchers.hasItem(tagName)));
     }
 
@@ -215,7 +253,7 @@ class BookControllerTest {
         BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
                 LocalDate.now(), "test000000000", 10000, 5000, false, 100, categoryIds);
 
-        given(bookService.createBook(any(BookCreateRequest.class))).willReturn(BookResponse.of(book));
+        given(bookService.createBook(any(BookCreateRequest.class))).willReturn(BookResponse.from(book));
 
         mockMvc.perform(post("/books")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -255,7 +293,7 @@ class BookControllerTest {
 
         book.setTitle(updateRequest.getTitle());
         book.setStatus(BookStatus.SALE_END);
-        BookResponse response = BookResponse.of(book);
+        BookResponse response = BookResponse.from(book);
 
         given(bookService.updateBook(eq(id), any(BookUpdateRequest.class)))
                 .willReturn(response);

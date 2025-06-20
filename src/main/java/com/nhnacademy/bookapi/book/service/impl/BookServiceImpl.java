@@ -79,6 +79,11 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new BookNotFoundException(id));
     }
 
+    @Override
+    public Page<BookResponse> getAllBooks(Pageable pageable) {
+        return bookRepository.findAllBookResponses(pageable);
+    }
+
     // 작가로 도서 검색
     @Override
     @Transactional(readOnly = true)

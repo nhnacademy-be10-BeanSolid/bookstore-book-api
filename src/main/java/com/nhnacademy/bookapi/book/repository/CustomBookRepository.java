@@ -16,6 +16,8 @@ public interface CustomBookRepository {
     // 도서 상세 정보
     Optional<BookDetailResponse> findBookDetailResponseByBookId(Long bookId);
 
+    Page<BookResponse> findAllBookResponses(Pageable pageable);
+
     Page<BookResponse> findBookResponsesByAuthor(String author, Pageable pageable);
 
     Page<BookResponse> findBookResponseByPublisher(String publisher, Pageable pageable);
@@ -34,4 +36,5 @@ public interface CustomBookRepository {
     Optional<BookCategoryMapResponse> findBookCategoryMapResponseByBookIdAndCategoryId(Long bookId, Long categoryId);
 
     int countBookCategoryByBookId(Long bookId);
+
 }

@@ -9,7 +9,4 @@ public class BookTagNotFoundException extends RuntimeException {
         super("BookTag not found with id " + tagId);
     }
 
-    public BookTagNotFoundException(String tagName) {
-        super("BookTag not found with name " + tagName);
-    }
 }

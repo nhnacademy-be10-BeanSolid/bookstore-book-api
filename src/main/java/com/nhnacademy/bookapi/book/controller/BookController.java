@@ -96,4 +96,10 @@ public class BookController {
         Page<BookResponse> response = bookService.getBookResponseByDescription(description, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+    @GetMapping("/books")
+    public ResponseEntity<Page<BookResponse>> getAllBookResponse(Pageable pageable) {
+        Page<BookResponse> responses = bookService.getAllBooks(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
+    }
 }

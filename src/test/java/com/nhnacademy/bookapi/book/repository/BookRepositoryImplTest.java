@@ -35,7 +35,7 @@ class BookRepositoryImplTest {
 
     @Test
     void findBookResponseByIdNotFoundTest() {
-        Optional<BookResponse> result = bookRepository.findBookResponseById(3L);
+        Optional<BookResponse> result = bookRepository.findBookResponseById(99L);
 
         assertThat(result).isNotPresent();
     }
@@ -51,9 +51,18 @@ class BookRepositoryImplTest {
 
     @Test
     void findBookDetailResponseByBookIdNotFoundTest() {
-        Optional<BookDetailResponse> result = bookRepository.findBookDetailResponseByBookId(3L);
+        Optional<BookDetailResponse> result = bookRepository.findBookDetailResponseByBookId(99L);
 
         assertThat(result).isNotPresent();
+    }
+
+    @Test
+    void findAllBookResponsesTest() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<BookResponse> result = bookRepository.findAllBookResponses(pageable);
+
+        assertThat(result).isNotNull();
+        assertThat(result).hasSize(3);
     }
 
     @Test

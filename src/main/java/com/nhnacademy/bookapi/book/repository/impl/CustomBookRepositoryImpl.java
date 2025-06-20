@@ -43,7 +43,7 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
                 .where(book.id.eq(id))
                 .fetchOne();
 
-        return Optional.ofNullable(result).map(BookResponse::of);
+        return Optional.ofNullable(result).map(BookResponse::from);
     }
 
     @Override
@@ -62,7 +62,32 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
                 .distinct()
                 .fetchOne();
 
-        return Optional.ofNullable(result).map(BookDetailResponse::of);
+        return Optional.ofNullable(result).map(BookDetailResponse::from);
+    }
+
+    @Override
+    public Page<BookResponse> findAllBookResponses(Pageable pageable) {
+        QBook book = QBook.book;
+
+        List<Book> books = queryFactory
+                .selectFrom(book)
+                .orderBy(book.id.asc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        List<BookResponse> content = books.stream()
+                .map(BookResponse::from)
+                .toList();
+
+        Long total = Optional.ofNullable(
+                queryFactory
+                        .select(book.count())
+                        .from(book)
+                        .fetchOne())
+                .orElse(0L);
+
+        return new PageImpl<>(content, pageable, total);
     }
 
     @Override
@@ -79,16 +104,18 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
                 .fetch();
 
         List<BookResponse> content = books.stream()
-                .map(BookResponse::of)
+                .map(BookResponse::from)
                 .toList();
 
-        Long total = queryFactory
-                .select(book.count())
-                .from(book)
-                .where(book.author.eq(author))
-                .fetchOne();
+        Long total = Optional.ofNullable(
+                queryFactory
+                    .select(book.count())
+                    .from(book)
+                    .where(book.author.eq(author))
+                    .fetchOne())
+                .orElse(0L);
 
-        return new PageImpl<>(content, pageable, total != null ? total : 0);
+        return new PageImpl<>(content, pageable, total);
     }
 
     @Override
@@ -105,16 +132,52 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
                 .fetch();
 
         List<BookResponse> content = books.stream()
-                .map(BookResponse::of)
+                .map(BookResponse::from)
                 .toList();
 
-        Long total = queryFactory
-                .select(book.count())
-                .from(book)
-                .where(book.publisher.eq(publisher))
-                .fetchOne();
+        Long total = Optional.ofNullable(
+                queryFactory
+                    .select(book.count())
+                    .from(book)
+                    .where(book.publisher.eq(publisher))
+                    .fetchOne())
+                .orElse(0L);
 
-        return new PageImpl<>(content, pageable, total != null ? total : 0);
+        return new PageImpl<>(content, pageable, total);
+    }
+
+    @Override
+    public Page<BookResponse> findBookResponseByTag(String tag, Pageable pageable) {
+        QBook book = QBook.book;
+        QBookTag tags = QBookTag.bookTag;
+
+        if (tag == null || tag.isBlank()) {
+            return Page.empty(pageable);  // 빈 페이지 반환
+        }
+
+        List<Book> books = queryFactory
+                .selectFrom(book)
+                .join(book.bookTags, tags).fetchJoin()
+                .leftJoin(book.bookCategories).fetchJoin()
+                .where(tags.name.eq(tag))
+                .fetch();
+
+        log.info("books: {}", books);
+
+        List<BookResponse> content = books.stream()
+                .map(BookResponse::from)
+                .toList();
+
+        Long total = Optional.ofNullable(
+                queryFactory
+                    .select(book.count())
+                    .from(book)
+                    .join(book.bookTags, tags)
+                    .where(tags.name.eq(tag))
+                    .fetchOne())
+                .orElse(0L);
+
+        return new PageImpl<>(content, pageable, total);
     }
 
     // 도서 이름으로 검색
@@ -134,16 +197,18 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
                 .fetch();
 
         List<BookResponse> content = books.stream()
-                .map(BookResponse::of)
+                .map(BookResponse::from)
                 .toList();
 
-        Long total = queryFactory
-                .select(book.count())
-                .from(book)
-                .where(book.title.containsIgnoreCase(title))
-                .fetchOne();
+        Long total = Optional.ofNullable(
+                queryFactory
+                    .select(book.count())
+                    .from(book)
+                    .where(book.title.containsIgnoreCase(title))
+                    .fetchOne())
+                .orElse(0L);
 
-        return new PageImpl<>(content, pageable, total != null ? total : 0);
+        return new PageImpl<>(content, pageable, total);
     }
 
     // 도서 설명으로 검색
@@ -163,16 +228,18 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
                 .fetch();
 
         List<BookResponse> content = books.stream()
-                .map(BookResponse::of)
+                .map(BookResponse::from)
                 .toList();
 
-        Long total = queryFactory
-                .select(book.count())
-                .from(book)
-                .where(book.description.containsIgnoreCase(description))
-                .fetchOne();
+        Long total = Optional.ofNullable(
+                queryFactory
+                    .select(book.count())
+                    .from(book)
+                    .where(book.description.containsIgnoreCase(description))
+                    .fetchOne())
+                .orElse(0L);
 
-        return new PageImpl<>(content, pageable, total != null ? total : 0);
+        return new PageImpl<>(content, pageable, total);
     }
 
     @Override
@@ -224,37 +291,5 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
                 .map(Book::getBookCategories)
                 .map(Set::size)
                 .orElse(0);
-    }
-
-    @Override
-    public Page<BookResponse> findBookResponseByTag(String tag, Pageable pageable) {
-        QBook book = QBook.book;
-        QBookTag tags = QBookTag.bookTag;
-
-        if (tag == null || tag.isBlank()) {
-            return Page.empty(pageable);  // 빈 페이지 반환
-        }
-
-        List<Book> books = queryFactory
-                .selectFrom(book)
-                .join(book.bookTags, tags).fetchJoin()
-                .leftJoin(book.bookCategories).fetchJoin()
-                .where(tags.name.eq(tag))
-                .fetch();
-
-        log.info("books: {}", books);
-
-        List<BookResponse> content = books.stream()
-                .map(BookResponse::of)
-                .toList();
-
-        Long total = queryFactory
-                .select(book.count())
-                .from(book)
-                .join(book.bookTags, tags)
-                .where(tags.name.eq(tag))
-                .fetchOne();
-
-        return new PageImpl<>(content, pageable, total != null ? total : 0);
     }
 }

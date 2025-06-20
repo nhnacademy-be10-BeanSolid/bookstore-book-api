@@ -1,7 +1,9 @@
 insert into book (book_id, title, description,  author, publisher, pulisher_at, isbn, price_original, price_sale, is_gift_wrappable, create_at, status, stock)
 values
     (1, '테스트책1', '설명12','김', '출판사', '2020-02-02', '0000000000000', 30000, 25000, true, '2020-03-03 14:30:00', 'on_sale', 200),
-    (2, '테스트책2', '설명34','김', '출판사', '2020-02-02', '0000000000001', 35000, 33000, true, '2020-03-03 14:30:00', 'on_sale', 100);
+    (2, '테스트책2', '설명34','김', '출판사', '2020-02-02', '0000000000001', 35000, 33000, true, '2020-03-03 14:30:00', 'on_sale', 100),
+    (3, '테스트책3', '재미있는 책','이', 'A사', '2020-02-02', '0000000000002', 35000, 33000, true, '2020-03-03 14:30:00', 'on_sale', 100);
+
 
 insert into book_tag (tag_id, name)
 values

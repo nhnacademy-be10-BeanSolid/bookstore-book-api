@@ -13,6 +13,10 @@ public interface BookService {
 
     BookResponse getBookResponseByBookId(Long id);
 
+    BookDetailResponse getBookDetailResponseByBookId(Long id);
+
+    Page<BookResponse> getAllBooks(Pageable pageable);
+
     Page<BookResponse> getBooksResponseByAuthor(String author, Pageable pageable);
 
     Page<BookResponse> getBooksResponseByPublisher(String publisher, Pageable pageable);
@@ -22,8 +26,6 @@ public interface BookService {
     void deleteBook(Long id);
 
     Page<BookResponse> getBooksResponseByTag(String tag, Pageable pageable);
-
-    BookDetailResponse getBookDetailResponseByBookId(Long id);
 
     // 도서 제목으로 검색
     Page<BookResponse> getBookResponseByTitle(String title, Pageable pageable);

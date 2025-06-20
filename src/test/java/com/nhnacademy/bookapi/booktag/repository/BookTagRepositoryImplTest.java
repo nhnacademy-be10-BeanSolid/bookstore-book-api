@@ -38,7 +38,7 @@ class BookTagRepositoryImplTest {
     void findAllBookTagResponseTest() {
         List<BookTagResponse> result = bookTagRepository.findAllBookTagResponses();
 
-        assertThat(result.size()).isEqualTo(2);
+        assertThat(result).hasSize(2);
         assertThat(result.get(0).name()).isEqualTo("태그1");
         assertThat(result.get(1).name()).isEqualTo("태그2");
     }

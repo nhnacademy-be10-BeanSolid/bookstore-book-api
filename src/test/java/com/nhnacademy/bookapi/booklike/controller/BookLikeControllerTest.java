@@ -48,7 +48,7 @@ class BookLikeControllerTest {
     @DisplayName("좋아요 조회 - 도서 아이디")
     void getBookLikesByBookIdTest() throws Exception {
         Long bookId = book.getId();
-        BookLikeResponse response = BookLikeResponse.of(bookLike);
+        BookLikeResponse response = BookLikeResponse.from(bookLike);
 
         given(bookLikeService.getBookLikesByBookId(bookId)).willReturn(List.of(response));
 
@@ -60,7 +60,7 @@ class BookLikeControllerTest {
     @Test
     @DisplayName("좋아요 조회 - 헤더")
     void getBookLikesByUserIdTest() throws Exception {
-        BookLikeResponse response = BookLikeResponse.of(bookLike);
+        BookLikeResponse response = BookLikeResponse.from(bookLike);
         List<BookLikeResponse> responses = List.of(response);
 
         given(bookLikeService.getBookLikesByUserId(userId)).willReturn(responses);
@@ -75,7 +75,7 @@ class BookLikeControllerTest {
     @Test
     @DisplayName("좋아요 조회 - 헤더 없는 경우")
     void getBookLikesByUserIdExceptionTest() throws Exception {
-        BookLikeResponse response = BookLikeResponse.of(bookLike);
+        BookLikeResponse response = BookLikeResponse.from(bookLike);
         List<BookLikeResponse> responses = List.of(response);
 
         given(bookLikeService.getBookLikesByUserId(userId)).willReturn(responses);
@@ -87,7 +87,7 @@ class BookLikeControllerTest {
     @Test
     @DisplayName("좋아요 조회 - 헤더 비어있는 경우")
     void getBookLikesByUserIdInvalidExceptionTest() throws Exception {
-        BookLikeResponse response = BookLikeResponse.of(bookLike);
+        BookLikeResponse response = BookLikeResponse.from(bookLike);
         List<BookLikeResponse> responses = List.of(response);
 
         given(bookLikeService.getBookLikesByUserId(userId)).willReturn(responses);
