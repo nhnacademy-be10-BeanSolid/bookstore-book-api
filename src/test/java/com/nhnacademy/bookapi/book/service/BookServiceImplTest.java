@@ -32,8 +32,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -352,7 +351,11 @@ class BookServiceImplTest {
         when(bookRepository.findById(id)).thenReturn(Optional.of(book));
 
         BookUpdateRequest request = new BookUpdateRequest();
-        request.setTitle("수정합니다");
+        request.setTitle("새 타이틀");
+        request.setDescription("새 설명");
+        request.setToc("새 목차");
+        request.setPublisher("새 출판사");
+        request.setAuthor("새 작가");
         request.setStatus("sale_end");
 
         book.setTitle(request.getTitle());
@@ -364,7 +367,11 @@ class BookServiceImplTest {
         BookResponse actualResponse = bookService.updateBook(id, request);
 
         assertThat(actualResponse).isNotNull();
-        assertThat(actualResponse.title()).isEqualTo("수정합니다");
+        assertThat(actualResponse.title()).isEqualTo("새 타이틀");
+        assertThat(actualResponse.description()).isEqualTo("새 설명");
+        assertThat(actualResponse.toc()).isEqualTo("새 목차");
+        assertThat(actualResponse.publisher()).isEqualTo("새 출판사");
+        assertThat(actualResponse.author()).isEqualTo("새 작가");
         assertThat(actualResponse.status()).isEqualTo(BookStatus.SALE_END);
     }
 
