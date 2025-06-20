@@ -359,6 +359,10 @@ class BookServiceImplTest {
         request.setStatus("sale_end");
 
         book.setTitle(request.getTitle());
+        book.setDescription(request.getDescription());
+        book.setToc(request.getToc());
+        book.setPublisher(request.getPublisher());
+        book.setAuthor(request.getAuthor());
         book.setStatus(BookStatus.from(request.getStatus()));
 
         BookResponse response = BookResponse.from(book);
