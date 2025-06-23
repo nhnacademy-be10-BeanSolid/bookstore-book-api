@@ -103,6 +103,12 @@
             <classifier>jakarta</classifier>
             <scope>provided</scope>
         </dependency>
+
+<!--        elastic-search-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

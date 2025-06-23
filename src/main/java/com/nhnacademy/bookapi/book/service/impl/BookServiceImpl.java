@@ -13,6 +13,8 @@ import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
+import com.nhnacademy.bookapi.document.BookDocument;
+import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -32,6 +34,7 @@ public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
     private final BookCategoryRepository bookCategoryRepository;
+    private final BookDocumentRepository bookDocumentRepository;
 
     // 도서 추가
     @Override
@@ -60,6 +63,13 @@ public class BookServiceImpl implements BookService {
                 .bookCategories(categories)
                 .build();
         Book savedBook = bookRepository.save(book);
+
+        // Elastic Search에 저장
+        BookDocument document = BookDocument.from(savedBook);
+        bookDocumentRepository.save(document);
+
+        log.info("Book created: {}", document);
+
         return bookRepository.findBookResponseById(savedBook.getId())
                 .orElseThrow(() -> new BookNotFoundException(savedBook.getId()));
     }
@@ -164,6 +174,12 @@ public class BookServiceImpl implements BookService {
     public void deleteBook(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
+        bookDocumentRepository.deleteById(String.valueOf(book.getId()));
         bookRepository.delete(book);
+    }
+
+    @Override
+    public Page<BookDocument> getBookDocumentByKeyword(String keyword, Pageable pageable) {
+        return bookDocumentRepository.searchByKeyword(keyword, pageable);
     }
 }
