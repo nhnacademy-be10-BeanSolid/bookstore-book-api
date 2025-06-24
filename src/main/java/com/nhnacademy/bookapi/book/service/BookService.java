@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.book.service;
 
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
+import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
@@ -41,5 +42,8 @@ public interface BookService {
     Page<BookDocument> getBookDocumentByKeyword(String keyword, Pageable pageable);
 
     // 주문 api 정보 전달
-    Page<BookOrderResponse> getBookOrderResponseByBookIds(List<Long> ids, Pageable pageable);
+    List<BookOrderResponse> getBookOrderResponseByBookIds(List<Long> ids);
+
+    // 주문 재고 변경
+    void updateBookStock(List<BookStockReduceRequest> requests);
 }

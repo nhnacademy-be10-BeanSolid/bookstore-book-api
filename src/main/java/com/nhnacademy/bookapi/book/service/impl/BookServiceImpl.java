@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.book.service.impl;
 
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
+import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
@@ -9,6 +10,8 @@ import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
+import com.nhnacademy.bookapi.book.exception.BookNotSaleException;
+import com.nhnacademy.bookapi.book.exception.InsufficientStockException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
@@ -24,6 +27,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -192,7 +196,46 @@ public class BookServiceImpl implements BookService {
 
     // 주문 api 에 정보 전달
     @Override
-    public Page<BookOrderResponse> getBookOrderResponseByBookIds(List<Long> ids, Pageable pageable) {
-        return bookRepository.findBookOrderResponsesById(ids, pageable);
+    public List<BookOrderResponse> getBookOrderResponseByBookIds(List<Long> ids) {
+        List<BookOrderResponse> response = bookRepository.findBookOrderResponsesById(ids);
+
+        Set<Long> responseIds = response.stream()
+                .map(BookOrderResponse::id)
+                .collect(Collectors.toSet());
+
+        Set<Long> notSaleIds = new HashSet<>();
+
+        for(Long id : ids){
+            if(!responseIds.contains(id)){
+                notSaleIds.add(id);
+            }
+        }
+
+        if(!notSaleIds.isEmpty()){
+            throw new BookNotSaleException(notSaleIds);
+        }
+
+        return response;
+    }
+
+    // 결제 후 재고 최신화
+    @Override
+    public void updateBookStock(List<BookStockReduceRequest> requests) {
+        for (BookStockReduceRequest request : requests) {
+            Long bookId = request.bookId();
+            Integer stock = request.stock();
+
+            Book book = bookRepository.findById(bookId)
+                    .orElseThrow(() -> new BookNotFoundException(bookId));
+
+            if (book.getStock() < stock) {
+                log.info("{} 재고차감 실패 ", bookId);
+                throw new InsufficientStockException(bookId);
+            }
+
+            book.setStock(book.getStock() - stock);
+            bookRepository.save(book);
+            log.info("Id {}의 재고 {} 차감 성공", bookId, stock);
+        }
     }
 }

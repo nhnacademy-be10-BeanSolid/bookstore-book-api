@@ -59,3 +59,16 @@ GET http://localhost:10346/search?tag=테스트
 
 ### 샵 메인페이지 도서 출력
 GET http://localhost:10346/shop
+
+### 정보 전달 테스트
+GET http://localhost:10346/books/ids?ids=2,3
+
+### 재고 차감 테스트
+PATCH http://localhost:10346/book-reduce
+Content-Type: application/json
+
+[
+  {"bookId": 1, "stock": 5},
+  {"bookId": 2, "stock": 5},
+  {"bookId": 3, "stock": -1}
+]

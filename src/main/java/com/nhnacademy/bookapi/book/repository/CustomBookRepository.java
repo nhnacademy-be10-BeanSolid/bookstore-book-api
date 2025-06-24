@@ -40,6 +40,6 @@ public interface CustomBookRepository {
     int countBookCategoryByBookId(Long bookId);
 
     // 주문 api 에서 받아갈 정보
-    Page<BookOrderResponse> findBookOrderResponsesById(List<Long> ids, Pageable pageable);
+    List<BookOrderResponse> findBookOrderResponsesById(List<Long> ids);
 
 }
