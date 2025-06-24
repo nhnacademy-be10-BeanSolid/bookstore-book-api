@@ -21,7 +21,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -149,101 +148,102 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
         return new PageImpl<>(content, pageable, total);
     }
 
-    @Override
-    public Page<BookResponse> findBookResponseByTag(String tag, Pageable pageable) {
-        QBook book = QBook.book;
-        QBookTag tags = QBookTag.bookTag;
+//    // 태그로 검색
+//    @Override
+//    public Page<BookResponse> findBookResponseByTag(String tag, Pageable pageable) {
+//        QBook book = QBook.book;
+//        QBookTag tags = QBookTag.bookTag;
+//
+//        if (tag == null || tag.isBlank()) {
+//            return Page.empty(pageable);  // 빈 페이지 반환
+//        }
+//
+//        List<Book> books = queryFactory
+//                .selectFrom(book)
+//                .join(book.bookTags, tags).fetchJoin()
+//                .leftJoin(book.bookCategories).fetchJoin()
+//                .where(tags.name.eq(tag))
+//                .fetch();
+//
+//        log.info("books: {}", books);
+//
+//        List<BookResponse> content = books.stream()
+//                .map(BookResponse::from)
+//                .toList();
+//
+//        Long total = Optional.ofNullable(
+//                queryFactory
+//                    .select(book.count())
+//                    .from(book)
+//                    .join(book.bookTags, tags)
+//                    .where(tags.name.eq(tag))
+//                    .fetchOne())
+//                .orElse(0L);
+//
+//        return new PageImpl<>(content, pageable, total);
+//    }
 
-        if (tag == null || tag.isBlank()) {
-            return Page.empty(pageable);  // 빈 페이지 반환
-        }
+//    // 도서 이름으로 검색
+//    @Override
+//    public Page<BookResponse> findBookResponseByTitle(String title, Pageable pageable) {
+//        QBook book = QBook.book;
+//
+//        if(title == null || title.isEmpty()) {
+//            return Page.empty(pageable);
+//        }
+//
+//        List<Book> books = queryFactory
+//                .selectFrom(book)
+//                .where(book.title.containsIgnoreCase(title))
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetch();
+//
+//        List<BookResponse> content = books.stream()
+//                .map(BookResponse::from)
+//                .toList();
+//
+//        Long total = Optional.ofNullable(
+//                queryFactory
+//                    .select(book.count())
+//                    .from(book)
+//                    .where(book.title.containsIgnoreCase(title))
+//                    .fetchOne())
+//                .orElse(0L);
+//
+//        return new PageImpl<>(content, pageable, total);
+//    }
 
-        List<Book> books = queryFactory
-                .selectFrom(book)
-                .join(book.bookTags, tags).fetchJoin()
-                .leftJoin(book.bookCategories).fetchJoin()
-                .where(tags.name.eq(tag))
-                .fetch();
-
-        log.info("books: {}", books);
-
-        List<BookResponse> content = books.stream()
-                .map(BookResponse::from)
-                .toList();
-
-        Long total = Optional.ofNullable(
-                queryFactory
-                    .select(book.count())
-                    .from(book)
-                    .join(book.bookTags, tags)
-                    .where(tags.name.eq(tag))
-                    .fetchOne())
-                .orElse(0L);
-
-        return new PageImpl<>(content, pageable, total);
-    }
-
-    // 도서 이름으로 검색
-    @Override
-    public Page<BookResponse> findBookResponseByTitle(String title, Pageable pageable) {
-        QBook book = QBook.book;
-
-        if(title == null || title.isEmpty()) {
-            return Page.empty(pageable);
-        }
-
-        List<Book> books = queryFactory
-                .selectFrom(book)
-                .where(book.title.containsIgnoreCase(title))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        List<BookResponse> content = books.stream()
-                .map(BookResponse::from)
-                .toList();
-
-        Long total = Optional.ofNullable(
-                queryFactory
-                    .select(book.count())
-                    .from(book)
-                    .where(book.title.containsIgnoreCase(title))
-                    .fetchOne())
-                .orElse(0L);
-
-        return new PageImpl<>(content, pageable, total);
-    }
-
-    // 도서 설명으로 검색
-    @Override
-    public Page<BookResponse> findBookResponseByDescription(String description, Pageable pageable) {
-        QBook book = QBook.book;
-
-        if (description == null || description.isBlank()) {
-            return Page.empty(pageable);  // 빈 페이지 반환
-        }
-
-        List<Book> books = queryFactory
-                .selectFrom(book)
-                .where(book.description.containsIgnoreCase(description))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        List<BookResponse> content = books.stream()
-                .map(BookResponse::from)
-                .toList();
-
-        Long total = Optional.ofNullable(
-                queryFactory
-                    .select(book.count())
-                    .from(book)
-                    .where(book.description.containsIgnoreCase(description))
-                    .fetchOne())
-                .orElse(0L);
-
-        return new PageImpl<>(content, pageable, total);
-    }
+//     //도서 설명으로 검색
+//    @Override
+//    public Page<BookResponse> findBookResponseByDescription(String description, Pageable pageable) {
+//        QBook book = QBook.book;
+//
+//        if (description == null || description.isBlank()) {
+//            return Page.empty(pageable);  // 빈 페이지 반환
+//        }
+//
+//        List<Book> books = queryFactory
+//                .selectFrom(book)
+//                .where(book.description.containsIgnoreCase(description))
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
+//                .fetch();
+//
+//        List<BookResponse> content = books.stream()
+//                .map(BookResponse::from)
+//                .toList();
+//
+//        Long total = Optional.ofNullable(
+//                queryFactory
+//                    .select(book.count())
+//                    .from(book)
+//                    .where(book.description.containsIgnoreCase(description))
+//                    .fetchOne())
+//                .orElse(0L);
+//
+//        return new PageImpl<>(content, pageable, total);
+//    }
 
     @Override
     public Optional<BookTagMapResponse> findBookTagMapResponseByBookIdAndTagId(Long bookId, Long tagId) {

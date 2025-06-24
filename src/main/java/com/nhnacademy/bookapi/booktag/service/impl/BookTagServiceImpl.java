@@ -18,6 +18,7 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class BookTagServiceImpl implements BookTagService {
+
     private final BookTagRepository bookTagRepository;
 
     @Override

@@ -20,12 +20,12 @@ POST http://localhost:10346/books
 Content-Type: application/json
 
 {
-  "title": "출판사A의 전략",
-  "description": "책입니다",
+  "title": "리그오브레전드 만화",
+  "description": "재미있다",
   "publisher": "출판사A",
-  "author": "작가DAAAA",
+  "author": "이",
   "publishedDate": "2025-06-21",
-  "isbn": "isbn900000021",
+  "isbn": "isbn900000026",
   "originalPrice": 18000,
   "salePrice": 14000,
   "wrappable": true,
@@ -52,10 +52,7 @@ Content-Type: application/json
 }
 
 ### 도서 삭제
-DELETE http://localhost:10346/books/56
-
-### 태그로 도서 검색
-GET http://localhost:10346/search?tag=테스트
+DELETE http://localhost:10346/books/70
 
 ### 샵 메인페이지 도서 출력
 GET http://localhost:10346/shop
@@ -72,3 +69,6 @@ Content-Type: application/json
   {"bookId": 2, "stock": 5},
   {"bookId": 3, "stock": -1}
 ]
+
+### elasticsearch 테스트
+GET http://localhost:10346/search?keyword=테스트2

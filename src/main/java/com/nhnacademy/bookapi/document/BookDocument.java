@@ -1,11 +1,15 @@
     package com.nhnacademy.bookapi.document;
 
     import com.nhnacademy.bookapi.book.domain.Book;
+    import com.nhnacademy.bookapi.booktag.domain.BookTag;
     import jakarta.persistence.Id;
     import lombok.Getter;
     import lombok.AllArgsConstructor;
     import lombok.ToString;
     import org.springframework.data.elasticsearch.annotations.*;
+
+    import java.util.Set;
+    import java.util.stream.Collectors;
 
     @ToString
     @Getter
@@ -27,7 +31,7 @@
         )
         private String title;
 
-        @Field(type = FieldType.Text)
+        @Field(type = FieldType.Text, analyzer = "korean_icu_analyzer")
         private String description;
 
         @Field(type = FieldType.Keyword)
@@ -39,14 +43,23 @@
         @Field(type = FieldType.Keyword)
         private String isbn;
 
+        @Field(type = FieldType.Keyword)
+        private Set<String> tags;
+
         public static BookDocument from(Book book) {
+            Set<String> tags = book.getBookTags()
+                    .stream()
+                    .map(BookTag::getName)
+                    .collect(Collectors.toSet());
+
             return new BookDocument(
                     String.valueOf(book.getId()),
                     book.getTitle(),
                     book.getDescription(),
                     book.getAuthor(),
                     book.getPublisher(),
-                    book.getIsbn()
+                    book.getIsbn(),
+                    tags
             );
         }
     }

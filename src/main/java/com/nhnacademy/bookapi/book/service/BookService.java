@@ -30,13 +30,14 @@ public interface BookService {
 
     void deleteBook(Long id);
 
-    Page<BookResponse> getBooksResponseByTag(String tag, Pageable pageable);
+//    // 태그로 검색
+//    Page<BookResponse> getBooksResponseByTag(String tag, Pageable pageable);
 
-    // 도서 제목으로 검색
-    Page<BookResponse> getBookResponseByTitle(String title, Pageable pageable);
+//    // 도서 제목으로 검색
+//    Page<BookResponse> getBookResponseByTitle(String title, Pageable pageable);
 
-    // 도서 설명으로 검색
-    Page<BookResponse> getBookResponseByDescription(String description, Pageable pageable);
+//    // 도서 설명으로 검색
+//    Page<BookResponse> getBookResponseByDescription(String description, Pageable pageable);
 
     // 도서 키워드로 검색
     Page<BookDocument> getBookDocumentByKeyword(String keyword, Pageable pageable);

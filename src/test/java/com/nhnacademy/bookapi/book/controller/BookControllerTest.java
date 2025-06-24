@@ -154,75 +154,75 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.totalElements").value(2));
     }
 
-    @Test
-    @DisplayName("작가 전체 조회")
-    void getAuthorTest() throws Exception{
-        String author = book.getAuthor(); // 작가
-        Book book1 = Book.builder()
-                .title("타이틀")
-                .description("설명")
-                .toc("목차")
-                .publisher("출판사")
-                .author(author)
-                .publishedDate(LocalDate.now())
-                .isbn("test000000001")
-                .originalPrice(10000)
-                .salePrice(5000)
-                .wrappable(false)
-                .stock(100)
-                .bookCategories(Set.of(category))
-                .bookTags(Set.of(tag))
-                .build();
-        BookResponse response = BookResponse.from(book);
-        BookResponse response1 = BookResponse.from(book1);
-
-        Pageable page = PageRequest.of(0, 10);
-        Page<BookResponse> pageResponse = new PageImpl<>(List.of(response1, response), page, 2);
-
-        given(bookService.getBooksResponseByAuthor(author, page)).willReturn(pageResponse);
-
-        mockMvc.perform(get("/authors/{author}", author)
-                        .param("page", "0")
-                        .param("size", "10"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(2))
-                .andExpect(jsonPath("$.content[0].author").value("작가"));
-    }
-
-    @Test
-    @DisplayName("출판사 전체 조회")
-    void getBooksByPublisherTest() throws Exception{
-        String publisher = book.getPublisher(); // 출판사
-        Book book1 = Book.builder()
-                .title("타이틀")
-                .description("설명")
-                .toc("목차")
-                .publisher(publisher)
-                .author("작가")
-                .publishedDate(LocalDate.now())
-                .isbn("test000000001")
-                .originalPrice(10000)
-                .salePrice(5000)
-                .wrappable(false)
-                .stock(100)
-                .bookCategories(Set.of(category))
-                .bookTags(Set.of(tag))
-                .build();
-        BookResponse response = BookResponse.from(book);
-        BookResponse response1 = BookResponse.from(book1);
-
-        Pageable page = PageRequest.of(0, 10);
-        Page<BookResponse> pageResponse = new PageImpl<>(List.of(response1, response), page, 2);
-
-        given(bookService.getBooksResponseByPublisher(publisher, page)).willReturn(pageResponse);
-
-        mockMvc.perform(get("/publishers/{publisher}", publisher)
-                        .param("page", "0")
-                        .param("size", "10"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(2))
-                .andExpect(jsonPath("$.content[0].publisher").value("출판사"));
-    }
+//    @Test
+//    @DisplayName("작가 전체 조회")
+//    void getAuthorTest() throws Exception{
+//        String author = book.getAuthor(); // 작가
+//        Book book1 = Book.builder()
+//                .title("타이틀")
+//                .description("설명")
+//                .toc("목차")
+//                .publisher("출판사")
+//                .author(author)
+//                .publishedDate(LocalDate.now())
+//                .isbn("test000000001")
+//                .originalPrice(10000)
+//                .salePrice(5000)
+//                .wrappable(false)
+//                .stock(100)
+//                .bookCategories(Set.of(category))
+//                .bookTags(Set.of(tag))
+//                .build();
+//        BookResponse response = BookResponse.from(book);
+//        BookResponse response1 = BookResponse.from(book1);
+//
+//        Pageable page = PageRequest.of(0, 10);
+//        Page<BookResponse> pageResponse = new PageImpl<>(List.of(response1, response), page, 2);
+//
+//        given(bookService.getBooksResponseByAuthor(author, page)).willReturn(pageResponse);
+//
+//        mockMvc.perform(get("/authors/{author}", author)
+//                        .param("page", "0")
+//                        .param("size", "10"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.totalElements").value(2))
+//                .andExpect(jsonPath("$.content[0].author").value("작가"));
+//    }
+//
+//    @Test
+//    @DisplayName("출판사 전체 조회")
+//    void getBooksByPublisherTest() throws Exception{
+//        String publisher = book.getPublisher(); // 출판사
+//        Book book1 = Book.builder()
+//                .title("타이틀")
+//                .description("설명")
+//                .toc("목차")
+//                .publisher(publisher)
+//                .author("작가")
+//                .publishedDate(LocalDate.now())
+//                .isbn("test000000001")
+//                .originalPrice(10000)
+//                .salePrice(5000)
+//                .wrappable(false)
+//                .stock(100)
+//                .bookCategories(Set.of(category))
+//                .bookTags(Set.of(tag))
+//                .build();
+//        BookResponse response = BookResponse.from(book);
+//        BookResponse response1 = BookResponse.from(book1);
+//
+//        Pageable page = PageRequest.of(0, 10);
+//        Page<BookResponse> pageResponse = new PageImpl<>(List.of(response1, response), page, 2);
+//
+//        given(bookService.getBooksResponseByPublisher(publisher, page)).willReturn(pageResponse);
+//
+//        mockMvc.perform(get("/publishers/{publisher}", publisher)
+//                        .param("page", "0")
+//                        .param("size", "10"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.totalElements").value(2))
+//                .andExpect(jsonPath("$.content[0].publisher").value("출판사"));
+//    }
 
     @Test
     @DisplayName("태그로 도서 검색")

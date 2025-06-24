@@ -64,18 +64,6 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @GetMapping("/authors/{author}")
-    public ResponseEntity<Page<BookResponse>> getBooksByAuthor(@PathVariable String author, Pageable pageable) {
-        Page<BookResponse> response = bookService.getBooksResponseByAuthor(author, pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @GetMapping("/publishers/{publisher}")
-    public ResponseEntity<Page<BookResponse>> getBooksByPublisher(@PathVariable String publisher, Pageable pageable) {
-        Page<BookResponse> response = bookService.getBooksResponseByPublisher(publisher, pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
     @PostMapping("/books")
     public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookCreateRequest request,
                                                    BindingResult bindingResult) {
@@ -103,34 +91,51 @@ public class BookController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<Page<BookResponse>> getBooksResponseByTag(@RequestParam String tag, Pageable pageable) {
-        log.info("컨트롤러 시작   Request to get Books by tag {}", tag);
-        Page<BookResponse> response = bookService.getBooksResponseByTag(tag, pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-//    @GetMapping("/searcht")
-//    public ResponseEntity<Page<BookResponse>> getBooksResponseByTitle(@RequestParam String title, Pageable pageable) {
-//        Page<BookResponse> response = bookService.getBookResponseByTitle(title, pageable);
-//        return ResponseEntity.status(HttpStatus.OK).body(response);
-//    }
-//
-//    @GetMapping("/searchd")
-//    public ResponseEntity<Page<BookResponse>> getBooksResponseByDescription(@RequestParam String description, Pageable pageable) {
-//        Page<BookResponse> response = bookService.getBookResponseByDescription(description, pageable);
-//        return ResponseEntity.status(HttpStatus.OK).body(response);
-//    }
-
     @GetMapping("/books")
     public ResponseEntity<Page<BookResponse>> getAllBookResponse(Pageable pageable) {
         Page<BookResponse> responses = bookService.getAllBooks(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 
-    @GetMapping("/searcha")
+    @GetMapping("/search")
     public ResponseEntity<Page<BookDocument>> getBookDocumentByKeyword(@RequestParam String keyword, Pageable pageable) {
         Page<BookDocument> response = bookService.getBookDocumentByKeyword(keyword, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
+
+//    // 이름으로 검색
+//    @GetMapping("/searcht")
+//    public ResponseEntity<Page<BookResponse>> getBooksResponseByTitle(@RequestParam String title, Pageable pageable) {
+//        Page<BookResponse> response = bookService.getBookResponseByTitle(title, pageable);
+//        return ResponseEntity.status(HttpStatus.OK).body(response);
+//    }
+//
+//    // 설명으로 검색
+//    @GetMapping("/searchd")
+//    public ResponseEntity<Page<BookResponse>> getBooksResponseByDescription(@RequestParam String description, Pageable pageable) {
+//        Page<BookResponse> response = bookService.getBookResponseByDescription(description, pageable);
+//        return ResponseEntity.status(HttpStatus.OK).body(response);
+//    }
+
+//    // 작가로 검색
+//    @GetMapping("/authors/{author}")
+//    public ResponseEntity<Page<BookResponse>> getBooksByAuthor(@PathVariable String author, Pageable pageable) {
+//        Page<BookResponse> response = bookService.getBooksResponseByAuthor(author, pageable);
+//        return ResponseEntity.status(HttpStatus.OK).body(response);
+//    }
+//
+//    // 출판사로 검색
+//    @GetMapping("/publishers/{publisher}")
+//    public ResponseEntity<Page<BookResponse>> getBooksByPublisher(@PathVariable String publisher, Pageable pageable) {
+//        Page<BookResponse> response = bookService.getBooksResponseByPublisher(publisher, pageable);
+//        return ResponseEntity.status(HttpStatus.OK).body(response);
+//    }
+//    // 태그로 검색
+//    @GetMapping("/search")
+//    public ResponseEntity<Page<BookResponse>> getBooksResponseByTag(@RequestParam String tag, Pageable pageable) {
+//        log.info("컨트롤러 시작   Request to get Books by tag {}", tag);
+//        Page<BookResponse> response = bookService.getBooksResponseByTag(tag, pageable);
+//        return ResponseEntity.status(HttpStatus.OK).body(response);
+//    }
 }
