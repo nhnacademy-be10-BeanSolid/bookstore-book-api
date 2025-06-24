@@ -3,6 +3,7 @@ package com.nhnacademy.bookapi.book.controller;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import com.nhnacademy.bookapi.advice.ValidationFailedException;
@@ -18,6 +19,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -35,6 +38,12 @@ public class BookController {
     }
 
     // /books/ids?ids=
+    // 페이징 처리?
+    @GetMapping("books/ids")
+    public ResponseEntity<Page<BookOrderResponse>> getBookOrderResponse(@RequestParam List<Long> ids, Pageable pageable) {
+        Page<BookOrderResponse> response = bookService.getBookOrderResponseByBookIds(ids, pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
     @GetMapping("/books/{id}")
     public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){

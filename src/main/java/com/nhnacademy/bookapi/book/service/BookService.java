@@ -3,10 +3,13 @@ package com.nhnacademy.bookapi.book.service;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.document.BookDocument;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+
+import java.util.List;
 
 public interface BookService {
 
@@ -36,4 +39,7 @@ public interface BookService {
 
     // 도서 키워드로 검색
     Page<BookDocument> getBookDocumentByKeyword(String keyword, Pageable pageable);
+
+    // 주문 api 정보 전달
+    Page<BookOrderResponse> getBookOrderResponseByBookIds(List<Long> ids, Pageable pageable);
 }

@@ -3,6 +3,7 @@ package com.nhnacademy.bookapi.book.service.impl;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
@@ -23,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -186,5 +188,11 @@ public class BookServiceImpl implements BookService {
     @Override
     public Page<BookDocument> getBookDocumentByKeyword(String keyword, Pageable pageable) {
         return bookDocumentRepository.searchByKeyword(keyword, pageable);
+    }
+
+    // 주문 api 에 정보 전달
+    @Override
+    public Page<BookOrderResponse> getBookOrderResponseByBookIds(List<Long> ids, Pageable pageable) {
+        return bookRepository.findBookOrderResponsesById(ids, pageable);
     }
 }

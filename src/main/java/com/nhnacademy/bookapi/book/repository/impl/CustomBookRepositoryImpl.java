@@ -3,6 +3,7 @@ package com.nhnacademy.bookapi.book.repository.impl;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.QBook;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.repository.CustomBookRepository;
 import com.nhnacademy.bookapi.bookcategory.domain.QBookCategory;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -291,5 +293,33 @@ public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implemen
                 .map(Book::getBookCategories)
                 .map(Set::size)
                 .orElse(0);
+    }
+
+
+    // 주문 api 에서 필요한 정보
+    @Override
+    public Page<BookOrderResponse> findBookOrderResponsesById(List<Long> ids, Pageable pageable) {
+        QBook book = QBook.book;
+
+        List<Book> results = queryFactory
+                .selectFrom(book)
+                .where(book.id.in(ids))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        Long total = Optional.ofNullable(
+                queryFactory
+                        .select(book.count())
+                        .from(book)
+                        .where(book.id.in(ids))
+                        .fetchOne())
+                .orElse(0L);
+
+        List<BookOrderResponse> contents = results.stream()
+                .map(BookOrderResponse::from)
+                .toList();
+
+        return new PageImpl<>(contents, pageable, total);
     }
 }
