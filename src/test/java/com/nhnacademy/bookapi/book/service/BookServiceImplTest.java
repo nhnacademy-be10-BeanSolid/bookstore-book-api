@@ -13,6 +13,8 @@ import com.nhnacademy.bookapi.book.service.impl.BookServiceImpl;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.booklike.domain.BookLike;
+import com.nhnacademy.bookapi.document.BookDocument;
+import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -43,6 +45,8 @@ class BookServiceImplTest {
     private BookRepository bookRepository;
     @Mock
     private BookCategoryRepository bookCategoryRepository;
+    @Mock
+    private BookDocumentRepository bookDocumentRepository;
 
     @InjectMocks
     private BookServiceImpl bookService;
@@ -85,6 +89,7 @@ class BookServiceImplTest {
 
         when(bookRepository.save(any(Book.class))).thenReturn(book);
         when(bookRepository.findBookResponseById(1L)).thenReturn(Optional.of(bookResponse));
+        when(bookDocumentRepository.save(any(BookDocument.class))).thenReturn(BookDocument.from(book));
 
         BookResponse response = bookService.createBook(request);
         assertThat(response).isNotNull();
@@ -397,8 +402,11 @@ class BookServiceImplTest {
         when(bookRepository.findById(id)).thenReturn(Optional.of(book));
 
         doNothing().when(bookRepository).delete(book);
+        doNothing().when(bookDocumentRepository).deleteById(String.valueOf(id));
+
         bookService.deleteBook(id);
 
+        verify(bookDocumentRepository, times(1)).deleteById(String.valueOf(id));
         verify(bookRepository, times(1)).delete(book);
     }
 

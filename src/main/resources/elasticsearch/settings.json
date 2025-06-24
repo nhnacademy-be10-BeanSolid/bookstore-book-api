@@ -1,0 +1,35 @@
+{
+  "analysis": {
+    "filter": {
+      "synonym_filter": {
+        "type": "synonym",
+        "synonyms": [
+          "롤, 리그오브레전드, LOL"
+        ],
+        "expand": false
+      }
+    },
+    "analyzer": {
+      "korean_icu_analyzer": {
+        "type": "custom",
+        "tokenizer": "nori_tokenizer",
+        "filter": [
+          "lowercase",
+          "icu_folding"
+        ]
+      },
+      "jaso_analyzer": {
+        "type": "custom",
+        "tokenizer": "jaso_tokenizer"
+      },
+      "synonym_analyzer": {
+        "type": "custom",
+        "tokenizer": "nori_tokenizer",
+        "filter": [
+          "lowercase",
+          "synonym_filter"
+        ]
+      }
+    }
+  }
+}

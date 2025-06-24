@@ -8,6 +8,7 @@ import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import com.nhnacademy.bookapi.advice.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.book.service.BookSearchApiService;
+import com.nhnacademy.bookapi.document.BookDocument;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,6 +34,8 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.OK).body(naverBookSearchService.searchBook(query, start));
     }
 
+    // /books/ids?ids=
+
     @GetMapping("/books/{id}")
     public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
         BookDetailResponse response = bookService.getBookDetailResponseByBookId(id);
@@ -53,7 +56,7 @@ public class BookController {
 
     @PostMapping("/books")
     public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookCreateRequest request,
-                                                BindingResult bindingResult) {
+                                                   BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException();
         }
@@ -101,5 +104,11 @@ public class BookController {
     public ResponseEntity<Page<BookResponse>> getAllBookResponse(Pageable pageable) {
         Page<BookResponse> responses = bookService.getAllBooks(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responses);
+    }
+
+    @GetMapping("/searcha")
+    public ResponseEntity<Page<BookDocument>> getBookDocumentByKeyword(@RequestParam String keyword, Pageable pageable) {
+        Page<BookDocument> response = bookService.getBookDocumentByKeyword(keyword, pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
