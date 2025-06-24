@@ -32,21 +32,21 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q.multiMatch(m -> m
                         .query(keyword)
-                        //
                         .fields(
                                 "title^5",
-                                "title.synonym^3",
-                                "title.jaso^2",
+                                "title.synonym^5",
+                                "title.jaso^5",
                                 "description^4",
                                 "author",
-                                "publisher"
+                                "publisher",
+                                "isbn^5"
                         )
                 ))
-                .withSort(s -> s.field(f -> f.field("id").order(SortOrder.Asc)))
+                .withSort(s -> s.field(f -> f.field("id").order(SortOrder.Desc)))
                 .withPageable(pageable)
                 .build();
 
-        log.info("쿼리 {}", query);
+        log.info("query {}", query);
 
         // 검색 결과를 담고있는 컨테이너
         SearchHits<BookDocument> hits = elasticsearchOperations.search(query, BookDocument.class); // 검색 실행(쿼리를 보냄)

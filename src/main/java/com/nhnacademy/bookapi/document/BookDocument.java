@@ -15,13 +15,14 @@
     public class BookDocument {
 
         @Id
+        @Field(type = FieldType.Keyword)
         private String id;
 
         @MultiField(
                 mainField = @Field(type = FieldType.Text, analyzer = "korean_icu_analyzer"),
                 otherFields = {
-                        @InnerField(suffix = "synonym", type = FieldType.Text, analyzer = "synonym_analyzer"), // 동의어 분석기
-                        @InnerField(suffix = "jaso", type = FieldType.Text, analyzer = "jaso_analyzer")        // 자소
+                        @InnerField(suffix = "jaso", type = FieldType.Text, analyzer = "jaso_analyzer"),        // 자소
+                        @InnerField(suffix = "synonym", type = FieldType.Text, analyzer = "synonym_analyzer") // 동의어 분석기
                 }
         )
         private String title;
@@ -29,9 +30,14 @@
         @Field(type = FieldType.Text)
         private String description;
 
+        @Field(type = FieldType.Keyword)
         private String author;
 
+        @Field(type = FieldType.Keyword)
         private String publisher;
+
+        @Field(type = FieldType.Keyword)
+        private String isbn;
 
         public static BookDocument from(Book book) {
             return new BookDocument(
@@ -39,7 +45,8 @@
                     book.getTitle(),
                     book.getDescription(),
                     book.getAuthor(),
-                    book.getPublisher()
+                    book.getPublisher(),
+                    book.getIsbn()
             );
         }
     }

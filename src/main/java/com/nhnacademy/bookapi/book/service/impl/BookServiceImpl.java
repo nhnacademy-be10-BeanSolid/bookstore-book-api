@@ -84,12 +84,14 @@ public class BookServiceImpl implements BookService {
 
     // 도서 상세정보 (좋아요한 유저까지 포함)
     @Override
+    @Transactional(readOnly = true)
     public BookDetailResponse getBookDetailResponseByBookId(Long id) {
         return bookRepository.findBookDetailResponseByBookId(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<BookResponse> getAllBooks(Pageable pageable) {
         return bookRepository.findAllBookResponses(pageable);
     }
@@ -103,6 +105,7 @@ public class BookServiceImpl implements BookService {
 
     // 출판사로 도서 검색
     @Override
+    @Transactional(readOnly = true)
     public Page<BookResponse> getBooksResponseByPublisher(String publisher, Pageable pageable) {
         return bookRepository.findBookResponseByPublisher(publisher, pageable);
     }
@@ -115,12 +118,14 @@ public class BookServiceImpl implements BookService {
     }
 
     // 도서 이름(타이틀)로 검색
+    @Transactional(readOnly = true)
     public Page<BookResponse> getBookResponseByTitle(String title, Pageable pageable) {
         return bookRepository.findBookResponseByTitle(title, pageable);
     }
 
     // 도서 설명으로 검색
     @Override
+    @Transactional(readOnly = true)
     public Page<BookResponse> getBookResponseByDescription(String description, Pageable pageable) {
         return bookRepository.findBookResponseByDescription(description, pageable);
     }

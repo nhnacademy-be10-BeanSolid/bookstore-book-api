@@ -20,12 +20,12 @@ POST http://localhost:10346/books
 Content-Type: application/json
 
 {
-  "title": "롤 게임 전략",
-  "description": "전략과 팁 모음",
-  "publisher": "출판사B",
-  "author": "작가D",
+  "title": "출판사A의 전략",
+  "description": "책입니다",
+  "publisher": "출판사A",
+  "author": "작가DAAAA",
   "publishedDate": "2025-06-21",
-  "isbn": "isbn900000016",
+  "isbn": "isbn900000021",
   "originalPrice": 18000,
   "salePrice": 14000,
   "wrappable": true,
@@ -52,7 +52,7 @@ Content-Type: application/json
 }
 
 ### 도서 삭제
-DELETE http://localhost:10346/books/54
+DELETE http://localhost:10346/books/56
 
 ### 태그로 도서 검색
 GET http://localhost:10346/search?tag=테스트

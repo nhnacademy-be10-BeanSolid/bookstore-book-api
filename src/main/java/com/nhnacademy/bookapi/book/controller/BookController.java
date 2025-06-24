@@ -34,6 +34,8 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.OK).body(naverBookSearchService.searchBook(query, start));
     }
 
+    // /books/ids?ids=
+
     @GetMapping("/books/{id}")
     public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
         BookDetailResponse response = bookService.getBookDetailResponseByBookId(id);
@@ -54,7 +56,7 @@ public class BookController {
 
     @PostMapping("/books")
     public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookCreateRequest request,
-                                                BindingResult bindingResult) {
+                                                   BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException();
         }
