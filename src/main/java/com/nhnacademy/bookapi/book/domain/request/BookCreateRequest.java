@@ -26,7 +26,7 @@ public record BookCreateRequest(
         @NotNull
         LocalDate publishedDate,
 
-        @NotNull
+        @NotBlank
         @Pattern(regexp = "^.{13}$")
         String isbn,
 

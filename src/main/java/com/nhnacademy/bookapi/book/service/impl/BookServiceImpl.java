@@ -7,7 +7,6 @@ import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.Book;
-import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.exception.BookNotSaleException;
@@ -26,7 +25,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -80,14 +78,6 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new BookNotFoundException(savedBook.getId()));
     }
 
-    // 아이디로 도서 검색
-    @Override
-    @Transactional(readOnly = true)
-    public BookResponse getBookResponseByBookId(Long id) {
-        return bookRepository.findBookResponseById(id)
-                .orElseThrow(() -> new BookNotFoundException(id));
-    }
-
     // 도서 상세정보 (좋아요한 유저까지 포함)
     @Override
     @Transactional(readOnly = true)
@@ -102,80 +92,16 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findAllBookResponses(pageable);
     }
 
-    // 작가로 도서 검색
-    @Override
-    @Transactional(readOnly = true)
-    public Page<BookResponse> getBooksResponseByAuthor(String author, Pageable pageable) {
-        return bookRepository.findBookResponsesByAuthor(author, pageable);
-    }
-
-    // 출판사로 도서 검색
-    @Override
-    @Transactional(readOnly = true)
-    public Page<BookResponse> getBooksResponseByPublisher(String publisher, Pageable pageable) {
-        return bookRepository.findBookResponseByPublisher(publisher, pageable);
-    }
-
-//    // 태그로 도서 검색
-//    @Override
-//    public Page<BookResponse> getBooksResponseByTag(String tag, Pageable pageable) {
-//        log.info("태그 파라미터 {}", tag);
-//        return bookRepository.findBookResponseByTag(tag, pageable);
-//    }
-
-//    // 도서 이름(타이틀)로 검색
-//    @Override
-//    @Transactional(readOnly = true)
-//    public Page<BookResponse> getBookResponseByTitle(String title, Pageable pageable) {
-//        return bookRepository.findBookResponseByTitle(title, pageable);
-//    }
-
-//    // 도서 설명으로 검색
-//    @Override
-//    @Transactional(readOnly = true)
-//    public Page<BookResponse> getBookResponseByDescription(String description, Pageable pageable) {
-//        return bookRepository.findBookResponseByDescription(description, pageable);
-//    }
-
     // 도서 업데이트
     @Override
     public BookResponse updateBook(Long id, BookUpdateRequest request) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
-        if (request.getTitle() != null) {
-            book.setTitle(request.getTitle());
-        }
-        if (request.getDescription() != null) {
-            book.setDescription(request.getDescription());
-        }
-        if (request.getToc() != null) {
-            book.setToc(request.getToc());
-        }
-        if (request.getPublisher() != null) {
-            book.setPublisher(request.getPublisher());
-        }
-        if (request.getAuthor() != null) {
-            book.setAuthor(request.getAuthor());
-        }
-        if (request.getPublishedDate() != null) {
-            book.setPublishedDate(request.getPublishedDate());
-        }
-        if (request.getIsbn() != null) {
-            book.setIsbn(request.getIsbn());
-        }
-        if (request.getOriginalPrice() != null) {
-            book.setOriginalPrice(request.getOriginalPrice());
-        }
-        if (request.getSalePrice() != null) {
-            book.setSalePrice(request.getSalePrice());
-        }
-        if (request.getStock() != null) {
-            book.setStock(request.getStock());
-        }
-        if (request.getStatus() != null) {
-            book.setStatus(BookStatus.from(request.getStatus()));
-        }
-        book.setUpdateAt(LocalDateTime.now());
+
+        book.updateFrom(request);
+
+        BookDocument updateDocument = BookDocument.from(book);
+        bookDocumentRepository.save(updateDocument);
 
         return bookRepository.findBookResponseById(book.getId())
                 .orElseThrow(() -> new BookNotFoundException(id));
@@ -186,10 +112,11 @@ public class BookServiceImpl implements BookService {
     public void deleteBook(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
-        bookDocumentRepository.deleteById(String.valueOf(book.getId()));
+        bookDocumentRepository.deleteById(String.valueOf(book.getId())); // 인덱스 다시 저장
         bookRepository.delete(book);
     }
 
+    // 검색
     @Override
     public Page<BookDocument> getBookDocumentByKeyword(String keyword, Pageable pageable) {
         return bookDocumentRepository.searchByKeyword(keyword, pageable);

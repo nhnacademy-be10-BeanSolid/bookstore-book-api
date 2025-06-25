@@ -25,7 +25,7 @@ Content-Type: application/json
   "publisher": "출판사A",
   "author": "이",
   "publishedDate": "2025-06-21",
-  "isbn": "isbn900000026",
+  "isbn": "isbn900000028",
   "originalPrice": 18000,
   "salePrice": 14000,
   "wrappable": true,
@@ -43,16 +43,25 @@ GET http://localhost:10346/authors/Lee
 GET http://localhost:10346/publishers/pub1?page=0&size=2
 
 ### 도서 업데이트
-PATCH http://localhost:10346/books/1
+PUT http://localhost:10346/books/1
 Content-Type: application/json
 
 {
   "title": "수정 제목",
+  "description": "수정 설명",
+  "toc": "수정 목차",
+  "publisher": "출판사A",
+  "author": "이",
+  "publishedDate": "2025-06-21",
+  "originalPrice": 18000,
+  "salePrice": 14000,
+  "wrappable": true,
+  "stock": 20,
   "status": "sale_end"
 }
 
 ### 도서 삭제
-DELETE http://localhost:10346/books/70
+DELETE http://localhost:10346/books/74
 
 ### 샵 메인페이지 도서 출력
 GET http://localhost:10346/shop

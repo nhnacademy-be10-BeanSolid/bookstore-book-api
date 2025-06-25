@@ -16,28 +16,13 @@ public interface BookService {
 
     BookResponse createBook(BookCreateRequest request);
 
-    BookResponse getBookResponseByBookId(Long id);
-
     BookDetailResponse getBookDetailResponseByBookId(Long id);
 
     Page<BookResponse> getAllBooks(Pageable pageable);
 
-    Page<BookResponse> getBooksResponseByAuthor(String author, Pageable pageable);
-
-    Page<BookResponse> getBooksResponseByPublisher(String publisher, Pageable pageable);
-
     BookResponse updateBook(Long id, BookUpdateRequest request);
 
     void deleteBook(Long id);
-
-//    // 태그로 검색
-//    Page<BookResponse> getBooksResponseByTag(String tag, Pageable pageable);
-
-//    // 도서 제목으로 검색
-//    Page<BookResponse> getBookResponseByTitle(String title, Pageable pageable);
-
-//    // 도서 설명으로 검색
-//    Page<BookResponse> getBookResponseByDescription(String description, Pageable pageable);
 
     // 도서 키워드로 검색
     Page<BookDocument> getBookDocumentByKeyword(String keyword, Pageable pageable);

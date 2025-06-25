@@ -1,5 +1,7 @@
 package com.nhnacademy.bookapi.book.domain;
 
+import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
+import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.booklike.domain.BookLike;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
@@ -11,9 +13,9 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
+@Setter
 @Builder
 @Getter
-@Setter
 @Entity
 @Table(name = "book")
 @NoArgsConstructor
@@ -41,7 +43,7 @@ public class Book {
     @Column(name = "pulisher_at", nullable = false)
     private LocalDate publishedDate;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String isbn;
 
     @Column(name = "price_original", nullable = false)
@@ -54,16 +56,14 @@ public class Book {
     private boolean wrappable;
 
     @Column(name = "create_at", nullable = false)
-    @Builder.Default
-    private LocalDateTime createAt = LocalDateTime.now();
+    private LocalDateTime createAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updateAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Builder.Default
-    private BookStatus status = BookStatus.ON_SALE;
+    private BookStatus status;
 
     @Column(nullable = false)
     private int stock;
@@ -88,4 +88,46 @@ public class Book {
 
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookLike> bookLikes = new HashSet<>();
+
+    public void createFrom(BookCreateRequest request) {
+        this.title = request.title();
+        this.description = request.description();
+        this.toc = request.toc();
+        this.publisher = request.publisher();
+        this.author = request.author();
+        this.publishedDate = request.publishedDate();
+        this.isbn = request.isbn();
+        this.originalPrice = request.originalPrice();
+        this.salePrice = request.salePrice();
+        this.wrappable = request.wrappable();
+        this.stock = request.stock();
+    }
+
+    public void updateFrom(BookUpdateRequest request) {
+        this.title = request.title();
+        this.description = request.description();
+        this.toc = request.toc();
+        this.publisher = request.publisher();
+        this.author = request.author();
+        this.publishedDate = request.publishedDate();
+        this.originalPrice = request.originalPrice();
+        this.salePrice = request.salePrice();
+        this.wrappable = request.wrappable();
+        this.status = BookStatus.from(request.status());
+        this.stock = request.stock();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createAt = now;
+        this.updateAt = now;
+        this.status = BookStatus.ON_SALE;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updateAt = LocalDateTime.now();
+    }
+
 }
