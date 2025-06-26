@@ -4,6 +4,9 @@ import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.List;
@@ -24,7 +27,7 @@ class BookTagRepositoryImplTest {
 
         assertThat(result).isPresent();
         assertThat(result.get().tagId()).isEqualTo(1L);
-        assertThat(result.get().name()).isEqualTo("태그1");
+        assertThat(result.get().tagName()).isEqualTo("태그1");
     }
 
     @Test
@@ -36,10 +39,12 @@ class BookTagRepositoryImplTest {
 
     @Test
     void findAllBookTagResponseTest() {
-        List<BookTagResponse> result = bookTagRepository.findAllBookTagResponses();
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<BookTagResponse> result = bookTagRepository.findAllBookTagResponses(pageable);
 
-        assertThat(result).hasSize(2);
-        assertThat(result.get(0).name()).isEqualTo("태그1");
-        assertThat(result.get(1).name()).isEqualTo("태그2");
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getContent())
+                .extracting(BookTagResponse::tagName)
+                .containsExactlyInAnyOrder("태그1", "태그2");
     }
 }

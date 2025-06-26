@@ -7,6 +7,8 @@ import com.nhnacademy.bookapi.booktag.domain.request.BookTagUpdateRequest;
 import com.nhnacademy.bookapi.booktag.service.BookTagService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +23,8 @@ public class BookTagController {
     private final BookTagService bookTagService;
 
     @GetMapping
-    public ResponseEntity<List<BookTagResponse>> getBookTags() {
-        List<BookTagResponse> response = bookTagService.getBookTags();
+    public ResponseEntity<Page<BookTagResponse>> getBookTags(Pageable pageable) {
+        Page<BookTagResponse> response = bookTagService.getBookTags(pageable);
         return ResponseEntity.ok(response);
     }
 
@@ -43,7 +45,7 @@ public class BookTagController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PatchMapping("/{tagId}")
+    @PutMapping("/{tagId}")
     public ResponseEntity<BookTagResponse> updateBookTag(@PathVariable Long tagId, @Valid @RequestBody BookTagUpdateRequest request,
                                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {

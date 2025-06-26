@@ -9,6 +9,7 @@ import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.service.BookSearchApiService;
+import com.nhnacademy.bookapi.book.service.BookSearchService;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.booklike.domain.BookLike;
@@ -52,6 +53,8 @@ class BookControllerTest {
 
     @MockBean
     BookService bookService;
+    @MockBean
+    BookSearchService searchService;
 
     @MockBean
     BookSearchApiService bookSearchService;

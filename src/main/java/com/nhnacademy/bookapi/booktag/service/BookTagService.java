@@ -3,11 +3,13 @@ package com.nhnacademy.bookapi.booktag.service;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagUpdateRequest;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
 public interface BookTagService {
-    List<BookTagResponse> getBookTags();
+    Page<BookTagResponse> getBookTags(Pageable pageable);
 
     BookTagResponse getBookTag(Long tagId);
 

@@ -40,4 +40,11 @@ public class BookCategory {
         this.parentCategory = parentCategory;
         this.createdAt = LocalDateTime.now();
     }
+
+    public BookCategory(long id, String name, BookCategory parentCategory) {
+        this.categoryId = id;
+        this.name = name;
+        this.parentCategory = parentCategory;
+        this.createdAt = LocalDateTime.now();
+    }
 }

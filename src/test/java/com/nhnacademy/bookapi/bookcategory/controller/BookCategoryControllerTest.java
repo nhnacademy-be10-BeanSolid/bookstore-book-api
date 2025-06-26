@@ -6,6 +6,7 @@ import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequ
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
+import com.nhnacademy.bookapi.bookcategory.service.CategoryCsvFileReadService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,8 @@ class BookCategoryControllerTest {
 
     @MockBean
     BookCategoryService bookCategoryService;
+    @MockBean
+    CategoryCsvFileReadService categoryCsvFileReadService;
 
     @Autowired
     ObjectMapper objectMapper;

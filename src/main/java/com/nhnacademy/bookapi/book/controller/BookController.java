@@ -8,9 +8,11 @@ import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import com.nhnacademy.bookapi.advice.ValidationFailedException;
+import com.nhnacademy.bookapi.book.service.BookSearchService;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.book.service.BookSearchApiService;
 import com.nhnacademy.bookapi.document.BookDocument;
+import com.nhnacademy.bookapi.book.feignclient.dto.AladinSearchResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -30,12 +32,21 @@ public class BookController {
 
     private final BookService bookService;
     private final BookSearchApiService naverBookSearchService;
+    private final BookSearchService bookSearchService; // 알라딘용
 
     @GetMapping("/books-search")
     public ResponseEntity<BookSearchResponse> searchBook(
             @RequestParam String query,
             @RequestParam(defaultValue = "1") int start) {
         return ResponseEntity.status(HttpStatus.OK).body(naverBookSearchService.searchBook(query, start));
+    }
+
+    @GetMapping("/books-search-aladin")
+    public ResponseEntity<AladinSearchResponse> searchBook1(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "1") Integer start,
+            @RequestParam(defaultValue = "10") Integer maxResults) {
+        return ResponseEntity.status(HttpStatus.OK).body(bookSearchService.search(query, start, maxResults));
     }
 
     @GetMapping("/books")

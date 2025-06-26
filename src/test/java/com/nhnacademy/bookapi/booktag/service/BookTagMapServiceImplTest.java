@@ -9,6 +9,7 @@ import com.nhnacademy.bookapi.booktag.exception.BookTagMapAlreadyExistsException
 import com.nhnacademy.bookapi.booktag.exception.BookTagMapNotFoundException;
 import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
 import com.nhnacademy.bookapi.booktag.service.impl.BookTagMapServiceImpl;
+import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,9 @@ class BookTagMapServiceImplTest {
     @Mock
     BookRepository bookRepository;
 
+    @Mock
+    BookDocumentRepository bookDocumentRepository;
+
     @InjectMocks
     private BookTagMapServiceImpl bookTagMapService;
 
@@ -60,6 +64,8 @@ class BookTagMapServiceImplTest {
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookTagRepository.findById(tagId)).thenReturn(Optional.of(tag));
+        when(bookRepository.save(any(Book.class))).thenReturn(book);
+        when(bookDocumentRepository.save(any())).thenReturn(null);
 
         BookTagMapResponse response = new BookTagMapResponse(bookId, tagId);
         when(bookRepository.findBookTagMapResponseByBookIdAndTagId(bookId, tagId))
@@ -101,10 +107,13 @@ class BookTagMapServiceImplTest {
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookTagRepository.findById(tagId)).thenReturn(Optional.of(tag));
+        when(bookRepository.save(any(Book.class))).thenReturn(book);
+        when(bookDocumentRepository.save(any())).thenReturn(null);
 
         bookTagMapService.deleteBookTag(bookId, tagId);
 
         verify(bookRepository, times(1)).save(book);
+        verify(bookDocumentRepository, times(1)).save(any());
     }
 
     @Test

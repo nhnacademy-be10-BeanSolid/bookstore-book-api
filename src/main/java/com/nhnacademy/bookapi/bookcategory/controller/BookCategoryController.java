@@ -5,12 +5,16 @@ import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequ
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
+import com.nhnacademy.bookapi.bookcategory.service.CategoryCsvFileReadService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -20,6 +24,7 @@ import java.util.List;
 public class BookCategoryController {
 
     private final BookCategoryService bookCategoryService;
+    private final CategoryCsvFileReadService categoryCsvFileReadService;
 
     @GetMapping
     public ResponseEntity<List<BookCategoryResponse>> getAllCategories() {
@@ -61,6 +66,17 @@ public class BookCategoryController {
     public ResponseEntity<Void> deleteCategory(@PathVariable("categoryId") Long categoryId) {
         bookCategoryService.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
+    }
+
+    // 임시 경로
+    @PostMapping("/import-categories")
+    public ResponseEntity<String> importCategories(@RequestParam("file") MultipartFile file) throws IOException {
+        File convFile = File.createTempFile("tmp", ".csv");
+        file.transferTo(convFile);
+
+        categoryCsvFileReadService.importCategoriesFromCsv(convFile);
+
+        return ResponseEntity.ok("Import completed");
     }
 
 }
