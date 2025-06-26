@@ -46,7 +46,8 @@ public class BookTagController {
     }
 
     @PutMapping("/{tagId}")
-    public ResponseEntity<BookTagResponse> updateBookTag(@PathVariable Long tagId, @Valid @RequestBody BookTagUpdateRequest request,
+    public ResponseEntity<BookTagResponse> updateBookTag(@PathVariable Long tagId,
+                                                         @Valid @RequestBody BookTagUpdateRequest request,
                                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException();

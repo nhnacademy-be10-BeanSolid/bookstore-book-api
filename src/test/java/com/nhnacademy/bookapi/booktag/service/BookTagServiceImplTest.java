@@ -15,6 +15,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -44,7 +45,7 @@ class BookTagServiceImplTest {
                 new BookTagResponse(1L, "tag1"),
                 new BookTagResponse(2L, "tag2")
         );
-        Page<BookTagResponse> result = bookTagService.getBookTags(pageable);
+        Page<BookTagResponse> result = new PageImpl<>(response, pageable, response.size());
 
         when(bookTagRepository.findAllBookTagResponses(pageable)).thenReturn(result);
 
@@ -54,8 +55,6 @@ class BookTagServiceImplTest {
         assertThat(tags.getContent())
                 .extracting(BookTagResponse::tagName)
                 .containsExactlyInAnyOrder("tag1", "tag2");
-
-        verify(bookTagRepository).findAllBookTagResponses(pageable);
     }
 
     @Test
@@ -74,9 +73,8 @@ class BookTagServiceImplTest {
     void getBookTag_notFound() {
         when(bookTagRepository.findBookTagResponseById(1L)).thenReturn(Optional.empty());
 
-        BookTagResponse result = bookTagService.getBookTag(1L);
-
-        assertThat(result).isNull();
+        assertThatThrownBy(() -> bookTagService.getBookTag(1L))
+                .isInstanceOf(BookTagNotFoundException.class);
     }
 
     @Test

@@ -1,9 +1,12 @@
 package com.nhnacademy.bookapi.booktag.repository;
 
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
+import com.nhnacademy.bookapi.config.QuerydslConfig;
+import com.querydsl.core.QueryFactory;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -16,6 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @ActiveProfiles("test")
+@Import(QuerydslConfig.class)
 class BookTagRepositoryImplTest {
 
     @Autowired

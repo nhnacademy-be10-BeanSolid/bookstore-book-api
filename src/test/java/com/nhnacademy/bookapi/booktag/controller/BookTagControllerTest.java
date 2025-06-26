@@ -68,7 +68,7 @@ class BookTagControllerTest {
         mockMvc.perform(get("/book-tags/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tagId").value(1L))
-                .andExpect(jsonPath("$.name").value("tag1"));
+                .andExpect(jsonPath("$.tagName").value("tag1"));
     }
 
     @Test
@@ -85,7 +85,7 @@ class BookTagControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/book-tags/1"))
                 .andExpect(jsonPath("$.tagId").value(1L))
-                .andExpect(jsonPath("$.name").value("tag1"));
+                .andExpect(jsonPath("$.tagName").value("tag1"));
     }
 
     @Test
@@ -119,9 +119,9 @@ class BookTagControllerTest {
     @Test
     @DisplayName("태그 수정 - 유효성 검사 실패")
     void updateBookTagValidFailTest() throws Exception {
-        BookTagUpdateRequest request = new BookTagUpdateRequest(null);
+        BookTagUpdateRequest request = new BookTagUpdateRequest("");
 
-        mockMvc.perform(patch("/book-tags/1")
+        mockMvc.perform(put("/book-tags/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
