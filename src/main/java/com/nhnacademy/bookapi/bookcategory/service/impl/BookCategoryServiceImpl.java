@@ -9,6 +9,8 @@ import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundExcepti
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,15 +25,15 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
     @Override
     public BookCategoryResponse createCategory(BookCategoryCreateRequest request) {
-        if (existsCategory(request.name())) {
-            throw new BookCategoryAlreadyExistsException(request.name());
+        if (existsCategory(request.categoryName())) {
+            throw new BookCategoryAlreadyExistsException(request.categoryName());
         }
         BookCategory parent = null;
         if (request.parentId() != null) {
             parent = bookCategoryRepository.findById(request.parentId())
                     .orElseThrow(() -> new BookCategoryNotFoundException(request.parentId()));
         }
-        BookCategory saved = bookCategoryRepository.save(new BookCategory(request.name(), parent));
+        BookCategory saved = bookCategoryRepository.save(new BookCategory(request.categoryName(), parent));
 
         return bookCategoryRepository.findBookCategoryResponseById(saved.getCategoryId())
                 .orElseThrow(() -> new BookCategoryNotFoundException(saved.getCategoryId()));
@@ -46,8 +48,8 @@ public class BookCategoryServiceImpl implements BookCategoryService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookCategoryResponse> getAllCategories() {
-        return bookCategoryRepository.findAllBookCategoryResponse();
+    public Page<BookCategoryResponse> getAllCategories(Pageable pageable) {
+        return bookCategoryRepository.findAllBookCategoryResponse(pageable);
     }
 
     @Override

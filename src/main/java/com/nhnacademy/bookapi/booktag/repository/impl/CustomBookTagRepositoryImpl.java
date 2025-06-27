@@ -22,6 +22,10 @@ public class CustomBookTagRepositoryImpl implements CustomBookTagRepository {
     public Optional<BookTagResponse> findBookTagResponseById(Long id) {
         QBookTag bookTag = QBookTag.bookTag;
 
+        if(id == null) {
+            return Optional.empty();
+        }
+
         BookTagResponse result = queryFactory
                 .select(Projections.constructor(BookTagResponse.class,
                         bookTag.tagId,

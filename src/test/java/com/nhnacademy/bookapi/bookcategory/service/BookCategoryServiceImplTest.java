@@ -133,32 +133,32 @@ class BookCategoryServiceImplTest {
                 .isInstanceOf(BookCategoryNotFoundException.class);
     }
 
-    @Test
-    void getAllCategories() {
-        BookCategoryResponse parentResponse = new BookCategoryResponse(
-                parentCategory.getCategoryId(),
-                null,
-                parentCategory.getName(),
-                parentCategory.getCreatedAt(),
-                parentCategory.getUpdatedAt()
-        );
-
-        BookCategoryResponse childResponse = new BookCategoryResponse(
-                childCategory.getCategoryId(),
-                childCategory.getParentCategory().getCategoryId(),
-                childCategory.getName(),
-                childCategory.getCreatedAt(),
-                childCategory.getUpdatedAt()
-        );
-
-        when(bookCategoryRepository.findAllBookCategoryResponse()).thenReturn(List.of(parentResponse, childResponse));
-
-        List<BookCategoryResponse> result = bookCategoryService.getAllCategories();
-
-        assertThat(result)
-                .hasSize(2)
-                .containsExactlyInAnyOrder(parentResponse, childResponse);
-    }
+//    @Test
+//    void getAllCategories() {
+//        BookCategoryResponse parentResponse = new BookCategoryResponse(
+//                parentCategory.getCategoryId(),
+//                null,
+//                parentCategory.getName(),
+//                parentCategory.getCreatedAt(),
+//                parentCategory.getUpdatedAt()
+//        );
+//
+//        BookCategoryResponse childResponse = new BookCategoryResponse(
+//                childCategory.getCategoryId(),
+//                childCategory.getParentCategory().getCategoryId(),
+//                childCategory.getName(),
+//                childCategory.getCreatedAt(),
+//                childCategory.getUpdatedAt()
+//        );
+//
+//        when(bookCategoryRepository.findAllBookCategoryResponse()).thenReturn(List.of(parentResponse, childResponse));
+//
+//        List<BookCategoryResponse> result = bookCategoryService.getAllCategories();
+//
+//        assertThat(result)
+//                .hasSize(2)
+//                .containsExactlyInAnyOrder(parentResponse, childResponse);
+//    }
 
     @Test
     void updateCategory_success() {

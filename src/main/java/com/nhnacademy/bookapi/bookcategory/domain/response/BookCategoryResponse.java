@@ -4,9 +4,10 @@ import java.time.LocalDateTime;
 
 public record BookCategoryResponse (
         Long categoryId,
-        Long parentId,
+//        Long parentId,
         String categoryName,
+        String parentCategoryName,
         LocalDateTime createdAt,
         LocalDateTime updatedAt
-)
-{}
+){
+}

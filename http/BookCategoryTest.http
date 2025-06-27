@@ -14,7 +14,7 @@ Host: localhost:10346
 Content-Type: application/json
 
 {
-  "name": "소설"
+  "categoryName": "소설"
 }
 
 ### 부모 카테고리가 있는 하위 카테고리 생성(예: parentId가 1)
@@ -23,8 +23,8 @@ Host: localhost:10346
 Content-Type: application/json
 
 {
-  "name": "한국 소설",
-  "parentId": 1
+  "categoryName": "한국 소설",
+  "parentId": 13
 }
 
 ### 카테고리 수정

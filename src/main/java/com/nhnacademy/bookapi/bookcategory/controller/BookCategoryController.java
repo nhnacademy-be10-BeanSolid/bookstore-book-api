@@ -8,6 +8,9 @@ import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
 import com.nhnacademy.bookapi.bookcategory.service.CategoryCsvFileReadService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +21,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/categories")
 @RequiredArgsConstructor
@@ -26,15 +30,22 @@ public class BookCategoryController {
     private final BookCategoryService bookCategoryService;
     private final CategoryCsvFileReadService categoryCsvFileReadService;
 
+//    @GetMapping
+//    public ResponseEntity<List<BookCategoryResponse>> getAllCategories() {
+//        List<BookCategoryResponse> bookCategoryList = bookCategoryService.getAllCategories();
+//        return ResponseEntity.ok(bookCategoryList);
+//    }
+
     @GetMapping
-    public ResponseEntity<List<BookCategoryResponse>> getAllCategories() {
-        List<BookCategoryResponse> bookCategoryList = bookCategoryService.getAllCategories();
+    public ResponseEntity<Page<BookCategoryResponse>> getAllCategories(Pageable pageable) {
+        Page<BookCategoryResponse> bookCategoryList = bookCategoryService.getAllCategories(pageable);
         return ResponseEntity.ok(bookCategoryList);
     }
 
     @GetMapping("/{categoryId}")
     public ResponseEntity<BookCategoryResponse> getCategoryById(@PathVariable("categoryId") Long categoryId) {
         BookCategoryResponse response = bookCategoryService.getCategoryById(categoryId);
+        log.info("아이디 도착 {} ", categoryId);
         return ResponseEntity.ok(response);
     }
 

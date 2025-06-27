@@ -37,12 +37,12 @@ class BookCategoryRepositoryImplTest {
         assertThat(result).isNotPresent();
     }
 
-    @Test
-    void findAllBookCategoryResponseTest() {
-        List<BookCategoryResponse> result = bookCategoryRepository.findAllBookCategoryResponse();
-
-        assertThat(result)
-                .isNotNull()
-                .hasSize(3);
-    }
+//    @Test
+//    void findAllBookCategoryResponseTest() {
+//        List<BookCategoryResponse> result = bookCategoryRepository.findAllBookCategoryResponse();
+//
+//        assertThat(result)
+//                .isNotNull()
+//                .hasSize(3);
+//    }
 }

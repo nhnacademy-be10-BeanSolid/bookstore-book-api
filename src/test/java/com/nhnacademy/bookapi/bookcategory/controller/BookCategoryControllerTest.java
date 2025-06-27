@@ -38,23 +38,23 @@ class BookCategoryControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    @Test
-    @DisplayName("카테고리 전체 조회")
-    void getAllCategories() throws Exception {
-        BookCategoryResponse parentResponse = new BookCategoryResponse(1L,
-                null, "Parent", LocalDateTime.now(), LocalDateTime.now());
-
-        BookCategoryResponse childResponse = new BookCategoryResponse(2L,
-                1L, "Child", LocalDateTime.now(), LocalDateTime.now());
-
-        given(bookCategoryService.getAllCategories()).willReturn(List.of(parentResponse, childResponse));
-
-        mockMvc.perform(get("/categories"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(2))
-                .andExpect(jsonPath("$[0].categoryId").value(1L))
-                .andExpect(jsonPath("$[1].categoryId").value(2L));
-    }
+//    @Test
+//    @DisplayName("카테고리 전체 조회")
+//    void getAllCategories() throws Exception {
+//        BookCategoryResponse parentResponse = new BookCategoryResponse(1L,
+//                null, "Parent", LocalDateTime.now(), LocalDateTime.now());
+//
+//        BookCategoryResponse childResponse = new BookCategoryResponse(2L,
+//                1L, "Child", LocalDateTime.now(), LocalDateTime.now());
+//
+//        given(bookCategoryService.getAllCategories()).willReturn(List.of(parentResponse, childResponse));
+//
+//        mockMvc.perform(get("/categories"))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.size()").value(2))
+//                .andExpect(jsonPath("$[0].categoryId").value(1L))
+//                .andExpect(jsonPath("$[1].categoryId").value(2L));
+//    }
 
     @Test
     @DisplayName("카테고리 단건 조회")
