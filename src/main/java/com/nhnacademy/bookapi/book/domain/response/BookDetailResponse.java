@@ -20,7 +20,7 @@ public record BookDetailResponse(
         String toc,
         String publisher,
         String author,
-        LocalDate publishedDate,
+        LocalDate publishAt,
         String isbn,
         int originalPrice,
         int salePrice,

@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.book.domain.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nhnacademy.bookapi.book.domain.Book;
 
 import java.time.LocalDate;
@@ -17,7 +18,9 @@ public record BookOrderResponse (
         int originalPrice,
         int salePrice,
         boolean wrappable,
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime createAt,
+        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime updateAt,
         String status,
         int stock
