@@ -28,8 +28,8 @@ public class CustomBookCategoryRepositoryImpl implements CustomBookCategoryRepos
         BookCategoryResponse result = queryFactory
                 .select(Projections.constructor(BookCategoryResponse.class,
                         bookCategory.categoryId,
-//                        bookCategory.parentCategory.categoryId,
                         bookCategory.name,
+                        parent.categoryId,
                         parent.name,
                         bookCategory.createdAt,
                         bookCategory.updatedAt
@@ -51,6 +51,7 @@ public class CustomBookCategoryRepositoryImpl implements CustomBookCategoryRepos
                 .select(Projections.constructor(BookCategoryResponse.class,
                         bookCategory.categoryId,
                         bookCategory.name,
+                        parent.categoryId,
                         parent.name,
                         bookCategory.createdAt,
                         bookCategory.updatedAt

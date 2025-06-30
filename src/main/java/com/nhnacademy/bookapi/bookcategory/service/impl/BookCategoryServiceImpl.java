@@ -56,13 +56,12 @@ public class BookCategoryServiceImpl implements BookCategoryService {
     public BookCategoryResponse updateCategory(Long categoryId, BookCategoryUpdateRequest request) {
         BookCategory category = bookCategoryRepository.findById(categoryId)
                 .orElseThrow(() -> new BookCategoryNotFoundException(categoryId));
-
         BookCategory parent = null;
         if (request.parentId() != null) {
             parent = bookCategoryRepository.findById(request.parentId())
                     .orElseThrow(() -> new BookCategoryNotFoundException(request.parentId()));
         }
-        category.setName(request.name());
+        category.setName(request.categoryName());
         category.setParentCategory(parent);
         category.setUpdatedAt(LocalDateTime.now());
 

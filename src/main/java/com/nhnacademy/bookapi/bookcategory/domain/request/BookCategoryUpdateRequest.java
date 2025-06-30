@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 
 public record BookCategoryUpdateRequest (
         @NotBlank
-        String name,
+        String categoryName,
         Long parentId
 )
 {}

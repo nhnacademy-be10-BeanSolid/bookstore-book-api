@@ -46,8 +46,8 @@ class BookTagRepositoryImplTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<BookTagResponse> result = bookTagRepository.findAllBookTagResponses(pageable);
 
-        assertThat(result.getContent()).hasSize(2);
         assertThat(result.getContent())
+                .hasSize(2)
                 .extracting(BookTagResponse::tagName)
                 .containsExactlyInAnyOrder("태그1", "태그2");
     }

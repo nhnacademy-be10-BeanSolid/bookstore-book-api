@@ -12,6 +12,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
@@ -22,7 +23,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -41,11 +42,13 @@ class BookTagControllerTest {
     @Test
     @DisplayName("전체 조회")
     void getBookTags() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10);
+
         List<BookTagResponse> tags = List.of(
                 new BookTagResponse(1L, "tag1"),
                 new BookTagResponse(2L, "tag2")
         );
-        Page<BookTagResponse> page = new PageImpl<>(tags);
+        Page<BookTagResponse> page = new PageImpl<>(tags, pageable, tags.size());
 
         given(bookTagService.getBookTags(any(Pageable.class))).willReturn(page);
 
@@ -130,7 +133,7 @@ class BookTagControllerTest {
     @Test
     @DisplayName("태그 삭제")
     void deleteBookTag() throws Exception {
-        doNothing().when(bookTagService).deleteBookTag(1L);
+        willDoNothing().given(bookTagService).deleteBookTag(1L);
 
         mockMvc.perform(delete("/book-tags/1"))
                 .andExpect(status().isNoContent());

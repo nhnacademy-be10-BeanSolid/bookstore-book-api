@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
-import java.util.List;
 
 @Slf4j
 @RestController
@@ -30,12 +29,6 @@ public class BookCategoryController {
     private final BookCategoryService bookCategoryService;
     private final CategoryCsvFileReadService categoryCsvFileReadService;
 
-//    @GetMapping
-//    public ResponseEntity<List<BookCategoryResponse>> getAllCategories() {
-//        List<BookCategoryResponse> bookCategoryList = bookCategoryService.getAllCategories();
-//        return ResponseEntity.ok(bookCategoryList);
-//    }
-
     @GetMapping
     public ResponseEntity<Page<BookCategoryResponse>> getAllCategories(Pageable pageable) {
         Page<BookCategoryResponse> bookCategoryList = bookCategoryService.getAllCategories(pageable);
@@ -45,7 +38,6 @@ public class BookCategoryController {
     @GetMapping("/{categoryId}")
     public ResponseEntity<BookCategoryResponse> getCategoryById(@PathVariable("categoryId") Long categoryId) {
         BookCategoryResponse response = bookCategoryService.getCategoryById(categoryId);
-        log.info("아이디 도착 {} ", categoryId);
         return ResponseEntity.ok(response);
     }
 
@@ -61,7 +53,7 @@ public class BookCategoryController {
         return ResponseEntity.created(location).body(response);
     }
 
-    @PatchMapping("/{categoryId}")
+    @PutMapping("/{categoryId}")
     public ResponseEntity<BookCategoryResponse> updateCategory(@PathVariable("categoryId") Long categoryId,
                                                                @Valid @RequestBody BookCategoryUpdateRequest request,
                                                                BindingResult bindingResult) {
