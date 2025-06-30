@@ -96,7 +96,7 @@ class BookServiceImplTest {
         assertThat(response.title()).isEqualTo("타이틀");
         assertThat(response.isbn()).isEqualTo("test000000000");
         assertThat(response.bookCategories()).contains("소설");
-        assertThat(response.publishedDate()).isEqualTo(LocalDate.of(2020,10,19));
+        assertThat(response.publishAt()).isEqualTo(LocalDate.of(2020,10,19));
     }
 
     @Test
