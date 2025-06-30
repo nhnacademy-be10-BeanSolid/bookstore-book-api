@@ -40,7 +40,7 @@ public class Book {
     @Column(nullable = false)
     private String publisher;
 
-    @Column(name = "publisher_at", nullable = false)
+    @Column(name = "publish_at", nullable = false)
     private LocalDate publishedDate;
 
     @Column(nullable = false, unique = true)
