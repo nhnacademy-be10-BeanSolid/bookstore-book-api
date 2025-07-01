@@ -3,29 +3,12 @@ POST http://localhost:10346/books
 Content-Type: application/json
 
 {
-  "title" : "book1",
-  "description": "저어어어엉말 유익한 책",
-  "publisher": "pub1",
-  "author": "Lee",
-  "publishedDate": "2025-06-09",
-  "isbn": "isbn001111117",
-  "originalPrice": 1000,
-  "salePrice": 500,
-  "wrappable": false,
-  "stock": 100
-}
-
-### 도서 추가
-POST http://localhost:10346/books
-Content-Type: application/json
-
-{
   "title": "만화",
   "description": "재미없다",
   "publisher": "출판사A",
   "author": "이",
-  "publishedDate": "2025-06-21",
-  "isbn": "isbn900000029",
+  "publishAt": "2025-06-21",
+  "isbn": "isbn900000040",
   "originalPrice": 18000,
   "salePrice": 14000,
   "wrappable": true,
@@ -55,7 +38,7 @@ Content-Type: application/json
 }
 
 ### 도서 삭제
-DELETE http://localhost:10346/books/74
+DELETE http://localhost:10346/books/1
 
 ### 샵 메인페이지 도서 출력
 GET http://localhost:10346/shop
@@ -68,9 +51,7 @@ PATCH http://localhost:10346/book-reduce
 Content-Type: application/json
 
 [
-  {"bookId": 1, "stock": 5},
-  {"bookId": 2, "stock": 5},
-  {"bookId": 3, "stock": -1}
+  {"bookId": 77, "stock": 5}
 ]
 
 ### elasticsearch 테스트

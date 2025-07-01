@@ -6,7 +6,6 @@ import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
-import com.nhnacademy.bookapi.book.feignclient.dto.AladinSearchResponse;
 import com.nhnacademy.bookapi.document.BookDocument;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -21,7 +20,7 @@ public interface BookService {
 
     Page<BookResponse> getAllBooks(Pageable pageable);
 
-    BookResponse updateBook(Long id, BookUpdateRequest request);
+    BookDetailResponse updateBook(Long id, BookUpdateRequest request);
 
     void deleteBook(Long id);
 
@@ -33,6 +32,4 @@ public interface BookService {
 
     // 주문 재고 변경
     void updateBookStock(List<BookStockReduceRequest> requests);
-
-    AladinSearchResponse getAladinSearchResponseByBookId(String query);
 }

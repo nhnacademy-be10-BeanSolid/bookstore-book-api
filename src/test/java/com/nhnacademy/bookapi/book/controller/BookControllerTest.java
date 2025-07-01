@@ -2,14 +2,14 @@ package com.nhnacademy.bookapi.book.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.bookapi.book.domain.Book;
+import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
-import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
-import com.nhnacademy.bookapi.book.service.BookSearchApiService;
-import com.nhnacademy.bookapi.book.service.BookSearchService;
+import com.nhnacademy.bookapi.book.feignclient.BookSearchApiService;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.booklike.domain.BookLike;
@@ -30,17 +30,16 @@ import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(BookController.class)
 class BookControllerTest {
@@ -54,10 +53,7 @@ class BookControllerTest {
     @MockBean
     BookService bookService;
     @MockBean
-    BookSearchService searchService;
-
-    @MockBean
-    BookSearchApiService bookSearchService;
+    BookSearchApiService bookSearchApiService;
 
     Book book;
     BookTag tag;
@@ -75,72 +71,56 @@ class BookControllerTest {
         Set<BookTag> tags = new HashSet<>();
         tags.add(tag);
 
-        book = Book.builder()
-                .title("타이틀")
-                .description("설명")
-                .toc("목차")
-                .publisher("출판사")
-                .author("작가")
-                .publishedDate(LocalDate.now())
-                .isbn("test000000000")
-                .originalPrice(10000)
-                .salePrice(5000)
-                .wrappable(false)
-                .stock(100)
-                .bookCategories(categories)
-                .bookTags(tags)
-                .bookLikes(new HashSet<>())
-                .build();
-        Set<BookLike> bookLikes = book.getBookLikes();
+        Set<BookLike> bookLikes = new HashSet<>();
         bookLikes.add(new BookLike("user", book));
-        ReflectionTestUtils.setField(book, "id", 1L);
-    }
 
-    @Test
-    @DisplayName("도서 검색 api 테스트")
-    void bookServiceTest() throws Exception {
-        String query = "포켓몬스터";
-
-        given(bookSearchService.searchBook(query, 1)).willReturn(new BookSearchResponse());
-
-        mockMvc.perform(get("/books-search?query=" + query))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @DisplayName("도서 상세정보 조회")
-    void getBookTest() throws Exception{
-        Long bookId = book.getId();
-        BookDetailResponse response = BookDetailResponse.from(book);
-
-        given(bookService.getBookDetailResponseByBookId(bookId)).willReturn(response);
-
-        mockMvc.perform(get("/books/{bookId}", bookId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.title").value("타이틀"))
-                .andExpect(jsonPath("$.isbn").value("test000000000"))
-                .andExpect(jsonPath("$.author").value("작가"))
-                .andExpect(jsonPath("$.likedUsers").value(Matchers.hasItems("user")));
+        book = new Book(
+                1L,                    // id, 보통 생성 시엔 null
+                "타이틀",
+                "설명",
+                "목차",
+                "작가",
+                "출판사",
+                LocalDate.now(),
+                "test000000000",
+                10000,
+                5000,
+                false,
+                LocalDateTime.now(),     // createAt
+                LocalDateTime.now(),     // updateAt
+                BookStatus.ON_SALE,      // status (필요에 따라 바꿔도 됨)
+                100,
+                null,                   // image (필요하면 넣기),
+                tags,
+                categories,
+                bookLikes
+        );
     }
 
     @Test
     @DisplayName("도서 전체 조회")
-    void getAllBookResponseTest() throws Exception{
-        Book book1 = Book.builder()
-                .title("타이틀")
-                .description("설명")
-                .toc("목차")
-                .publisher("출판사")
-                .author("작가")
-                .publishedDate(LocalDate.now())
-                .isbn("test000000001")
-                .originalPrice(10000)
-                .salePrice(5000)
-                .wrappable(false)
-                .stock(100)
-                .bookCategories(Set.of(category))
-                .bookTags(Set.of(tag))
-                .build();
+    void getAllBookResponses() throws Exception{
+        Book book1 = new Book(
+                2L,
+                "타이틀",
+                "설명",
+                "목차",
+                "작가",
+                "출판사",
+                LocalDate.now(),
+                "test000000001",
+                10000,
+                5000,
+                false,
+                null,
+                null,
+                BookStatus.ON_SALE,
+                100,
+                null,
+                Set.of(tag),
+                Set.of(category),
+                new HashSet<>()
+        );
 
         BookResponse response1 = BookResponse.from(book);
         BookResponse response2 = BookResponse.from(book1);
@@ -154,16 +134,35 @@ class BookControllerTest {
                         .param("page", "0")
                         .param("size", "10"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.totalElements").value(2));
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].id").value(1L))
+                .andExpect(jsonPath("$.content[0].isbn").value("test000000000"))
+                .andExpect(jsonPath("$.content[1].id").value(2L))
+                .andExpect(jsonPath("$.content[1].isbn").value("test000000001"));
+    }
+
+    @Test
+    @DisplayName("도서 상세정보 조회")
+    void getBookDetailById() throws Exception{
+        Long bookId = book.getId(); // 1L
+        BookDetailResponse response = BookDetailResponse.from(book);
+
+        given(bookService.getBookDetailResponseByBookId(bookId)).willReturn(response);
+
+        mockMvc.perform(get("/books/{bookId}", bookId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.title").value("타이틀"))
+                .andExpect(jsonPath("$.isbn").value("test000000000"))
+                .andExpect(jsonPath("$.likedUsers").value(Matchers.hasItems("user")));
     }
 
     @Test
     @DisplayName("도서 생성")
-    void createBookTest() throws Exception{
+    void createBook() throws Exception{
         Set<Long> categoryIds = Set.of(1L);
 
         BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
-                LocalDate.now(), "test000000000", 10000, 5000, false, 100, categoryIds);
+                LocalDate.now(), "test000000000", 10000, 5000, false, 100, null, categoryIds);
 
         given(bookService.createBook(any(BookCreateRequest.class))).willReturn(BookResponse.from(book));
 
@@ -171,6 +170,7 @@ class BookControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
+                .andExpect(header().string("Location", "/books/1"))
                 .andExpect(jsonPath("$.title").value("타이틀"))
                 .andExpect(jsonPath("$.isbn").value("test000000000"))
                 .andExpect(jsonPath("$.author").value("작가"))
@@ -179,13 +179,11 @@ class BookControllerTest {
 
     @Test
     @DisplayName("도서 생성 - 유효성 검사 실패")
-    void createBookValidationFailTest() throws Exception {
-        Set<Long> categoryIds = Set.of(1L);
-
-        // 재고량 -1로 지정
+    void createBook_validFail() throws Exception {
+        // 재고량 null 요청
         BookCreateRequest badRequest = new BookCreateRequest(
                 "타이틀", "설명", "목차", "출판사", "작가",
-                LocalDate.now(), "test123456789", 10000, 5000, false, -1, categoryIds);
+                LocalDate.now(), "test123456789", 10000, 5000, false, null, null, new HashSet<>());
 
         mockMvc.perform(post("/books")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -194,14 +192,98 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("삭제")
+    @DisplayName("도서 수정")
+    void updateBook() throws Exception{
+        // 포장 여부 > false, 도서 상태 > SALE_END
+        BookUpdateRequest request = new BookUpdateRequest("타이틀", "설명", "목차", "출판사", "작가",
+                LocalDate.of(2020,10,19), 10000, 5000, true, BookStatus.SALE_END.toString(), 100);
+        book.updateFrom(request);
+        BookDetailResponse response = BookDetailResponse.from(book);
+
+        given(bookService.updateBook(1L, request)).willReturn(response);
+
+        mockMvc.perform(put("/books/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.id").value(1L))
+                .andExpect(jsonPath("$.wrappable").value(true))
+                .andExpect(jsonPath("$.status").value(BookStatus.SALE_END.toString()));
+    }
+
+    @Test
+    @DisplayName("도서 수정 - 유효성 검사 실패")
+    void updateBook_validFail() throws Exception {
+        BookUpdateRequest badRequest = new BookUpdateRequest(null, "설명", "목차", "출판사", "작가",
+                LocalDate.of(2020,10,19), 10000, 5000, true, BookStatus.SALE_END.toString(), 100);
+
+        mockMvc.perform(put("/books/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(badRequest)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("도서 삭제")
     void deleteBookSuccessTest() throws Exception {
-        Long id = book.getId();
+        willDoNothing().given(bookService).deleteBook(1L);
 
-        doNothing().when(bookService).deleteBook(id);
-
-        mockMvc.perform(delete("/books/{id}", id))
+        mockMvc.perform(delete("/books/1"))
                 .andExpect(status().isNoContent());
     }
 
+    @Test
+    @DisplayName("주문상품 정보 전달")
+    void getBookOrderResponse_success() throws Exception {
+        Book book1 = new Book(
+                2L,
+                "타이틀",
+                "설명",
+                "목차",
+                "작가",
+                "출판사",
+                LocalDate.now(),
+                "test000000001",
+                10000,
+                5000,
+                false,
+                null,
+                null,
+                BookStatus.ON_SALE,
+                100,
+                null,
+                Set.of(tag),
+                Set.of(category),
+                new HashSet<>()
+        );
+
+        List<BookOrderResponse> response = List.of(
+                BookOrderResponse.from(book),
+                BookOrderResponse.from(book1)
+        );
+
+        given(bookService.getBookOrderResponseByBookIds(List.of(1L, 2L))).willReturn(response);
+
+        mockMvc.perform(get("/books/ids")
+                        .param("ids", "1", "2"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$", hasSize(2)))
+                .andExpect(jsonPath("$[0].id").value(1L))
+                .andExpect(jsonPath("$[1].id").value(2L));
+    }
+
+    @Test
+    @DisplayName("재고 최신화")
+    void getBookOrderResponse() throws Exception {
+        List<BookStockReduceRequest> requests = List.of(new BookStockReduceRequest(1L, 10));
+
+        willDoNothing().given(bookService).updateBookStock(requests);
+
+        mockMvc.perform(patch("/book-reduce")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requests)))
+                .andExpect(status().isOk());
+
+        verify(bookService).updateBookStock(requests);
+    }
 }

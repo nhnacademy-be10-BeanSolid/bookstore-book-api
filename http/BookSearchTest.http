@@ -1,11 +1,5 @@
 ### 외부 api 사용해서 책 검색
 GET http://localhost:10346/books-search?query=novel
 
-### 외부 api 사용해서 책 검색
-GET http://localhost:10346/books-search?query=추리소설
-
-### 외부 api 사용해서 책 검색
-GET http://localhost:10346/books-search?query=추리소설&start=5
-
 ### 알라딘 api
-GET http://localhost:10346/books-search-aladin?query=추리
+GET http://localhost:10346/books-search-aladin?query=추리&start=5

@@ -3,16 +3,13 @@ package com.nhnacademy.bookapi.book.controller;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
-import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
-import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
-import com.nhnacademy.bookapi.book.domain.response.BookResponse;
-import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
+import com.nhnacademy.bookapi.book.domain.response.*;
 import com.nhnacademy.bookapi.advice.ValidationFailedException;
-import com.nhnacademy.bookapi.book.service.BookSearchService;
+//import com.nhnacademy.bookapi.book.feignclient.BookSearchService;
+//import com.nhnacademy.bookapi.book.feignclient.dto.AladinItem;
 import com.nhnacademy.bookapi.book.service.BookService;
-import com.nhnacademy.bookapi.book.service.BookSearchApiService;
+import com.nhnacademy.bookapi.book.feignclient.BookSearchApiService;
 import com.nhnacademy.bookapi.document.BookDocument;
-import com.nhnacademy.bookapi.book.feignclient.dto.AladinSearchResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
 
 @Slf4j
@@ -32,36 +30,63 @@ public class BookController {
 
     private final BookService bookService;
     private final BookSearchApiService naverBookSearchService;
-    private final BookSearchService bookSearchService; // 알라딘용
+//    private final BookSearchService bookSearchService; // 알라딘용
 
     @GetMapping("/books-search")
-    public ResponseEntity<BookSearchResponse> searchBook(
+    public ResponseEntity<List<BookItemResponse>> searchBook(
             @RequestParam String query,
             @RequestParam(defaultValue = "1") int start) {
         return ResponseEntity.status(HttpStatus.OK).body(naverBookSearchService.searchBook(query, start));
     }
 
-    @GetMapping("/books-search-aladin")
-    public ResponseEntity<AladinSearchResponse> searchBook1(
-            @RequestParam String query,
-            @RequestParam(defaultValue = "1") Integer start,
-            @RequestParam(defaultValue = "10") Integer maxResults) {
-        return ResponseEntity.status(HttpStatus.OK).body(bookSearchService.search(query, start, maxResults));
-    }
+//    @GetMapping("/books-search-aladin")
+//    public ResponseEntity<List<AladinItem>> searchBook1(
+//            @RequestParam String query,
+//            @RequestParam(defaultValue = "1") Integer start,
+//            @RequestParam(defaultValue = "10") Integer maxResults) {
+//        return ResponseEntity.status(HttpStatus.OK).body(bookSearchService.search(query, start, maxResults));
+//    }
 
     @GetMapping("/books")
-    public ResponseEntity<Page<BookResponse>> getAllBookResponse(Pageable pageable) {
+    public ResponseEntity<Page<BookResponse>> getAllBookResponses(Pageable pageable) {
         Page<BookResponse> responses = bookService.getAllBooks(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(responses);
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<Page<BookDocument>> getBookDocumentByKeyword(@RequestParam String keyword, Pageable pageable) {
-        Page<BookDocument> response = bookService.getBookDocumentByKeyword(keyword, pageable);
+    @GetMapping("/books/{id}")
+    public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
+        BookDetailResponse response = bookService.getBookDetailResponseByBookId(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    // /books/ids?ids=
+    @PostMapping("/books")
+    public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookCreateRequest request,
+                                                   BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationFailedException();
+        }
+        BookResponse response = bookService.createBook(request);
+        URI location = URI.create("/books/" + response.id());
+        return ResponseEntity.created(location).body(response);
+    }
+
+    @PutMapping("/books/{bookId}")
+    public ResponseEntity<BookDetailResponse> updateBook(@PathVariable Long bookId,
+                                                         @Valid @RequestBody BookUpdateRequest request,
+                                                         BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationFailedException();
+        }
+        BookDetailResponse response = bookService.updateBook(bookId, request);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @DeleteMapping("/books/{bookId}")
+    public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
+        bookService.deleteBook(bookId);
+        return ResponseEntity.noContent().build();
+    }
+
     // 주문 api 전달
     @GetMapping("/books/ids")
     public ResponseEntity<List<BookOrderResponse>> getBookOrderResponse(@RequestParam List<Long> ids) {
@@ -70,8 +95,14 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    // 엘라스틱 서치
+    @GetMapping("/search")
+    public ResponseEntity<Page<BookDocument>> getBookDocumentByKeyword(@RequestParam String keyword, Pageable pageable) {
+        Page<BookDocument> response = bookService.getBookDocumentByKeyword(keyword, pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     // 재고 최신화
-    // 경로를 어떻게?
     @PatchMapping("/book-reduce")
     public ResponseEntity<Void> stockUpdate(@RequestBody List<BookStockReduceRequest> request,
                                             BindingResult bindingResult) {
@@ -80,42 +111,5 @@ public class BookController {
         }
         bookService.updateBookStock(request);
         return ResponseEntity.status(HttpStatus.OK).build();
-    }
-
-    // 도서 세부사항
-    @GetMapping("/books/{id}")
-    public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
-        BookDetailResponse response = bookService.getBookDetailResponseByBookId(id);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    // 도서 생성
-    @PostMapping("/books")
-    public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookCreateRequest request,
-                                                   BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationFailedException();
-        }
-        BookResponse response = bookService.createBook(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    // 도서 업데이트
-    @PutMapping("/books/{bookId}")
-    public ResponseEntity<BookResponse> updateBook(@PathVariable Long bookId,
-                                                   @Valid @RequestBody BookUpdateRequest request,
-                                                   BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            throw new ValidationFailedException();
-        }
-        BookResponse response = bookService.updateBook(bookId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    // 도서 삭제
-    @DeleteMapping("/books/{bookId}")
-    public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
-        bookService.deleteBook(bookId);
-        return ResponseEntity.noContent().build();
     }
 }

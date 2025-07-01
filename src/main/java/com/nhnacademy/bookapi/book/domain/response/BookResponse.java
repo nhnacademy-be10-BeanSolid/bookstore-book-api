@@ -12,7 +12,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public record BookResponse(
-
     Long id,
     String title,
     String description,
@@ -54,7 +53,7 @@ public static BookResponse from(Book book) {
             book.getToc(),
             book.getPublisher(),
             book.getAuthor(),
-            book.getPublishedDate(),
+            book.getPublishAt(),
             book.getIsbn(),
             book.getOriginalPrice(),
             book.getSalePrice(),

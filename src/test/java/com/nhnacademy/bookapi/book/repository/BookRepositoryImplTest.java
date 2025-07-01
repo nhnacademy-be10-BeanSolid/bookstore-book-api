@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.book.repository;
 
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
@@ -14,6 +15,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -64,8 +67,10 @@ class BookRepositoryImplTest {
         Pageable pageable = PageRequest.of(0, 10);
         Page<BookResponse> result = bookRepository.findAllBookResponses(pageable);
 
-        assertThat(result).isNotNull();
-        assertThat(result).hasSize(3);
+        assertThat(result.getContent())
+                .hasSize(3)
+                .extracting(BookResponse::title)
+                .containsExactlyInAnyOrder("테스트책1", "테스트책2", "테스트책3");
     }
 
     @Test
@@ -113,25 +118,24 @@ class BookRepositoryImplTest {
 
         assertThat(result).isZero();
     }
-//    @Test
-//    void findBookResponseByTagTest() {
-//        Pageable pageable = PageRequest.of(0, 10);
-//        Page<BookResponse> result = bookRepository.findBookResponseByTag("태그1", pageable);
-//        BookResponse first = result.getContent().get(0);
-//        BookResponse second = result.getContent().get(1);
-//
-//        assertThat(result).isNotNull();
-//        assertThat(result.getContent()).hasSize(2);
-//        assertThat(first.bookTags()).contains("태그1");
-//        assertThat(second.bookTags()).contains("태그1");
-//    }
-//
-//    @Test
-//    void findBookResponseByTagReturnEmptyPageTest() {
-//        Pageable pageable = PageRequest.of(0, 10);
-//        Page<BookResponse> result = bookRepository.findBookResponseByTag("", pageable);
-//
-//        assertThat(result.getContent()).isEmpty();
-//    }
+
+    @Test
+    void findBookOrderResponseByIdTest() {
+        List<Long> ids = Arrays.asList(1L, 2L);
+        List<BookOrderResponse> result = bookRepository.findBookOrderResponsesById(ids);
+
+        assertThat(result).isNotEmpty();
+        assertThat(result.size()).isEqualTo(2);
+        assertThat(result.get(0).id()).isEqualTo(1L);
+        assertThat(result.get(1).id()).isEqualTo(2L);
+    }
+
+    @Test
+    void findBookOrderResponseByIdNotFoundTest() {
+        List<Long> ids = Arrays.asList(3L, 99L);
+        List<BookOrderResponse> result = bookRepository.findBookOrderResponsesById(ids);
+
+        assertThat(result).isEmpty();
+    }
 }
 

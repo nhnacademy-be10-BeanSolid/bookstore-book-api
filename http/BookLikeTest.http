@@ -8,9 +8,9 @@ Content-Type: application/json
 }
 
 ### 책 좋아요 생성 - 헤더 o
-POST http://localhost:10346/books/1/bookLikes
+POST http://localhost:10346/books/76/bookLikes
 Content-Type: application/json
-X-USER-ID: user
+X-USER-ID: user1
 
 ### 좋아요 조회
 GET http://localhost:10346/books/1/bookLikes

@@ -6,7 +6,6 @@ import java.time.LocalDate;
 import java.util.Set;
 
 public record BookCreateRequest(
-
         @NotBlank
         @Size(max = 255)
         String title,
@@ -24,7 +23,7 @@ public record BookCreateRequest(
         String author,
 
         @NotNull
-        LocalDate publishedDate,
+        LocalDate publishAt,
 
         @NotBlank
         @Pattern(regexp = "^.{13}$")
@@ -41,6 +40,8 @@ public record BookCreateRequest(
 
         @PositiveOrZero
         Integer stock,
+
+        String image,
 
         @NotEmpty
         Set<Long> categoryIds

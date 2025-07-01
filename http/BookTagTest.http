@@ -49,9 +49,9 @@ Content-Type: application/json
 }
 
 ### 도서에 태그 추가
-POST http://localhost:10346/books/1/tags
+POST http://localhost:10346/books/76/tags
 Content-Type: application/json
 
 {
-  "tagId": 2
+  "tagId": 3
 }

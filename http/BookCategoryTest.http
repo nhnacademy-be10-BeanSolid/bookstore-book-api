@@ -42,10 +42,10 @@ DELETE /categories/1 HTTP/1.1
 Host: localhost:10346
 
 ### 도서에 카테고리 추가
-POST http://localhost:10346/books/1/categories
+POST http://localhost:10346/books/76/categories
 Content-Type: application/json
 
 {
-  "categoryId": 1
+  "categoryId": 37
 }
 

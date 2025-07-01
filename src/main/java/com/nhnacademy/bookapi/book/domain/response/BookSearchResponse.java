@@ -18,5 +18,5 @@ public class BookSearchResponse {
     private int display;
 
     // 책 정보를 담는 리스트
-    private List<BookItem> items;
+    private List<BookItemResponse> items;
 }

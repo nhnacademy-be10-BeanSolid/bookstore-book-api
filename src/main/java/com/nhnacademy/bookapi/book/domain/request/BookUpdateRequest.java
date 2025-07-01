@@ -24,7 +24,7 @@ public record BookUpdateRequest (
         String author,
 
         @NotNull
-        LocalDate publishedDate,
+        LocalDate publishAt,
 
         @NotNull
         @Positive

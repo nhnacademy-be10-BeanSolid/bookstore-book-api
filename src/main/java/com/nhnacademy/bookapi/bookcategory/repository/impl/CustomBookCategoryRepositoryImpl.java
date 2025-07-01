@@ -1,6 +1,5 @@
 package com.nhnacademy.bookapi.bookcategory.repository.impl;
 
-import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.QBookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.repository.CustomBookCategoryRepository;
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
 import java.util.Optional;

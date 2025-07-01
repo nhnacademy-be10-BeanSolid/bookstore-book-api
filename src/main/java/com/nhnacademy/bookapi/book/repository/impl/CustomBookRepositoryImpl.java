@@ -14,26 +14,21 @@ import com.nhnacademy.bookapi.booktag.domain.QBookTag;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @Slf4j
-public class CustomBookRepositoryImpl extends QuerydslRepositorySupport implements CustomBookRepository {
+@RequiredArgsConstructor
+public class CustomBookRepositoryImpl implements CustomBookRepository {
 
     private final JPAQueryFactory queryFactory;
-
-    public CustomBookRepositoryImpl(EntityManager entityManager) {
-        super(Book.class);
-        this.queryFactory = new JPAQueryFactory(entityManager);
-    }
 
     public Optional<BookResponse> findBookResponseById(Long id) {
         QBook book = QBook.book;

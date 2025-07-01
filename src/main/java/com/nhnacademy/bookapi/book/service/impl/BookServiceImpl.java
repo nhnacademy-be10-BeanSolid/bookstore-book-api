@@ -11,7 +11,7 @@ import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.exception.BookNotSaleException;
 import com.nhnacademy.bookapi.book.exception.InsufficientStockException;
-import com.nhnacademy.bookapi.book.feignclient.dto.AladinSearchResponse;
+//import com.nhnacademy.bookapi.book.feignclient.dto.AladinSearchResponse;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
@@ -53,20 +53,16 @@ public class BookServiceImpl implements BookService {
                         .orElseThrow(() -> new BookCategoryNotFoundException(id)))
                 .collect(Collectors.toSet());
 
-        Book book = Book.builder()
-                .title(request.title())
-                .description(request.description())
-                .toc(request.toc())
-                .publisher(request.publisher())
-                .author(request.author())
-                .publishedDate(request.publishedDate())
-                .isbn(request.isbn())
-                .originalPrice(request.originalPrice())
-                .salePrice(request.salePrice())
-                .wrappable(request.wrappable())
-                .stock(request.stock())
-                .bookCategories(categories)
-                .build();
+        String image = request.image();
+
+        log.info("image: {}", image);
+
+        if (image == null || image.isEmpty()) {
+            image = "/images/default.png";
+        }
+
+        Book book = Book.from(request, categories);
+        book.setImage(image);
         Book savedBook = bookRepository.save(book);
 
         // Elastic Search에 저장
@@ -87,6 +83,7 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new BookNotFoundException(id));
     }
 
+    // 전체 리스트
     @Override
     @Transactional(readOnly = true)
     public Page<BookResponse> getAllBooks(Pageable pageable) {
@@ -95,7 +92,7 @@ public class BookServiceImpl implements BookService {
 
     // 도서 업데이트
     @Override
-    public BookResponse updateBook(Long id, BookUpdateRequest request) {
+    public BookDetailResponse updateBook(Long id, BookUpdateRequest request) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
 
@@ -104,7 +101,7 @@ public class BookServiceImpl implements BookService {
         BookDocument updateDocument = BookDocument.from(book);
         bookDocumentRepository.save(updateDocument);
 
-        return bookRepository.findBookResponseById(book.getId())
+        return bookRepository.findBookDetailResponseByBookId(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
     }
 
@@ -148,6 +145,7 @@ public class BookServiceImpl implements BookService {
     }
 
     // 결제 후 재고 최신화
+    // 동시성 문제
     @Override
     public void updateBookStock(List<BookStockReduceRequest> requests) {
         for (BookStockReduceRequest request : requests) {
@@ -168,9 +166,9 @@ public class BookServiceImpl implements BookService {
         }
     }
 
-    @Override
-    public AladinSearchResponse getAladinSearchResponseByBookId(String query) {
-        return null;
-    }
+//    @Override
+//    public AladinSearchResponse getAladinSearchResponseByBookId(String query) {
+//        return null;
+//    }
 
 }

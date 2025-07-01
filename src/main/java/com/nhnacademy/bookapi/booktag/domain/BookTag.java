@@ -3,11 +3,12 @@ package com.nhnacademy.bookapi.booktag.domain;
 import jakarta.persistence.*;
 import lombok.*;
 
-@Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Setter
 @Getter
+@Entity
+@Table(name = "book_tags")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class BookTag {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

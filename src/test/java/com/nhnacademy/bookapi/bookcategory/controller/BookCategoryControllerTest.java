@@ -101,7 +101,7 @@ class BookCategoryControllerTest {
 
     @Test
     @DisplayName("카테고리 생성 - 유효성 검사 실패")
-    void createCategoryValidFailTest() throws Exception {
+    void createCategory_validFail() throws Exception {
         BookCategoryCreateRequest request = new BookCategoryCreateRequest(null, null);
 
         mockMvc.perform(post("/categories")
@@ -150,8 +150,8 @@ class BookCategoryControllerTest {
                 any(BookCategoryUpdateRequest.class))).willReturn(updated);
 
         mockMvc.perform(put("/categories/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.categoryId").value(1L))
                 .andExpect(jsonPath("$.categoryName").value("Updated"));
@@ -159,7 +159,7 @@ class BookCategoryControllerTest {
 
     @Test
     @DisplayName("카테고리 수정 - 유효성 검사 실패")
-    void updateCategoryValidFailTest() throws Exception {
+    void updateCategory_validFail() throws Exception {
         BookCategoryUpdateRequest request = new BookCategoryUpdateRequest(null, null);
 
         mockMvc.perform(put("/categories/1")
