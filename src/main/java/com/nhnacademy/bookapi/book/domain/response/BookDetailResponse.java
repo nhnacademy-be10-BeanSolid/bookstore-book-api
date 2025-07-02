@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
-import com.nhnacademy.bookapi.booklike.domain.BookLike;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
 
 import java.time.LocalDate;
@@ -36,9 +35,10 @@ public record BookDetailResponse(
 
         Set<String> bookCategories,
         Set<String> bookTags,
-        Set<String> likedUsers
+
+        int likeCount
 ) {
-    public static BookDetailResponse from (Book book) {
+    public static BookDetailResponse from (Book book, int likeCount) {
         Set<String> categories = book.getBookCategories()
                 .stream()
                 .map(BookCategory::getName)
@@ -49,10 +49,6 @@ public record BookDetailResponse(
                 .map(BookTag::getName)
                 .collect(Collectors.toSet());
 
-        Set<String> likeUsers = book.getBookLikes()
-                .stream()
-                .map(BookLike::getUserId)
-                .collect(Collectors.toSet());
 
         return new BookDetailResponse(
                 book.getId(),
@@ -73,6 +69,6 @@ public record BookDetailResponse(
                 book.getImage(),
                 categories,
                 tags,
-                likeUsers);
+                likeCount);
     }
 }

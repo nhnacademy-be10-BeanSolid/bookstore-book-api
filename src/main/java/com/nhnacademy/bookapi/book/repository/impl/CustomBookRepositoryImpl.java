@@ -48,18 +48,24 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
         QBook book = QBook.book;
         QBookTag tag = QBookTag.bookTag;
         QBookCategory category = QBookCategory.bookCategory;
-        QBookLike likes = QBookLike.bookLike;
+        QBookLike like = QBookLike.bookLike;
 
         Book result = queryFactory
                 .selectFrom(book)
                 .leftJoin(book.bookTags, tag).fetchJoin()
                 .leftJoin(book.bookCategories, category).fetchJoin()
-                .leftJoin(book.bookLikes, likes).fetchJoin()
                 .where(book.id.eq(bookId))
                 .distinct()
                 .fetchOne();
 
-        return Optional.ofNullable(result).map(BookDetailResponse::from);
+        Long likeCount = queryFactory
+                .select(like.count())
+                .from(like)
+                .where(like.book.id.eq(bookId))
+                .fetchOne();
+
+        return Optional.ofNullable(result)
+                .map(b -> BookDetailResponse.from(b, likeCount != null ? likeCount.intValue() : 0));
     }
 
     @Override

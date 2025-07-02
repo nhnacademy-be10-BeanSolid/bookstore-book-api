@@ -9,6 +9,8 @@ import com.nhnacademy.bookapi.booklike.exception.BookLikeAlreadyExistsException;
 import com.nhnacademy.bookapi.booklike.exception.BookLikeNotFoundException;
 import com.nhnacademy.bookapi.booklike.repository.BookLikeRepository;
 import com.nhnacademy.bookapi.booklike.service.BookLikeService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -43,18 +45,18 @@ public class BookLikeServiceImpl implements BookLikeService {
     // 유저별 좋아요 조회
     @Override
     @Transactional(readOnly = true)
-    public List<BookLikeResponse> getBookLikesByUserId(String userId) {
-        return bookLikeRepository.findBookLikeResponsesByUserId(userId);
+    public Page<BookLikeResponse> getBookLikesByUserId(String userId, Pageable pageable) {
+        return bookLikeRepository.findBookLikeResponsesByUserId(userId, pageable);
     }
 
     // 도서별 좋아요 조회
     @Override
     @Transactional(readOnly = true)
-    public List<BookLikeResponse> getBookLikesByBookId(Long bookId) {
+    public Page<BookLikeResponse> getBookLikesByBookId(Long bookId, Pageable pageable) {
         if(!bookLikeRepository.existsByBookId(bookId)) {
             throw new BookNotFoundException(bookId);
         }
-        return bookLikeRepository.findBookLikeResponsesByBookId(bookId);
+        return bookLikeRepository.findBookLikeResponsesByBookId(bookId, pageable);
     }
 
     // 유저 아이디와 도서 아이디로 좋아요 삭제

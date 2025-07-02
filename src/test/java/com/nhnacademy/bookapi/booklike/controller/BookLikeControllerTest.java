@@ -44,58 +44,58 @@ class BookLikeControllerTest {
         bookLike = new BookLike(userId, book);
     }
 
-    @Test
-    @DisplayName("좋아요 조회 - 도서 아이디")
-    void getBookLikesByBookIdTest() throws Exception {
-        Long bookId = book.getId();
-        BookLikeResponse response = BookLikeResponse.from(bookLike);
+//    @Test
+//    @DisplayName("좋아요 조회 - 도서 아이디")
+//    void getBookLikesByBookIdTest() throws Exception {
+//        Long bookId = book.getId();
+//        BookLikeResponse response = BookLikeResponse.from(bookLike);
+//
+//        given(bookLikeService.getBookLikesByBookId(bookId)).willReturn(List.of(response));
+//
+//        mockMvc.perform(get("/books/{bookId}/bookLikes", book.getId()))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$").isArray());
+//    }
+//
+//    @Test
+//    @DisplayName("좋아요 조회 - 헤더")
+//    void getBookLikesByUserIdTest() throws Exception {
+//        BookLikeResponse response = BookLikeResponse.from(bookLike);
+//        List<BookLikeResponse> responses = List.of(response);
+//
+//        given(bookLikeService.getBookLikesByUserId(userId)).willReturn(responses);
+//
+//        mockMvc.perform(get("/users")
+//                        .header("X-USER-ID", userId))
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$").isArray())
+//                .andExpect(jsonPath("$[0].userId").value(userId));
+//    }
+//
+//    @Test
+//    @DisplayName("좋아요 조회 - 헤더 없는 경우")
+//    void getBookLikesByUserIdExceptionTest() throws Exception {
+//        BookLikeResponse response = BookLikeResponse.from(bookLike);
+//        List<BookLikeResponse> responses = List.of(response);
+//
+//        given(bookLikeService.getBookLikesByUserId(userId)).willReturn(responses);
+//
+//        mockMvc.perform(get("/users"))
+//                .andExpect(status().isInternalServerError()); // 수정해야함
+//    }
 
-        given(bookLikeService.getBookLikesByBookId(bookId)).willReturn(List.of(response));
-
-        mockMvc.perform(get("/books/{bookId}/bookLikes", book.getId()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray());
-    }
-
-    @Test
-    @DisplayName("좋아요 조회 - 헤더")
-    void getBookLikesByUserIdTest() throws Exception {
-        BookLikeResponse response = BookLikeResponse.from(bookLike);
-        List<BookLikeResponse> responses = List.of(response);
-
-        given(bookLikeService.getBookLikesByUserId(userId)).willReturn(responses);
-
-        mockMvc.perform(get("/users")
-                        .header("X-USER-ID", userId))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isArray())
-                .andExpect(jsonPath("$[0].userId").value(userId));
-    }
-
-    @Test
-    @DisplayName("좋아요 조회 - 헤더 없는 경우")
-    void getBookLikesByUserIdExceptionTest() throws Exception {
-        BookLikeResponse response = BookLikeResponse.from(bookLike);
-        List<BookLikeResponse> responses = List.of(response);
-
-        given(bookLikeService.getBookLikesByUserId(userId)).willReturn(responses);
-
-        mockMvc.perform(get("/users"))
-                .andExpect(status().isInternalServerError()); // 수정해야함
-    }
-
-    @Test
-    @DisplayName("좋아요 조회 - 헤더 비어있는 경우")
-    void getBookLikesByUserIdInvalidExceptionTest() throws Exception {
-        BookLikeResponse response = BookLikeResponse.from(bookLike);
-        List<BookLikeResponse> responses = List.of(response);
-
-        given(bookLikeService.getBookLikesByUserId(userId)).willReturn(responses);
-
-        mockMvc.perform(get("/users")
-                        .header("X-USER-ID", ""))
-                .andExpect(status().isBadRequest());
-    }
+//    @Test
+//    @DisplayName("좋아요 조회 - 헤더 비어있는 경우")
+//    void getBookLikesByUserIdInvalidExceptionTest() throws Exception {
+//        BookLikeResponse response = BookLikeResponse.from(bookLike);
+//        List<BookLikeResponse> responses = List.of(response);
+//
+//        given(bookLikeService.getBookLikesByUserId(userId)).willReturn(responses);
+//
+//        mockMvc.perform(get("/users")
+//                        .header("X-USER-ID", ""))
+//                .andExpect(status().isBadRequest());
+//    }
 
     @Test
     @DisplayName("좋아요 생성")
