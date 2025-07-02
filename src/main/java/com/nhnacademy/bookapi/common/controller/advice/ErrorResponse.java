@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.advice;
+package com.nhnacademy.bookapi.common.controller.advice;
 
 import lombok.Getter;
 

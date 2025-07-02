@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.advice;
+package com.nhnacademy.bookapi.common.controller.advice;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;

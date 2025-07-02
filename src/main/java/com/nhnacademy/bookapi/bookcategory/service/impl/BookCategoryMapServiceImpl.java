@@ -34,7 +34,7 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
 
         int categoryCount = bookRepository.countBookCategoryByBookId(bookId);
         if (categoryCount >= 10) {
-            throw new BookCategoryMapCreateException(bookId, book.getTitle());
+            throw new BookCategoryMapCreateException(bookId);
         }
 
         BookCategory category = bookCategoryRepository.findById(request.categoryId())

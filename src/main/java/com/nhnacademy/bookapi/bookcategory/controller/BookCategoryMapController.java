@@ -1,6 +1,6 @@
 package com.nhnacademy.bookapi.bookcategory.controller;
 
-import com.nhnacademy.bookapi.advice.ValidationFailedException;
+import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryMapCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryMapService;
@@ -23,7 +23,7 @@ public class BookCategoryMapController {
                                                                          @Valid @RequestBody BookCategoryMapCreateRequest request,
                                                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ValidationFailedException();
+            throw new ValidationFailedException(bindingResult);
         }
         BookCategoryMapResponse response = bookCategoryMapService.createBookCategoryMap(bookId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);

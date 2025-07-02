@@ -1,6 +1,6 @@
 package com.nhnacademy.bookapi.booktag.controller;
 
-import com.nhnacademy.bookapi.advice.ValidationFailedException;
+import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagUpdateRequest;
@@ -14,7 +14,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
-import java.util.List;
 
 @RestController
 @RequestMapping("/book-tags")
@@ -38,7 +37,7 @@ public class BookTagController {
     public ResponseEntity<BookTagResponse> createBookTag(@Valid @RequestBody BookTagCreateRequest request,
                                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ValidationFailedException();
+            throw new ValidationFailedException(bindingResult);
         }
         BookTagResponse response = bookTagService.createBookTag(request);
         URI location = URI.create("/book-tags/" + response.tagId());
@@ -50,7 +49,7 @@ public class BookTagController {
                                                          @Valid @RequestBody BookTagUpdateRequest request,
                                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ValidationFailedException();
+            throw new ValidationFailedException(bindingResult);
         }
         BookTagResponse response = bookTagService.updateBookTag(tagId, request);
         return ResponseEntity.ok(response);

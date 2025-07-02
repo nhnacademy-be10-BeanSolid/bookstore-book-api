@@ -1,7 +1,7 @@
 package com.nhnacademy.bookapi.booklike.repository;
 
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
-import com.nhnacademy.bookapi.config.QuerydslConfig;
+import com.nhnacademy.bookapi.common.config.QuerydslConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;

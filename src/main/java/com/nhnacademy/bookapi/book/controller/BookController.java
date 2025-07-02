@@ -4,7 +4,7 @@ import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.*;
-import com.nhnacademy.bookapi.advice.ValidationFailedException;
+import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.book.feignclient.BookSearchApiService;
 import com.nhnacademy.bookapi.document.BookDocument;
@@ -52,7 +52,7 @@ public class BookController {
     public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookCreateRequest request,
                                                    BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ValidationFailedException();
+            throw new ValidationFailedException(bindingResult);
         }
         BookResponse response = bookService.createBook(request);
         URI location = URI.create("/books/" + response.id());
@@ -64,7 +64,7 @@ public class BookController {
                                                          @Valid @RequestBody BookUpdateRequest request,
                                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ValidationFailedException();
+            throw new ValidationFailedException(bindingResult);
         }
         BookDetailResponse response = bookService.updateBook(bookId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -96,7 +96,7 @@ public class BookController {
     public ResponseEntity<Void> stockUpdate(@RequestBody List<BookStockReduceRequest> request,
                                             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ValidationFailedException();
+            throw new ValidationFailedException(bindingResult);
         }
         bookService.updateBookStock(request);
         return ResponseEntity.status(HttpStatus.OK).build();

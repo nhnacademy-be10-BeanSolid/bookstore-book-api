@@ -67,16 +67,4 @@ public class BookLikeServiceImpl implements BookLikeService {
         }
         bookLikeRepository.deleteByUserIdAndBookId(userId, bookId);
     }
-
-    // 도서 아이디로 삭제
-    @Override
-    public void deleteBookLikeByBookId(Long bookId) {
-        if(!bookRepository.existsById(bookId)) {
-            throw new BookNotFoundException(bookId);
-        }
-        if(!bookLikeRepository.existsByBookId(bookId)) {
-            throw new BookLikeNotFoundException(bookId);
-        }
-        bookLikeRepository.deleteByBookId(bookId);
-    }
 }

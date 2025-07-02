@@ -1,13 +1,9 @@
 package com.nhnacademy.bookapi.bookcategory.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import com.nhnacademy.bookapi.common.exception.ConflictException;
 
-@ResponseStatus(HttpStatus.CONFLICT)
-public class BookCategoryMapAlreadyExistsException extends RuntimeException {
-
+public class BookCategoryMapAlreadyExistsException extends ConflictException {
     public BookCategoryMapAlreadyExistsException(Long bookId, Long categoryId) {
         super(String.format("Book id %s category id %s already exists", bookId, categoryId));
     }
-
 }

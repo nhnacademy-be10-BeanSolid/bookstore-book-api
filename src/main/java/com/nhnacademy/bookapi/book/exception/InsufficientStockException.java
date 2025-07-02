@@ -1,7 +1,9 @@
 package com.nhnacademy.bookapi.book.exception;
 
-public class InsufficientStockException extends RuntimeException {
+import com.nhnacademy.bookapi.common.exception.BadRequestException;
+
+public class InsufficientStockException extends BadRequestException {
     public InsufficientStockException(Long bookId) {
-        super(String.format("아이디 %d에 해당하는 도서는 재고가 부족합니다.", bookId));
+        super(String.format("Book ID %d has insufficient stock", bookId));
     }
 }

@@ -1,6 +1,6 @@
 package com.nhnacademy.bookapi.bookcategory.controller;
 
-import com.nhnacademy.bookapi.advice.ValidationFailedException;
+import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
@@ -45,7 +45,7 @@ public class BookCategoryController {
     public ResponseEntity<BookCategoryResponse> createCategory(@Valid @RequestBody BookCategoryCreateRequest request,
                                                                BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ValidationFailedException();
+            throw new ValidationFailedException(bindingResult);
         }
         BookCategoryResponse response = bookCategoryService.createCategory(request);
         URI location = URI.create("/categories/" + response.categoryId());
@@ -58,7 +58,7 @@ public class BookCategoryController {
                                                                @Valid @RequestBody BookCategoryUpdateRequest request,
                                                                BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ValidationFailedException();
+            throw new ValidationFailedException(bindingResult);
         }
         BookCategoryResponse response = bookCategoryService.updateCategory(categoryId, request);
 

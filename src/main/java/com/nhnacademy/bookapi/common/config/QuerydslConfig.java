@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.config;
+package com.nhnacademy.bookapi.common.config;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import jakarta.persistence.EntityManager;

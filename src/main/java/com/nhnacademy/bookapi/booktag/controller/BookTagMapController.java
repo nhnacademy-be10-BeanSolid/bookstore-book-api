@@ -1,6 +1,6 @@
 package com.nhnacademy.bookapi.booktag.controller;
 
-import com.nhnacademy.bookapi.advice.ValidationFailedException;
+import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagMapCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.nhnacademy.bookapi.booktag.service.BookTagMapService;
@@ -23,7 +23,7 @@ public class BookTagMapController {
                                                                @Valid @RequestBody BookTagMapCreateRequest request,
                                                                BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ValidationFailedException();
+            throw new ValidationFailedException(bindingResult);
         }
         BookTagMapResponse response = bookTagMapService.createBookTag(bookId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
