@@ -1,8 +1,10 @@
 package com.nhnacademy.bookapi.booklike.service;
 
 import com.nhnacademy.bookapi.book.domain.Book;
+import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 import com.nhnacademy.bookapi.booklike.domain.BookLike;
 import com.nhnacademy.bookapi.booklike.exception.BookLikeAlreadyExistsException;
@@ -19,8 +21,11 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -49,20 +54,29 @@ class BookLikeServiceImplTest {
         userId = "user1";
         userId1 = "user2";
 
-        book = Book.builder()
-                .title("타이틀")
-                .description("설명")
-                .toc("목차")
-                .publisher("출판사")
-                .author("작가")
-                .publishedDate(LocalDate.now())
-                .isbn("test000000000")
-                .originalPrice(10000)
-                .salePrice(5000)
-                .wrappable(false)
-                .stock(100)
-                .build();
-        ReflectionTestUtils.setField(book, "id", 1L);
+        BookCategory category = new BookCategory(1L, "소설", null);
+
+        book = new Book(
+                1L,
+                "타이틀",
+                "설명",
+                "목차",
+                "작가",
+                "출판사",
+                LocalDate.of(2020, 10, 19),
+                "test000000000",
+                10000,
+                5000,
+                false,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                BookStatus.ON_SALE,
+                100,
+                null,
+                new HashSet<>(),
+                Set.of(category),
+                new HashSet<>()
+        );
         bookLike = new BookLike(userId, book);
         bookLike1 = new BookLike(userId1, book);
     }

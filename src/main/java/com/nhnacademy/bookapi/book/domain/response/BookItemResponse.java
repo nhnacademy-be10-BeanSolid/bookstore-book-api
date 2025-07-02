@@ -5,7 +5,7 @@ import lombok.Data;
 // 개별 검색 결과
 
 @Data
-public class BookItem {
+public class BookItemResponse {
 
     private String title;
 

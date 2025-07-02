@@ -1,5 +1,7 @@
 package com.nhnacademy.bookapi.book.domain;
 
+import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
+import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.booklike.domain.BookLike;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
@@ -11,15 +13,16 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-@Builder
-@Getter
+// setter 사용 x
 @Setter
+@Getter
 @Entity
-@Table(name = "book")
+@Table(name = "books", uniqueConstraints = {
+        @UniqueConstraint(columnNames = "isbn")
+})
 @NoArgsConstructor
 @AllArgsConstructor
 public class Book {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "book_id")
@@ -28,6 +31,7 @@ public class Book {
     @Column(nullable = false)
     private String title;
 
+    @Column(columnDefinition = "TEXT")
     private String description;
 
     private String toc;
@@ -38,10 +42,10 @@ public class Book {
     @Column(nullable = false)
     private String publisher;
 
-    @Column(name = "pulisher_at", nullable = false)
-    private LocalDate publishedDate;
+    @Column(name = "publish_at", nullable = false)
+    private LocalDate publishAt;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String isbn;
 
     @Column(name = "price_original", nullable = false)
@@ -54,21 +58,21 @@ public class Book {
     private boolean wrappable;
 
     @Column(name = "create_at", nullable = false)
-    @Builder.Default
-    private LocalDateTime createAt = LocalDateTime.now();
+    private LocalDateTime createAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updateAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    @Builder.Default
-    private BookStatus status = BookStatus.ON_SALE;
+    private BookStatus status;
 
     @Column(nullable = false)
     private int stock;
 
-    @Builder.Default
+    @Column(columnDefinition = "TEXT")
+    private String image;
+
     @ManyToMany
     @JoinTable(
             name = "book_tag_map",
@@ -77,7 +81,6 @@ public class Book {
     )
     private Set<BookTag> bookTags = new HashSet<>();
 
-    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "book_category_map",
@@ -86,6 +89,53 @@ public class Book {
     )
     private Set<BookCategory> bookCategories = new HashSet<>();
 
+    // CascadeType
     @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<BookLike> bookLikes = new HashSet<>();
+
+    public static Book from(BookCreateRequest request, Set<BookCategory> categories) {
+        Book book = new Book();
+        book.title = request.title();
+        book.description = request.description();
+        book.publisher = request.publisher();
+        book.author = request.author();
+        book.publishAt = request.publishAt();
+        book.isbn = request.isbn();
+        book.originalPrice = request.originalPrice();
+        book.salePrice = request.salePrice();
+        book.wrappable = request.wrappable();
+        book.stock = request.stock();
+        book.image = request.image();
+        book.status = BookStatus.ON_SALE;
+        book.bookCategories = categories;
+        return book;
+    }
+
+    public void updateFrom(BookUpdateRequest request) {
+        this.title = request.title();
+        this.description = request.description();
+        this.toc = request.toc();
+        this.publisher = request.publisher();
+        this.author = request.author();
+        this.publishAt = request.publishAt();
+        this.originalPrice = request.originalPrice();
+        this.salePrice = request.salePrice();
+        this.wrappable = request.wrappable();
+        this.status = BookStatus.from(request.status());
+        this.stock = request.stock();
+    }
+
+    @PrePersist
+    public void prePersist() {
+        LocalDateTime now = LocalDateTime.now();
+        this.createAt = now;
+        this.updateAt = now;
+        this.status = BookStatus.ON_SALE;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.updateAt = LocalDateTime.now();
+    }
+
 }

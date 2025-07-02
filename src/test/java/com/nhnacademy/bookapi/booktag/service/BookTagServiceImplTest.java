@@ -14,6 +14,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -21,8 +25,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class BookTagServiceImplTest {
@@ -36,17 +39,21 @@ class BookTagServiceImplTest {
     @Test
     @DisplayName("전체 조회")
     void getBookTags() {
+        Pageable pageable = PageRequest.of(0, 10);
         List<BookTagResponse> response = List.of(
                 new BookTagResponse(1L, "tag1"),
                 new BookTagResponse(2L, "tag2")
         );
+        Page<BookTagResponse> result = new PageImpl<>(response, pageable, response.size());
 
-        when(bookTagRepository.findAllBookTagResponses()).thenReturn(response);
+        when(bookTagRepository.findAllBookTagResponses(pageable)).thenReturn(result);
 
-        List<BookTagResponse> tags = bookTagService.getBookTags();
+        Page<BookTagResponse> tags = bookTagService.getBookTags(pageable);
 
-        assertThat(tags).hasSize(2);
-        verify(bookTagRepository).findAllBookTagResponses();
+        assertThat(tags.getContent()).hasSize(2);
+        assertThat(tags.getContent())
+                .extracting(BookTagResponse::tagName)
+                .containsExactlyInAnyOrder("tag1", "tag2");
     }
 
     @Test
@@ -61,13 +68,12 @@ class BookTagServiceImplTest {
     }
 
     @Test
-    @DisplayName("태그 생성 - 이미 존재하는 태그")
-    void createBookTag_duplicateName() {
-        when(bookTagRepository.existsBookTagByName("tag1")).thenReturn(true);
+    @DisplayName("태그 조회 - 존재하지 않는 태그")
+    void getBookTag_notFound() {
+        when(bookTagRepository.findBookTagResponseById(1L)).thenReturn(Optional.empty());
 
-        BookTagCreateRequest request = new BookTagCreateRequest("tag1");
-        assertThatThrownBy(() -> bookTagService.createBookTag(request))
-                .isInstanceOf(BookTagAlreadyExistsException.class);
+        assertThatThrownBy(() -> bookTagService.getBookTag(1L))
+                .isInstanceOf(BookTagNotFoundException.class);
     }
 
     @Test
@@ -79,24 +85,22 @@ class BookTagServiceImplTest {
         BookTag saved = new BookTag(1L,"tag1");
 
         when(bookTagRepository.save(any(BookTag.class))).thenReturn(saved);
-        when(bookTagRepository.findBookTagResponseById(1L)).thenReturn(Optional.of(new BookTagResponse(1L, "tag1")));
+        when(bookTagRepository.findBookTagResponseById(1L))
+                .thenReturn(Optional.of(new BookTagResponse(1L, "tag1")));
 
         BookTagResponse response = bookTagService.createBookTag(request);
 
-        assertThat(response.name()).isEqualTo("tag1");
-        verify(bookTagRepository).save(any(BookTag.class));
+        assertThat(response.tagName()).isEqualTo("tag1");
     }
 
     @Test
-    @DisplayName("업데이트 - 중복 이름")
-    void updateBookTag_duplicateName() {
-        BookTag tag = new BookTag(1L, "tag");
-        BookTagUpdateRequest request = new BookTagUpdateRequest("tag1");
-
-        when(bookTagRepository.findById(1L)).thenReturn(Optional.of(tag));
+    @DisplayName("태그 생성 - 존재하는 태그")
+    void createBookTag_duplicateName() {
         when(bookTagRepository.existsBookTagByName("tag1")).thenReturn(true);
 
-        assertThatThrownBy(() -> bookTagService.updateBookTag(1L, request))
+        BookTagCreateRequest request = new BookTagCreateRequest("tag1");
+
+        assertThatThrownBy(() -> bookTagService.createBookTag(request))
                 .isInstanceOf(BookTagAlreadyExistsException.class);
     }
 
@@ -113,7 +117,40 @@ class BookTagServiceImplTest {
 
         BookTagResponse updatedResponse = bookTagService.updateBookTag(1L, request);
 
-        assertThat(updatedResponse.name()).isEqualTo("tag1");
+        assertThat(updatedResponse.tagName()).isEqualTo("tag1");
+    }
+
+    @Test
+    @DisplayName("업데이트 - 존재하지 않는 태그 요청")
+    void updateBookTag_notFound() {
+        when(bookTagRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookTagService.updateBookTag(1L, new BookTagUpdateRequest("tag1")))
+                .isInstanceOf(BookTagNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("업데이트 - 중복 이름")
+    void updateBookTag_duplicateName() {
+        BookTag tag = new BookTag(1L, "tag");
+        BookTagUpdateRequest request = new BookTagUpdateRequest("tag1");
+
+        when(bookTagRepository.findById(1L)).thenReturn(Optional.of(tag));
+        when(bookTagRepository.existsBookTagByName("tag1")).thenReturn(true);
+
+        assertThatThrownBy(() -> bookTagService.updateBookTag(1L, request))
+                .isInstanceOf(BookTagAlreadyExistsException.class);
+    }
+
+    @Test
+    @DisplayName("삭제")
+    void deleteBookTag_success() {
+        when(bookTagRepository.existsById(1L)).thenReturn(true);
+        doNothing().when(bookTagRepository).deleteById(1L);
+
+        bookTagService.deleteBookTag(1L);
+
+        verify(bookTagRepository).deleteById(1L);
     }
 
     @Test
@@ -123,16 +160,6 @@ class BookTagServiceImplTest {
 
         assertThatThrownBy(() -> bookTagService.deleteBookTag(1L))
                 .isInstanceOf(BookTagNotFoundException.class);
-    }
-
-    @Test
-    @DisplayName("삭제")
-    void deleteBookTag_success() {
-        when(bookTagRepository.existsById(1L)).thenReturn(true);
-
-        bookTagService.deleteBookTag(1L);
-
-        verify(bookTagRepository).deleteById(1L);
     }
 
     @Test
@@ -150,5 +177,4 @@ class BookTagServiceImplTest {
 
         assertThat(bookTagService.existsBookTag("tag1")).isTrue();
     }
-
 }

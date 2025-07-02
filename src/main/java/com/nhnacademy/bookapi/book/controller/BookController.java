@@ -1,13 +1,12 @@
 package com.nhnacademy.bookapi.book.controller;
 
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
+import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
-import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
-import com.nhnacademy.bookapi.book.domain.response.BookResponse;
-import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
+import com.nhnacademy.bookapi.book.domain.response.*;
 import com.nhnacademy.bookapi.advice.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
-import com.nhnacademy.bookapi.book.service.BookSearchApiService;
+import com.nhnacademy.bookapi.book.feignclient.BookSearchApiService;
 import com.nhnacademy.bookapi.document.BookDocument;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +17,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -34,23 +36,15 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.OK).body(naverBookSearchService.searchBook(query, start));
     }
 
-    // /books/ids?ids=
+    @GetMapping("/books")
+    public ResponseEntity<Page<BookResponse>> getAllBookResponses(Pageable pageable) {
+        Page<BookResponse> responses = bookService.getAllBooks(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(responses);
+    }
 
     @GetMapping("/books/{id}")
     public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
         BookDetailResponse response = bookService.getBookDetailResponseByBookId(id);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @GetMapping("/authors/{author}")
-    public ResponseEntity<Page<BookResponse>> getBooksByAuthor(@PathVariable String author, Pageable pageable) {
-        Page<BookResponse> response = bookService.getBooksResponseByAuthor(author, pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @GetMapping("/publishers/{publisher}")
-    public ResponseEntity<Page<BookResponse>> getBooksByPublisher(@PathVariable String publisher, Pageable pageable) {
-        Page<BookResponse> response = bookService.getBooksResponseByPublisher(publisher, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -61,17 +55,18 @@ public class BookController {
             throw new ValidationFailedException();
         }
         BookResponse response = bookService.createBook(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        URI location = URI.create("/books/" + response.id());
+        return ResponseEntity.created(location).body(response);
     }
 
-    @PatchMapping("/books/{bookId}")
-    public ResponseEntity<BookResponse> updateBook(@PathVariable Long bookId,
-                                                   @Valid @RequestBody BookUpdateRequest request,
-                                                   BindingResult bindingResult) {
+    @PutMapping("/books/{bookId}")
+    public ResponseEntity<BookDetailResponse> updateBook(@PathVariable Long bookId,
+                                                         @Valid @RequestBody BookUpdateRequest request,
+                                                         BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException();
         }
-        BookResponse response = bookService.updateBook(bookId, request);
+        BookDetailResponse response = bookService.updateBook(bookId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -81,34 +76,29 @@ public class BookController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/search")
-    public ResponseEntity<Page<BookResponse>> getBooksResponseByTag(@RequestParam String tag, Pageable pageable) {
-        log.info("컨트롤러 시작   Request to get Books by tag {}", tag);
-        Page<BookResponse> response = bookService.getBooksResponseByTag(tag, pageable);
+    // 주문 api 전달
+    @GetMapping("/books/ids")
+    public ResponseEntity<List<BookOrderResponse>> getBookOrderResponse(@RequestParam List<Long> ids) {
+        log.info("요청!");
+        List<BookOrderResponse> response = bookService.getBookOrderResponseByBookIds(ids);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-//    @GetMapping("/searcht")
-//    public ResponseEntity<Page<BookResponse>> getBooksResponseByTitle(@RequestParam String title, Pageable pageable) {
-//        Page<BookResponse> response = bookService.getBookResponseByTitle(title, pageable);
-//        return ResponseEntity.status(HttpStatus.OK).body(response);
-//    }
-//
-//    @GetMapping("/searchd")
-//    public ResponseEntity<Page<BookResponse>> getBooksResponseByDescription(@RequestParam String description, Pageable pageable) {
-//        Page<BookResponse> response = bookService.getBookResponseByDescription(description, pageable);
-//        return ResponseEntity.status(HttpStatus.OK).body(response);
-//    }
-
-    @GetMapping("/books")
-    public ResponseEntity<Page<BookResponse>> getAllBookResponse(Pageable pageable) {
-        Page<BookResponse> responses = bookService.getAllBooks(pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(responses);
-    }
-
-    @GetMapping("/searcha")
+    // 엘라스틱 서치
+    @GetMapping("/search")
     public ResponseEntity<Page<BookDocument>> getBookDocumentByKeyword(@RequestParam String keyword, Pageable pageable) {
         Page<BookDocument> response = bookService.getBookDocumentByKeyword(keyword, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    // 재고 최신화
+    @PatchMapping("/book-reduce")
+    public ResponseEntity<Void> stockUpdate(@RequestBody List<BookStockReduceRequest> request,
+                                            BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationFailedException();
+        }
+        bookService.updateBookStock(request);
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }

@@ -3,59 +3,56 @@ POST http://localhost:10346/books
 Content-Type: application/json
 
 {
-  "title" : "book1",
-  "description": "저어어어엉말 유익한 책",
-  "publisher": "pub1",
-  "author": "Lee",
-  "publishedDate": "2025-06-09",
-  "isbn": "isbn001111117",
-  "originalPrice": 1000,
-  "salePrice": 500,
-  "wrappable": false,
-  "stock": 100
-}
-
-### 도서 추가
-POST http://localhost:10346/books
-Content-Type: application/json
-
-{
-  "title": "출판사A의 전략",
-  "description": "책입니다",
+  "title": "만화",
+  "description": "재미없다",
   "publisher": "출판사A",
-  "author": "작가DAAAA",
-  "publishedDate": "2025-06-21",
-  "isbn": "isbn900000021",
+  "author": "이",
+  "publishAt": "2025-06-21",
+  "isbn": "isbn900000040",
   "originalPrice": 18000,
   "salePrice": 14000,
   "wrappable": true,
   "stock": 20,
-  "categoryIds": [1]
+  "categoryIds": [40]
 }
 
 ### ID로 도서 찾기(상세정보, 좋아요한 유저아이디까지)
-GET http://localhost:10346/books/1
-
-### 작가로 도서 찾기
-GET http://localhost:10346/authors/Lee
-
-### 출판사로 도서 찾기
-GET http://localhost:10346/publishers/pub1?page=0&size=2
+GET http://localhost:10346/books/76
 
 ### 도서 업데이트
-PATCH http://localhost:10346/books/1
+PUT http://localhost:10346/books/1
 Content-Type: application/json
 
 {
   "title": "수정 제목",
+  "description": "수정 설명",
+  "toc": "수정 목차",
+  "publisher": "출판사A",
+  "author": "이",
+  "publishedDate": "2025-06-21",
+  "originalPrice": 18000,
+  "salePrice": 14000,
+  "wrappable": true,
+  "stock": 20,
   "status": "sale_end"
 }
 
 ### 도서 삭제
-DELETE http://localhost:10346/books/56
-
-### 태그로 도서 검색
-GET http://localhost:10346/search?tag=테스트
+DELETE http://localhost:10346/books/1
 
 ### 샵 메인페이지 도서 출력
 GET http://localhost:10346/shop
+
+### 정보 전달 테스트
+GET http://localhost:10346/books/ids?ids=2,3
+
+### 재고 차감 테스트
+PATCH http://localhost:10346/book-reduce
+Content-Type: application/json
+
+[
+  {"bookId": 77, "stock": 5}
+]
+
+### elasticsearch 테스트
+GET http://localhost:10346/search?keyword=테스트2

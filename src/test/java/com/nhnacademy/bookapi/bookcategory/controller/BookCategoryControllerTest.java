@@ -6,17 +6,23 @@ import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequ
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
+import com.nhnacademy.bookapi.bookcategory.service.CategoryCsvFileReadService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
@@ -31,6 +37,8 @@ class BookCategoryControllerTest {
 
     @MockBean
     BookCategoryService bookCategoryService;
+    @MockBean
+    CategoryCsvFileReadService categoryCsvFileReadService;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -38,33 +46,40 @@ class BookCategoryControllerTest {
     @Test
     @DisplayName("카테고리 전체 조회")
     void getAllCategories() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10);
+
         BookCategoryResponse parentResponse = new BookCategoryResponse(1L,
-                null, "Parent", LocalDateTime.now(), LocalDateTime.now());
-
+                "Parent", null, null, LocalDateTime.now(), LocalDateTime.now());
         BookCategoryResponse childResponse = new BookCategoryResponse(2L,
-                1L, "Child", LocalDateTime.now(), LocalDateTime.now());
+                "Child",1L,"Parent", LocalDateTime.now(), LocalDateTime.now());
+        Page<BookCategoryResponse> page = new PageImpl<>(List.of(parentResponse, childResponse), pageable, 2);
 
-        given(bookCategoryService.getAllCategories()).willReturn(List.of(parentResponse, childResponse));
+        given(bookCategoryService.getAllCategories(any(Pageable.class))).willReturn(page);
 
         mockMvc.perform(get("/categories"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(2))
-                .andExpect(jsonPath("$[0].categoryId").value(1L))
-                .andExpect(jsonPath("$[1].categoryId").value(2L));
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].categoryId").value(1L))
+                .andExpect(jsonPath("$.content[0].categoryName").value("Parent"))
+                .andExpect(jsonPath("$.content[0].parentCategoryName").isEmpty())
+                .andExpect(jsonPath("$.content[1].categoryId").value(2L))
+                .andExpect(jsonPath("$.content[1].categoryName").value("Child"))
+                .andExpect(jsonPath("$.content[1].parentCategoryName").value("Parent"));
     }
 
     @Test
     @DisplayName("카테고리 단건 조회")
     void getCategoryById() throws Exception {
         BookCategoryResponse response = new BookCategoryResponse(1L,
-                null, "Parent", LocalDateTime.now(), LocalDateTime.now());
+                "Parent", null, null, LocalDateTime.now(), LocalDateTime.now());
 
         given(bookCategoryService.getCategoryById(1L)).willReturn(response);
 
         mockMvc.perform(get("/categories/{categoryId}", 1L))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.categoryId").value(1L))
-                .andExpect(jsonPath("$.categoryName").value("Parent"));
+                .andExpect(jsonPath("$.categoryName").value("Parent"))
+                .andExpect(jsonPath("$.parentCategoryName").isEmpty());
     }
 
     @Test
@@ -72,7 +87,7 @@ class BookCategoryControllerTest {
     void createCategory() throws Exception {
         BookCategoryCreateRequest request = new BookCategoryCreateRequest("NewCategory", null);
         BookCategoryResponse response = new BookCategoryResponse(10L,
-                null, "NewCategory", LocalDateTime.now(), LocalDateTime.now());
+                "NewCategory", null, null, LocalDateTime.now(), LocalDateTime.now());
         given(bookCategoryService.createCategory(request)).willReturn(response);
 
         mockMvc.perform(post("/categories")
@@ -86,50 +101,13 @@ class BookCategoryControllerTest {
 
     @Test
     @DisplayName("카테고리 생성 - 유효성 검사 실패")
-    void createCategoryValidFailTest() throws Exception {
+    void createCategory_validFail() throws Exception {
         BookCategoryCreateRequest request = new BookCategoryCreateRequest(null, null);
 
         mockMvc.perform(post("/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("카테고리 수정")
-    void updateCategory() throws Exception {
-        BookCategoryUpdateRequest request = new BookCategoryUpdateRequest("Updated", null);
-        BookCategoryResponse updated = new BookCategoryResponse(1L, null, "Updated", LocalDateTime.now(), LocalDateTime.now());
-
-        given(bookCategoryService.updateCategory(eq(1L),
-                any(BookCategoryUpdateRequest.class))).willReturn(updated);
-
-        mockMvc.perform(patch("/categories/1")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.categoryId").value(1L))
-                .andExpect(jsonPath("$.categoryName").value("Updated"));
-    }
-
-    @Test
-    @DisplayName("카테고리 수정 - 유효성 검사 실패")
-    void updateCategoryValidFailTest() throws Exception {
-        BookCategoryUpdateRequest request = new BookCategoryUpdateRequest(null, null);
-
-        mockMvc.perform(patch("/categories/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("카테고리 삭제")
-    void deleteCategory() throws Exception {
-        willDoNothing().given(bookCategoryService).deleteCategory(1L);
-
-        mockMvc.perform(delete("/categories/1"))
-                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -147,7 +125,7 @@ class BookCategoryControllerTest {
         BookCategory child = new BookCategory("ChildCategory", parent);
         child.setCategoryId(2L);
 
-        BookCategoryResponse response = new BookCategoryResponse(2L, 1L, "ChildCategory", LocalDateTime.now(), LocalDateTime.now());
+        BookCategoryResponse response = new BookCategoryResponse(2L, "ChildCategory", 1L,"ParentCategory", LocalDateTime.now(), LocalDateTime.now());
 
         given(bookCategoryService.createCategory(any(BookCategoryCreateRequest.class)))
                 .willReturn(response);
@@ -158,7 +136,44 @@ class BookCategoryControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/categories/2"))
                 .andExpect(jsonPath("$.categoryId").value(2L))
-                .andExpect(jsonPath("$.parentId").value(1L))
+                .andExpect(jsonPath("$.parentCategoryName").value("ParentCategory"))
                 .andExpect(jsonPath("$.categoryName").value("ChildCategory"));
+    }
+
+    @Test
+    @DisplayName("카테고리 수정")
+    void updateCategory() throws Exception {
+        BookCategoryUpdateRequest request = new BookCategoryUpdateRequest("Updated", null);
+        BookCategoryResponse updated = new BookCategoryResponse(1L, "Updated", null, null, LocalDateTime.now(), LocalDateTime.now());
+
+        given(bookCategoryService.updateCategory(eq(1L),
+                any(BookCategoryUpdateRequest.class))).willReturn(updated);
+
+        mockMvc.perform(put("/categories/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.categoryId").value(1L))
+                .andExpect(jsonPath("$.categoryName").value("Updated"));
+    }
+
+    @Test
+    @DisplayName("카테고리 수정 - 유효성 검사 실패")
+    void updateCategory_validFail() throws Exception {
+        BookCategoryUpdateRequest request = new BookCategoryUpdateRequest(null, null);
+
+        mockMvc.perform(put("/categories/1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("카테고리 삭제")
+    void deleteCategory() throws Exception {
+        willDoNothing().given(bookCategoryService).deleteCategory(1L);
+
+        mockMvc.perform(delete("/categories/1"))
+                .andExpect(status().isNoContent());
     }
 }

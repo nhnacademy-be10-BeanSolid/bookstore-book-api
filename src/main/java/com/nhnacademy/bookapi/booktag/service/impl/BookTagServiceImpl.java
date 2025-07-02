@@ -9,21 +9,22 @@ import com.nhnacademy.bookapi.booktag.exception.BookTagNotFoundException;
 import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
 import com.nhnacademy.bookapi.booktag.service.BookTagService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
 
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class BookTagServiceImpl implements BookTagService {
+
     private final BookTagRepository bookTagRepository;
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookTagResponse> getBookTags() {
-        return bookTagRepository.findAllBookTagResponses();
+    public Page<BookTagResponse> getBookTags(Pageable pageable) {
+        return bookTagRepository.findAllBookTagResponses(pageable);
     }
 
     @Override
@@ -35,11 +36,11 @@ public class BookTagServiceImpl implements BookTagService {
 
     @Override
     public BookTagResponse createBookTag(BookTagCreateRequest request) {
-        if(existsBookTag(request.name())) {
-            throw new BookTagAlreadyExistsException(request.name());
+        if(existsBookTag(request.tagName())) {
+            throw new BookTagAlreadyExistsException(request.tagName());
         }
 
-        BookTag saved = bookTagRepository.save(new BookTag(request.name()));
+        BookTag saved = bookTagRepository.save(new BookTag(request.tagName()));
 
         return bookTagRepository.findBookTagResponseById(saved.getTagId())
                 .orElseThrow(() -> new BookTagNotFoundException(saved.getTagId()));

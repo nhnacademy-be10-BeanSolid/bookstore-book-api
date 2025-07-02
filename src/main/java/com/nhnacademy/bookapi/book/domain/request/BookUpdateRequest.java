@@ -1,45 +1,45 @@
 package com.nhnacademy.bookapi.book.domain.request;
 
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class BookUpdateRequest {
+public record BookUpdateRequest (
+        @NotBlank
+        @Size(max=255)
+        String title,
 
-    @Size(max=255)
-    private String title;
+        @NotBlank
+        String description,
 
-    private String description;
+        String toc,
 
-    private String toc;
+        @NotBlank
+        @Size(max=255)
+        String publisher,
 
-    @Size(max=255)
-    private String publisher;
+        @NotBlank
+        @Size(max=255)
+        String author,
 
-    @Size(max=255)
-    private String author;
+        @NotNull
+        LocalDate publishAt,
 
-    private LocalDate publishedDate;
+        @NotNull
+        @Positive
+        Integer originalPrice,
 
-    @Pattern(regexp = "^.{13}$")
-    private String isbn;
+        @NotNull
+        @Positive
+        Integer salePrice,
 
-    @Positive
-    private Integer originalPrice;
+        @NotNull
+        Boolean wrappable,
 
-    @Positive
-    private Integer salePrice;
+        @NotBlank
+        String status,
 
-    private Boolean wrappable;
-
-    private String status;
-
-    @PositiveOrZero
-    private Integer stock;
-}
+        @NotNull
+        @PositiveOrZero
+        Integer stock
+){}

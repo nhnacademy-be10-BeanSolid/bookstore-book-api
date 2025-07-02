@@ -10,6 +10,10 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -19,7 +23,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.BDDMockito.willDoNothing;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -38,30 +42,36 @@ class BookTagControllerTest {
     @Test
     @DisplayName("전체 조회")
     void getBookTags() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10);
+
         List<BookTagResponse> tags = List.of(
                 new BookTagResponse(1L, "tag1"),
                 new BookTagResponse(2L, "tag2")
         );
+        Page<BookTagResponse> page = new PageImpl<>(tags, pageable, tags.size());
 
-        given(bookTagService.getBookTags()).willReturn(tags);
+        given(bookTagService.getBookTags(any(Pageable.class))).willReturn(page);
 
         mockMvc.perform(get("/book-tags"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(2)))
-                .andExpect(jsonPath("$[0].tagId").value(1L))
-                .andExpect(jsonPath("$[0].name").value("tag1"));
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].tagId").value(1L))
+                .andExpect(jsonPath("$.content[0].tagName").value("tag1"))
+                .andExpect(jsonPath("$.content[1].tagId").value(2L))
+                .andExpect(jsonPath("$.content[1].tagName").value("tag2"));
     }
 
     @Test
     @DisplayName("단일 조회")
     void getBookTag() throws Exception {
         BookTagResponse response = new BookTagResponse(1L, "tag1");
+
         given(bookTagService.getBookTag(1L)).willReturn(response);
 
         mockMvc.perform(get("/book-tags/1"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tagId").value(1L))
-                .andExpect(jsonPath("$.name").value("tag1"));
+                .andExpect(jsonPath("$.tagName").value("tag1"));
     }
 
     @Test
@@ -69,6 +79,7 @@ class BookTagControllerTest {
     void createBookTag() throws Exception {
         BookTagCreateRequest request = new BookTagCreateRequest("tag1");
         BookTagResponse response = new BookTagResponse(1L, "tag1");
+
         given(bookTagService.createBookTag(request)).willReturn(response);
 
         mockMvc.perform(post("/book-tags")
@@ -77,7 +88,7 @@ class BookTagControllerTest {
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/book-tags/1"))
                 .andExpect(jsonPath("$.tagId").value(1L))
-                .andExpect(jsonPath("$.name").value("tag1"));
+                .andExpect(jsonPath("$.tagName").value("tag1"));
     }
 
     @Test
@@ -100,20 +111,20 @@ class BookTagControllerTest {
         given(bookTagService.updateBookTag(eq(1L), any(BookTagUpdateRequest.class)))
                 .willReturn(updateResponse);
 
-        mockMvc.perform(patch("/book-tags/1")
+        mockMvc.perform(put("/book-tags/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tagId").value(1L))
-                .andExpect(jsonPath("$.name").value("tag2"));
+                .andExpect(jsonPath("$.tagName").value("tag2"));
     }
 
     @Test
     @DisplayName("태그 수정 - 유효성 검사 실패")
     void updateBookTagValidFailTest() throws Exception {
-        BookTagUpdateRequest request = new BookTagUpdateRequest(null);
+        BookTagUpdateRequest request = new BookTagUpdateRequest("");
 
-        mockMvc.perform(patch("/book-tags/1")
+        mockMvc.perform(put("/book-tags/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isBadRequest());
@@ -122,10 +133,9 @@ class BookTagControllerTest {
     @Test
     @DisplayName("태그 삭제")
     void deleteBookTag() throws Exception {
-        doNothing().when(bookTagService).deleteBookTag(1L);
+        willDoNothing().given(bookTagService).deleteBookTag(1L);
 
         mockMvc.perform(delete("/book-tags/1"))
                 .andExpect(status().isNoContent());
     }
-
 }

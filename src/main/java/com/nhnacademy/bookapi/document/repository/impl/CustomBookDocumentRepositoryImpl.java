@@ -39,7 +39,8 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                                 "description^4",
                                 "author",
                                 "publisher",
-                                "isbn^5"
+                                "isbn^5",
+                                "tags^5"
                         )
                 ))
                 .withSort(s -> s.field(f -> f.field("id").order(SortOrder.Desc)))

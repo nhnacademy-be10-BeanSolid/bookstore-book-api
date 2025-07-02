@@ -7,11 +7,12 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-@Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 @Getter
 @Setter
+@Entity
+@Table(name = "book_categories")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class BookCategory {
 
     @Id
@@ -36,6 +37,13 @@ public class BookCategory {
     private LocalDateTime updatedAt;
 
     public BookCategory(String name, BookCategory parentCategory) {
+        this.name = name;
+        this.parentCategory = parentCategory;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public BookCategory(long id, String name, BookCategory parentCategory) {
+        this.categoryId = id;
         this.name = name;
         this.parentCategory = parentCategory;
         this.createdAt = LocalDateTime.now();

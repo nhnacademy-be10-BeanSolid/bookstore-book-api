@@ -13,14 +13,13 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 public record BookDetailResponse(
-
         Long id,
         String title,
         String description,
         String toc,
         String publisher,
         String author,
-        LocalDate publishedDate,
+        LocalDate publishAt,
         String isbn,
         int originalPrice,
         int salePrice,
@@ -33,6 +32,7 @@ public record BookDetailResponse(
 
         BookStatus status,
         int stock,
+        String image,
 
         Set<String> bookCategories,
         Set<String> bookTags,
@@ -61,7 +61,7 @@ public record BookDetailResponse(
                 book.getToc(),
                 book.getPublisher(),
                 book.getAuthor(),
-                book.getPublishedDate(),
+                book.getPublishAt(),
                 book.getIsbn(),
                 book.getOriginalPrice(),
                 book.getSalePrice(),
@@ -70,6 +70,7 @@ public record BookDetailResponse(
                 book.getUpdateAt(),
                 book.getStatus(),
                 book.getStock(),
+                book.getImage(),
                 categories,
                 tags,
                 likeUsers);

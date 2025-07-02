@@ -27,7 +27,7 @@ Content-Type: application/json
 }
 
 ### 북태그 수정
-PATCH /book-tags/1 HTTP/1.1
+PUT /book-tags/1 HTTP/1.1
 Host: localhost:10346
 Content-Type: application/json
 
@@ -41,7 +41,7 @@ DELETE /book-tags/1 HTTP/1.1
 Host: localhost:10346
 
 ### 도서에 태그 추가
-POST http://localhost:10346/books/1/tags
+POST http://localhost:10346/books/73/tags
 Content-Type: application/json
 
 {
@@ -49,9 +49,9 @@ Content-Type: application/json
 }
 
 ### 도서에 태그 추가
-POST http://localhost:10346/books/1/tags
+POST http://localhost:10346/books/76/tags
 Content-Type: application/json
 
 {
-  "tagId": 2
+  "tagId": 3
 }
