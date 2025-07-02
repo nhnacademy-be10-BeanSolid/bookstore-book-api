@@ -5,8 +5,6 @@ import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.*;
 import com.nhnacademy.bookapi.advice.ValidationFailedException;
-//import com.nhnacademy.bookapi.book.feignclient.BookSearchService;
-//import com.nhnacademy.bookapi.book.feignclient.dto.AladinItem;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.book.feignclient.BookSearchApiService;
 import com.nhnacademy.bookapi.document.BookDocument;
@@ -30,22 +28,13 @@ public class BookController {
 
     private final BookService bookService;
     private final BookSearchApiService naverBookSearchService;
-//    private final BookSearchService bookSearchService; // 알라딘용
 
     @GetMapping("/books-search")
-    public ResponseEntity<List<BookItemResponse>> searchBook(
+    public ResponseEntity<BookSearchResponse> searchBook(
             @RequestParam String query,
             @RequestParam(defaultValue = "1") int start) {
         return ResponseEntity.status(HttpStatus.OK).body(naverBookSearchService.searchBook(query, start));
     }
-
-//    @GetMapping("/books-search-aladin")
-//    public ResponseEntity<List<AladinItem>> searchBook1(
-//            @RequestParam String query,
-//            @RequestParam(defaultValue = "1") Integer start,
-//            @RequestParam(defaultValue = "10") Integer maxResults) {
-//        return ResponseEntity.status(HttpStatus.OK).body(bookSearchService.search(query, start, maxResults));
-//    }
 
     @GetMapping("/books")
     public ResponseEntity<Page<BookResponse>> getAllBookResponses(Pageable pageable) {

@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.book.feignclient;
 
 import com.nhnacademy.bookapi.book.domain.response.BookItemResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,18 +22,21 @@ public class BookSearchApiService {
     @Value("${naver-client-secret}")
     private String clientSecret;
 
-    public List<BookItemResponse> searchBook(String query, int start) {
-        List<BookItemResponse> items = naverBookClient.searchBook(clientId, clientSecret, query, start).getItems();
+    public BookSearchResponse searchBook(String query, int start) {
+        BookSearchResponse response = naverBookClient.searchBook(clientId, clientSecret, query, start);
 
-        for (BookItemResponse item : items) {
-            String pubDate = item.getPubdate();
-            if (pubDate != null && pubDate.length() == 8) {
-                String formatDate = pubDate.substring(0, 4) + "-" +
-                        pubDate.substring(4, 6) + "-" +
-                        pubDate.substring(6, 8);
-                item.setPubdate(formatDate);
+        if (response.getItems() != null) {
+            for (BookItemResponse item : response.getItems()) {
+                String pubDate = item.getPubdate();
+                if (pubDate != null && pubDate.length() == 8) {
+                    String formatDate = pubDate.substring(0, 4) + "-" +
+                            pubDate.substring(4, 6) + "-" +
+                            pubDate.substring(6, 8);
+                    item.setPubdate(formatDate);
+                }
             }
         }
-        return items;
+
+        return response;
     }
 }

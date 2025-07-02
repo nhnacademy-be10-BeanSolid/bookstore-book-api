@@ -12,7 +12,6 @@ public record BookUpdateRequest (
         @NotBlank
         String description,
 
-        @NotBlank
         String toc,
 
         @NotBlank

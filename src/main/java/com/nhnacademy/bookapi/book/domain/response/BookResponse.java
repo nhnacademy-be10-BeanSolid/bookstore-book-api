@@ -31,6 +31,7 @@ public record BookResponse(
 
     BookStatus status,
     int stock,
+    String image,
 
     Set<String> bookCategories,
     Set<String> bookTags
@@ -62,6 +63,7 @@ public static BookResponse from(Book book) {
             book.getUpdateAt(),
             book.getStatus(),
             book.getStock(),
+            book.getImage(),
             categories,
             tags);
     }
