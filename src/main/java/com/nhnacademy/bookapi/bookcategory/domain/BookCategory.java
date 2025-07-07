@@ -48,4 +48,5 @@ public class BookCategory {
         this.parentCategory = parentCategory;
         this.createdAt = LocalDateTime.now();
     }
+
 }

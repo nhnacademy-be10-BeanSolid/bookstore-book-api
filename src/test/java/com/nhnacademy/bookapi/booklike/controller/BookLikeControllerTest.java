@@ -10,12 +10,19 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.hamcrest.Matchers.hasSize;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
@@ -34,68 +41,63 @@ class BookLikeControllerTest {
 
     Book book;
     BookLike bookLike;
-    String userId;
+    BookLike bookLike2;
 
     @BeforeEach
     void setUp() {
-        userId = "user";
         book = new Book();
         ReflectionTestUtils.setField(book, "id", 1L);
-        bookLike = new BookLike(userId, book);
+        bookLike = new BookLike("user1", book);
+        bookLike2 = new BookLike("user2", book);
     }
 
-//    @Test
-//    @DisplayName("좋아요 조회 - 도서 아이디")
-//    void getBookLikesByBookIdTest() throws Exception {
-//        Long bookId = book.getId();
-//        BookLikeResponse response = BookLikeResponse.from(bookLike);
-//
-//        given(bookLikeService.getBookLikesByBookId(bookId)).willReturn(List.of(response));
-//
-//        mockMvc.perform(get("/books/{bookId}/bookLikes", book.getId()))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$").isArray());
-//    }
-//
-//    @Test
-//    @DisplayName("좋아요 조회 - 헤더")
-//    void getBookLikesByUserIdTest() throws Exception {
-//        BookLikeResponse response = BookLikeResponse.from(bookLike);
-//        List<BookLikeResponse> responses = List.of(response);
-//
-//        given(bookLikeService.getBookLikesByUserId(userId)).willReturn(responses);
-//
-//        mockMvc.perform(get("/users")
-//                        .header("X-USER-ID", userId))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$").isArray())
-//                .andExpect(jsonPath("$[0].userId").value(userId));
-//    }
-//
-//    @Test
-//    @DisplayName("좋아요 조회 - 헤더 없는 경우")
-//    void getBookLikesByUserIdExceptionTest() throws Exception {
-//        BookLikeResponse response = BookLikeResponse.from(bookLike);
-//        List<BookLikeResponse> responses = List.of(response);
-//
-//        given(bookLikeService.getBookLikesByUserId(userId)).willReturn(responses);
-//
-//        mockMvc.perform(get("/users"))
-//                .andExpect(status().isInternalServerError()); // 수정해야함
-//    }
+    @Test
+    @DisplayName("좋아요 조회 - 도서 아이디")
+    void getBookLikesByBookIdTest() throws Exception {
+        Long bookId = book.getId();
+        Pageable pageable = PageRequest.of(0, 10);
+        List<BookLikeResponse> likes = List.of(
+                BookLikeResponse.from(bookLike),
+                BookLikeResponse.from(bookLike2)
+        );
+        Page<BookLikeResponse> page = new PageImpl<>(likes, pageable, likes.size());
 
-//    @Test
-//    @DisplayName("좋아요 조회 - 헤더 비어있는 경우")
-//    void getBookLikesByUserIdInvalidExceptionTest() throws Exception {
-//        BookLikeResponse response = BookLikeResponse.from(bookLike);
-//        List<BookLikeResponse> responses = List.of(response);
-//
-//        given(bookLikeService.getBookLikesByUserId(userId)).willReturn(responses);
-//
-//        mockMvc.perform(get("/users")
-//                        .header("X-USER-ID", ""))
-//                .andExpect(status().isBadRequest());
-//    }
+        given(bookLikeService.getBookLikesByBookId(eq(bookId), any(Pageable.class))).willReturn(page);
+
+        mockMvc.perform(get("/books/{bookId}/bookLikes", bookId))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].userId").value("user1"))
+                .andExpect(jsonPath("$.content[1].userId").value("user2"));
+    }
+
+    @Test
+    @DisplayName("좋아요 조회 - 헤더")
+    void getBookLikesByUserIdTest() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10);
+        List<BookLikeResponse> likes = List.of(BookLikeResponse.from(bookLike));
+        Page<BookLikeResponse> page = new PageImpl<>(likes, pageable, likes.size());
+
+        given(bookLikeService.getBookLikesByUserId(eq("user1"), any(Pageable.class))).willReturn(page);
+
+        mockMvc.perform(get("/users")
+                        .header("X-USER-ID", "user1"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].userId").value("user1"));
+    }
+
+    @Test
+    @DisplayName("좋아요 조회 - 헤더 없는 경우")
+    void getBookLikesByUserIdExceptionTest() throws Exception {
+        Pageable pageable = PageRequest.of(0, 10);
+        List<BookLikeResponse> likes = List.of(BookLikeResponse.from(bookLike));
+        Page<BookLikeResponse> page = new PageImpl<>(likes, pageable, likes.size());
+
+        given(bookLikeService.getBookLikesByUserId(eq("user1"), any(Pageable.class))).willReturn(page);
+
+        mockMvc.perform(get("/users"))
+                .andExpect(status().isInternalServerError()); // 코드
+    }
 
     @Test
     @DisplayName("좋아요 생성")
@@ -103,15 +105,15 @@ class BookLikeControllerTest {
         Book newBook = new Book();
         ReflectionTestUtils.setField(newBook, "id", 2L);
 
-        BookLikeResponse response = new BookLikeResponse(2L, LocalDateTime.now(), userId, newBook.getId());
+        BookLikeResponse response = new BookLikeResponse(2L, LocalDateTime.now(), "user1", newBook.getId());
 
-        given(bookLikeService.createBookLike(newBook.getId(), userId)).willReturn(response);
+        given(bookLikeService.createBookLike(newBook.getId(), "user1")).willReturn(response);
 
         mockMvc.perform(post("/books/{bookId}/bookLikes", newBook.getId())
-                        .header("X-USER-ID", userId))
+                        .header("X-USER-ID", "user1"))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.bookId").value("2"))
-                .andExpect(jsonPath("$.userId").value(userId));
+                .andExpect(jsonPath("$.userId").value("user1"));
     }
 
     @Test
@@ -120,9 +122,9 @@ class BookLikeControllerTest {
         Book newBook = new Book();
         ReflectionTestUtils.setField(newBook, "id", 2L);
 
-        BookLikeResponse response = new BookLikeResponse(2L, LocalDateTime.now(), userId, newBook.getId());
+        BookLikeResponse response = new BookLikeResponse(2L, LocalDateTime.now(), "user1", newBook.getId());
 
-        given(bookLikeService.createBookLike(newBook.getId(), userId)).willReturn(response);
+        given(bookLikeService.createBookLike(newBook.getId(), "user1")).willReturn(response);
 
         mockMvc.perform(post("/books/{bookId}/bookLikes", newBook.getId()))
                 .andExpect(status().isInternalServerError()); // 수정해야함
@@ -131,19 +133,19 @@ class BookLikeControllerTest {
     @Test
     @DisplayName("삭제 - 유저,도서 아이디")
     void deleteBookLikeByUserIdAndBookIdTest() throws Exception {
-        doNothing().when(bookLikeService).deleteBookLikeByUserIdAndBookId(userId, book.getId());
+        doNothing().when(bookLikeService).deleteBookLikeByUserIdAndBookId("user1", book.getId());
 
         mockMvc.perform(delete("/books/{bookId}/bookLikes", book.getId())
-                        .header("X-USER-ID", userId))
+                        .header("X-USER-ID", "user1"))
                 .andExpect(status().isNoContent());
 
-        verify(bookLikeService).deleteBookLikeByUserIdAndBookId(userId, book.getId());
+        verify(bookLikeService).deleteBookLikeByUserIdAndBookId("user1", book.getId());
     }
 
     @Test
     @DisplayName("유저,도서 아이디 삭제 - 헤더 없는 경우")
     void deleteBookLikeByUserIdAndBookIdExceptionTest() throws Exception {
-        doNothing().when(bookLikeService).deleteBookLikeByUserIdAndBookId(userId, book.getId());
+        doNothing().when(bookLikeService).deleteBookLikeByUserIdAndBookId("user1", book.getId());
 
         mockMvc.perform(delete("/books/{bookId}/bookLikes", book.getId()))
                 .andExpect(status().isInternalServerError());

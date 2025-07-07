@@ -15,6 +15,7 @@ import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Service

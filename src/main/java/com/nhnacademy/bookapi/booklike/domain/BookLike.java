@@ -32,7 +32,7 @@ public class BookLike {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 

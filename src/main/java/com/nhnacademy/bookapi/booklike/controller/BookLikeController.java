@@ -47,8 +47,9 @@ public class BookLikeController {
     }
 
     @DeleteMapping("/books/{bookId}/bookLikes")
-    public ResponseEntity<Void> deleteBookLikeByUserIdAndBookId(@RequestHeader("X-USER-ID") String userId,
-                                                                @PathVariable Long bookId) {
+    public ResponseEntity<Void> deleteBookLikeByUserIdAndBookId(@PathVariable Long bookId,
+                                                                @RequestHeader("X-USER-ID") String userId
+                                                                ) {
         if (userId == null || userId.isBlank()) {
             throw new InvalidHeaderException();
         }

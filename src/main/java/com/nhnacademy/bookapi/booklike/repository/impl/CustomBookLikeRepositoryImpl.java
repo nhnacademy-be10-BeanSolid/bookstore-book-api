@@ -1,35 +1,35 @@
 package com.nhnacademy.bookapi.booklike.repository.impl;
 
-import com.nhnacademy.bookapi.booklike.domain.BookLike;
 import com.nhnacademy.bookapi.booklike.domain.QBookLike;
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 import com.nhnacademy.bookapi.booklike.repository.CustomBookLikeRepository;
 import com.querydsl.core.types.Projections;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 
 import java.util.List;
 import java.util.Optional;
 
-public class CustomBookLikeRepositoryImpl extends QuerydslRepositorySupport implements CustomBookLikeRepository {
+@RequiredArgsConstructor
+public class CustomBookLikeRepositoryImpl implements CustomBookLikeRepository {
 
-    public CustomBookLikeRepositoryImpl() {
-        super(BookLike.class);
-    }
+    private final JPAQueryFactory queryFactory;
 
     @Override
     public Optional<BookLikeResponse> findBookLikeResponseById(Long id) {
         QBookLike bookLike = QBookLike.bookLike;
 
-        BookLikeResponse result = from(bookLike)
+        BookLikeResponse result = queryFactory
                 .select(Projections.constructor(BookLikeResponse.class,
                         bookLike.id,
                         bookLike.likedAt,
                         bookLike.userId,
                         bookLike.book.id
                 ))
+                .from(bookLike)
                 .where(bookLike.id.eq(id))
                 .fetchOne();
 
@@ -41,20 +41,22 @@ public class CustomBookLikeRepositoryImpl extends QuerydslRepositorySupport impl
     public Page<BookLikeResponse> findBookLikeResponsesByBookId(Long bookId, Pageable pageable) {
         QBookLike bookLike = QBookLike.bookLike;
 
-        List<BookLikeResponse> content = from(bookLike)
+        List<BookLikeResponse> content = queryFactory
                 .select(Projections.constructor(BookLikeResponse.class,
                         bookLike.id,
                         bookLike.likedAt,
                         bookLike.userId,
                         bookLike.book.id
                 ))
+                .from(bookLike)
                 .where(bookLike.book.id.eq(bookId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        Long total = from(bookLike)
+        Long total = queryFactory
                 .select(bookLike.count())
+                .from(bookLike)
                 .where(bookLike.book.id.eq(bookId))
                 .fetchOne();
 
@@ -66,24 +68,25 @@ public class CustomBookLikeRepositoryImpl extends QuerydslRepositorySupport impl
     public Page<BookLikeResponse> findBookLikeResponsesByUserId(String userId, Pageable pageable) {
         QBookLike bookLike = QBookLike.bookLike;
 
-        List<BookLikeResponse> content = from(bookLike)
+        List<BookLikeResponse> content = queryFactory
                 .select(Projections.constructor(BookLikeResponse.class,
                         bookLike.id,
                         bookLike.likedAt,
                         bookLike.userId,
                         bookLike.book.id
                 ))
+                .from(bookLike)
                 .where(bookLike.userId.eq(userId))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        Long total = from(bookLike)
+        Long total = queryFactory
                 .select(bookLike.count())
+                .from(bookLike)
                 .where(bookLike.userId.eq(userId))
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0);
     }
-
 }

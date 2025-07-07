@@ -14,7 +14,7 @@ Host: localhost:10346
 Content-Type: application/json
 
 {
-  "name": "테스트"
+  "tagName": "테스트99"
 }
 
 ### 북태그 생성 2

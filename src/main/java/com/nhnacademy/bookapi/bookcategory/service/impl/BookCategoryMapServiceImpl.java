@@ -64,6 +64,12 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
             throw new BookCategoryMapNotFoundException(bookId, categoryId);
         }
 
+        int categoryCount = bookRepository.countBookCategoryByBookId(bookId);
+        if (categoryCount <= 1) {
+            throw new IllegalStateException("최소 1개의 카테고리는 반드시 남아야 합니다.");
+
+        }
+
         book.getBookCategories().remove(category);
         bookRepository.save(book);
     }

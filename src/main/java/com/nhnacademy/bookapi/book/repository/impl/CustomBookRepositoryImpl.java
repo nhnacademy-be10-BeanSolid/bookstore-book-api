@@ -6,6 +6,7 @@ import com.nhnacademy.bookapi.book.domain.QBook;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
+import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.repository.CustomBookRepository;
 import com.nhnacademy.bookapi.bookcategory.domain.QBookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
@@ -65,32 +66,62 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
                 .fetchOne();
 
         return Optional.ofNullable(result)
-                .map(b -> BookDetailResponse.from(b, likeCount != null ? likeCount.intValue() : 0));
+                .map(r -> BookDetailResponse.from(r, likeCount != null ? likeCount.intValue() : 0));
     }
 
     @Override
-    public Page<BookResponse> findAllBookResponses(Pageable pageable) {
+    public Page<SimpleBookResponse> findAllSimpleBookResponses(Pageable pageable) {
         QBook book = QBook.book;
 
-        List<Book> books = queryFactory
-                .selectFrom(book)
+        List<SimpleBookResponse> content = queryFactory
+                .select(Projections.constructor(SimpleBookResponse.class,
+                        book.id,
+                        book.title,
+                        book.author,
+                        book.salePrice,
+                        book.stock,
+                        book.image
+                ))
+                .from(book)
                 .orderBy(book.id.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
+        Long total = queryFactory
+                .select(book.count())
+                .from(book)
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
+    }
+
+    // TODO
+    // 카테고리에 해당하는 도서 찾기
+    @Override
+    public Page<BookResponse> findAllBookResponsesByBookCategory(Long categoryId, Pageable pageable) {
+        QBook book = QBook.book;
+        QBookCategory category = QBookCategory.bookCategory;
+
+        List<Book> books = queryFactory
+                .selectFrom(book)
+                .join(book.bookCategories, category).fetchJoin()
+                .where(category.categoryId.eq(categoryId))
+                .distinct()
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
         List<BookResponse> content = books.stream()
-                .map(BookResponse::from)
-                .toList();
+                .map(BookResponse::from).
+                toList();
 
-        Long total = Optional.ofNullable(
-                queryFactory
-                        .select(book.count())
-                        .from(book)
-                        .fetchOne())
-                .orElse(0L);
+        Long total = queryFactory
+                .select(book.count())
+                .from(book)
+                .fetchOne();
 
-        return new PageImpl<>(content, pageable, total);
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
     }
 
     @Override

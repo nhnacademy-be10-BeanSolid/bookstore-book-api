@@ -93,6 +93,7 @@ public class Book {
         Book book = new Book();
         book.title = request.title();
         book.description = request.description();
+        book.toc = request.toc();
         book.publisher = request.publisher();
         book.author = request.author();
         book.publishAt = request.publishAt();

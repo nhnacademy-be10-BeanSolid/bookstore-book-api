@@ -6,7 +6,7 @@ import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface BookRepository extends JpaRepository<Book, Long>, QuerydslPredicateExecutor<Book>, CustomBookRepository {
+public interface BookRepository extends JpaRepository<Book, Long>, CustomBookRepository {
     boolean existsByIsbn(String isbn);
 }
 
