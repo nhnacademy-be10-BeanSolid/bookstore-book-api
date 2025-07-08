@@ -164,6 +164,7 @@ class BookControllerTest {
 
         mockMvc.perform(post("/books")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-USER-ID", "tester")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/books/1"))
