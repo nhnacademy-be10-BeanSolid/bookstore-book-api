@@ -34,6 +34,10 @@ public class BookSearchApiService {
                             pubDate.substring(6, 8);
                     item.setPubdate(formatDate);
                 }
+                String author = item.getAuthor();
+                if (author != null && author.contains("^")) {
+                    item.setAuthor(author.replace("^", ", "));
+                }
             }
         }
 

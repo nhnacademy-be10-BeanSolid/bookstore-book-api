@@ -55,4 +55,4 @@ Content-Type: application/json
 ]
 
 ### elasticsearch 테스트
-GET http://localhost:10346/search?keyword=테스트2
+GET http://localhost:10346/search?keyword=사건

@@ -104,7 +104,7 @@ public class BookController {
     }
 
     // 재고 최신화
-    @PatchMapping("/book-reduce")
+    @PutMapping("/book-reduce")
     public ResponseEntity<Void> stockUpdate(@RequestBody List<BookStockReduceRequest> request,
                                             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
