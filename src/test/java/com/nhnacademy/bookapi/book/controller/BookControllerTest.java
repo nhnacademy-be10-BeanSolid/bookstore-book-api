@@ -183,6 +183,7 @@ class BookControllerTest {
 
         mockMvc.perform(post("/books")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-USER-ID", "tester")
                         .content(objectMapper.writeValueAsString(badRequest)))
                 .andExpect(status().isBadRequest());
     }
