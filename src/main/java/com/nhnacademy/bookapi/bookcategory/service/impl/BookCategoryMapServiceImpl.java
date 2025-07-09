@@ -6,10 +6,7 @@ import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryMapCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
-import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapAlreadyExistsException;
-import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapCreateException;
-import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapNotFoundException;
-import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
+import com.nhnacademy.bookapi.bookcategory.exception.*;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryMapService;
 import lombok.RequiredArgsConstructor;
@@ -47,8 +44,7 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
         book.getBookCategories().add(category);
         bookRepository.save(book);
 
-        return bookRepository.findBookCategoryMapResponseByBookIdAndCategoryId(bookId, categoryId)
-                .orElseThrow(() -> new BookCategoryMapNotFoundException(bookId,categoryId));
+        return getBookCategoryMapResponse(bookId);
     }
 
     // 도서에서 카테고리 삭제
@@ -66,11 +62,16 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
 
         int categoryCount = bookRepository.countBookCategoryByBookId(bookId);
         if (categoryCount <= 1) {
-            throw new IllegalStateException("최소 1개의 카테고리는 반드시 남아야 합니다.");
-
+            throw new BookCategoryMapDeleteFailException();
         }
 
         book.getBookCategories().remove(category);
         bookRepository.save(book);
+    }
+
+    // 도서의 카테고리 조회
+    @Override
+    public BookCategoryMapResponse getBookCategoryMapResponse (Long bookId) {
+        return bookCategoryRepository.findBookCategoryMapResponse(bookId);
     }
 }

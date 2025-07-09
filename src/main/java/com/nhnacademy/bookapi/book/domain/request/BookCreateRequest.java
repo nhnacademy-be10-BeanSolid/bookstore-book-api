@@ -10,6 +10,7 @@ public record BookCreateRequest(
         @Size(max = 255)
         String title,
 
+        @NotBlank
         String description,
 
         String toc,

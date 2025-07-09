@@ -53,7 +53,7 @@ class BookLikeServiceImplTest {
     @BeforeEach
     void setUp() {
 
-        BookCategory category = new BookCategory(1L, "소설", null);
+        BookCategory category = new BookCategory("소설", null);
 
         book = new Book(
                 1L,

@@ -124,40 +124,22 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
         return new PageImpl<>(content, pageable, total != null ? total : 0);
     }
 
-    @Override
-    public Optional<BookTagMapResponse> findBookTagMapResponseByBookIdAndTagId(Long bookId, Long tagId) {
-        QBook book = QBook.book;
-        QBookTag tag = QBookTag.bookTag;
-
-        return Optional.ofNullable(
-                queryFactory
-                        .select(Projections.constructor(BookTagMapResponse.class,
-                                book.id,
-                                tag.tagId
-                        ))
-                        .from(book)
-                        .join(book.bookTags, tag)
-                        .where(book.id.eq(bookId).and(tag.tagId.eq(tagId)))
-                        .fetchOne()
-        );
-    }
-
-    @Override
-    public Optional<BookCategoryMapResponse> findBookCategoryMapResponseByBookIdAndCategoryId(Long bookId, Long categoryId) {
-        QBook book = QBook.book;
-        QBookCategory category = QBookCategory.bookCategory;
-
-        return Optional.ofNullable(
-                queryFactory.select(Projections.constructor(BookCategoryMapResponse.class,
-                                book.id,
-                                category.categoryId
-                        ))
-                        .from(book)
-                        .join(book.bookCategories, category)
-                        .where(book.id.eq(bookId).and(category.categoryId.eq(categoryId)))
-                        .fetchOne()
-        );
-    }
+//    @Override
+//    public Optional<BookCategoryMapResponse> findBookCategoryMapResponseByBookIdAndCategoryId(Long bookId, Long categoryId) {
+//        QBook book = QBook.book;
+//        QBookCategory category = QBookCategory.bookCategory;
+//
+//        return Optional.ofNullable(
+//                queryFactory.select(Projections.constructor(BookCategoryMapResponse.class,
+//                                book.id,
+//                                category.categoryId
+//                        ))
+//                        .from(book)
+//                        .join(book.bookCategories, category)
+//                        .where(book.id.eq(bookId).and(category.categoryId.eq(categoryId)))
+//                        .fetchOne()
+//        );
+//    }
 
     @Override
     public int countBookCategoryByBookId(Long bookId) {

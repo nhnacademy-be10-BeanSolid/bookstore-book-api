@@ -21,9 +21,6 @@ public class BookLikeController {
     // 마이페이지에서 좋아요 확인
     @GetMapping("/users")
     public ResponseEntity<Page<BookLikeResponse>> getBookLikes(@RequestHeader("X-USER-ID") String userId, Pageable pageable) {
-        if (userId == null || userId.isBlank()) {
-            throw new InvalidHeaderException();
-        }
         Page<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByUserId(userId, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(bookLikes);
     }
@@ -38,9 +35,6 @@ public class BookLikeController {
     @PostMapping("/books/{bookId}/bookLikes")
     public ResponseEntity<BookLikeResponse> createBookLike(@PathVariable Long bookId,
                                                            @RequestHeader("X-USER-ID") String userId) {
-        if (userId == null || userId.isBlank()) {
-            throw new InvalidHeaderException();
-        }
         BookLikeResponse response = bookLikeService.createBookLike(bookId, userId);
         URI location = URI.create("/books/" + bookId + "/bookLikes/" + response.bookLikeId());
         return ResponseEntity.created(location).body(response);
@@ -48,11 +42,7 @@ public class BookLikeController {
 
     @DeleteMapping("/books/{bookId}/bookLikes")
     public ResponseEntity<Void> deleteBookLikeByUserIdAndBookId(@PathVariable Long bookId,
-                                                                @RequestHeader("X-USER-ID") String userId
-                                                                ) {
-        if (userId == null || userId.isBlank()) {
-            throw new InvalidHeaderException();
-        }
+                                                                @RequestHeader("X-USER-ID") String userId) {
         bookLikeService.deleteBookLikeByUserIdAndBookId(userId, bookId);
         return ResponseEntity.noContent().build();
     }

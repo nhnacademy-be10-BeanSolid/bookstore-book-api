@@ -6,6 +6,7 @@ import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagMapCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
+import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
 import com.nhnacademy.bookapi.booktag.exception.BookTagMapAlreadyExistsException;
 import com.nhnacademy.bookapi.booktag.exception.BookTagMapNotFoundException;
 import com.nhnacademy.bookapi.booktag.exception.BookTagNotFoundException;
@@ -18,13 +19,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class BookTagMapServiceImpl implements BookTagMapService {
 
-    private final BookTagRepository bookTagRepository;
     private final BookRepository bookRepository;
+    private final BookTagRepository bookTagRepository;
     private final BookDocumentRepository bookDocumentRepository;
 
     // 도서에 태그 추가
@@ -43,11 +46,9 @@ public class BookTagMapServiceImpl implements BookTagMapService {
 
         book.getBookTags().add(bookTag);
         bookRepository.save(book);
-
         bookDocumentRepository.save(BookDocument.from(book));
 
-        return bookRepository.findBookTagMapResponseByBookIdAndTagId(bookId, tagId)
-                .orElseThrow(() -> new BookTagMapNotFoundException(bookId, tagId));
+        return getBookTagMapResponse(bookId);
     }
 
     // 도서 태그 삭제
@@ -67,5 +68,11 @@ public class BookTagMapServiceImpl implements BookTagMapService {
 
         bookRepository.save(book);
         bookDocumentRepository.save(BookDocument.from(book));
+    }
+
+    // 도서에 해당하는 태그 조회
+    @Override
+    public BookTagMapResponse getBookTagMapResponse(Long bookId) {
+        return bookTagRepository.findBookTagMapResponse(bookId);
     }
 }

@@ -5,9 +5,13 @@ import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.PathVariable;
 
+import java.util.List;
+
 public interface BookTagMapService {
 
     BookTagMapResponse createBookTag(Long bookId ,BookTagMapCreateRequest request);
 
     void deleteBookTag(Long bookId, Long tagId);
+
+    BookTagMapResponse getBookTagMapResponse(Long bookId);
 }

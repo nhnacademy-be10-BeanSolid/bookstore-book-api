@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.bookcategory.repository;
 
+import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.common.config.QuerydslConfig;
 import org.junit.jupiter.api.Test;
@@ -50,5 +51,14 @@ class BookCategoryRepositoryImplTest {
                 .hasSize(3)
                 .extracting(BookCategoryResponse::categoryName)
                 .containsExactlyInAnyOrder("소설", "추리소설", "공포소설");
+    }
+
+    @Test
+    void findBookTagMapResponseTest() {
+        BookCategoryMapResponse result = bookCategoryRepository.findBookCategoryMapResponse(1L);
+
+        assertThat(result).isNotNull();
+        assertThat(result.bookId()).isEqualTo(1L);
+        assertThat(result.categories()).hasSize(2);
     }
 }

@@ -52,19 +52,15 @@ public class BookController {
     }
 
     @PostMapping("/books")
-    public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookCreateRequest request,
-                                                   BindingResult bindingResult,
-                                                   @RequestHeader("X-USER-ID") String userId)
+    public ResponseEntity<BookResponse> createBook(@RequestHeader("X-USER-ID") String userId,
+                                                   @Valid @RequestBody BookCreateRequest request,
+                                                   BindingResult bindingResult)
     {
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException(bindingResult);
         }
 
         log.info("userId = {}", userId);
-
-        if (userId == null || userId.isBlank()) {
-            throw new InvalidHeaderException();
-        }
 
         BookResponse response = bookService.createBook(request);
         URI location = URI.create("/books/" + response.id());

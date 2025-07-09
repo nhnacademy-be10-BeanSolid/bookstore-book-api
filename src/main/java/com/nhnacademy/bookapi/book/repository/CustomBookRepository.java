@@ -24,13 +24,10 @@ public interface CustomBookRepository {
 
     Page<BookResponse> findAllBookResponsesByBookCategory(Long categoryId, Pageable pageable);
 
-    Optional<BookTagMapResponse> findBookTagMapResponseByBookIdAndTagId(Long bookId, Long tagId);
-
-    Optional<BookCategoryMapResponse> findBookCategoryMapResponseByBookIdAndCategoryId(Long bookId, Long categoryId);
+//    Optional<BookCategoryMapResponse> findBookCategoryMapResponseByBookIdAndCategoryId(Long bookId, Long categoryId);
 
     int countBookCategoryByBookId(Long bookId);
 
     // 주문 api 에서 받아갈 정보
     List<BookOrderResponse> findBookOrderResponsesById(List<Long> ids);
-
 }
