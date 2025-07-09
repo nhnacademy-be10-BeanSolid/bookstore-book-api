@@ -6,7 +6,6 @@ import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagMapCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
-import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
 import com.nhnacademy.bookapi.booktag.exception.BookTagMapAlreadyExistsException;
 import com.nhnacademy.bookapi.booktag.exception.BookTagMapNotFoundException;
 import com.nhnacademy.bookapi.booktag.exception.BookTagNotFoundException;
@@ -16,10 +15,7 @@ import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 @Transactional

@@ -12,7 +12,6 @@ import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.exception.BookNotSaleException;
 import com.nhnacademy.bookapi.book.exception.InsufficientStockException;
-//import com.nhnacademy.bookapi.book.feignclient.dto.AladinSearchResponse;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;

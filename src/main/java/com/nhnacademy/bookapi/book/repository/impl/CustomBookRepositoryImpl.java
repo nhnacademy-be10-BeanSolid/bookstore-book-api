@@ -9,10 +9,8 @@ import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.repository.CustomBookRepository;
 import com.nhnacademy.bookapi.bookcategory.domain.QBookCategory;
-import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
 import com.nhnacademy.bookapi.booklike.domain.QBookLike;
 import com.nhnacademy.bookapi.booktag.domain.QBookTag;
-import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -96,7 +94,6 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
         return new PageImpl<>(content, pageable, total != null ? total : 0);
     }
 
-    // TODO
     // 카테고리에 해당하는 도서 찾기
     @Override
     public Page<BookResponse> findAllBookResponsesByBookCategory(Long categoryId, Pageable pageable) {
@@ -123,23 +120,6 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
 
         return new PageImpl<>(content, pageable, total != null ? total : 0);
     }
-
-//    @Override
-//    public Optional<BookCategoryMapResponse> findBookCategoryMapResponseByBookIdAndCategoryId(Long bookId, Long categoryId) {
-//        QBook book = QBook.book;
-//        QBookCategory category = QBookCategory.bookCategory;
-//
-//        return Optional.ofNullable(
-//                queryFactory.select(Projections.constructor(BookCategoryMapResponse.class,
-//                                book.id,
-//                                category.categoryId
-//                        ))
-//                        .from(book)
-//                        .join(book.bookCategories, category)
-//                        .where(book.id.eq(bookId).and(category.categoryId.eq(categoryId)))
-//                        .fetchOne()
-//        );
-//    }
 
     @Override
     public int countBookCategoryByBookId(Long bookId) {

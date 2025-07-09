@@ -1,6 +1,5 @@
 package com.nhnacademy.bookapi.booklike.controller;
 
-import com.nhnacademy.bookapi.common.exception.InvalidHeaderException;
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 import com.nhnacademy.bookapi.booklike.service.BookLikeService;
 import lombok.RequiredArgsConstructor;

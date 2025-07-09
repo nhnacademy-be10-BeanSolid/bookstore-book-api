@@ -24,8 +24,6 @@ public interface CustomBookRepository {
 
     Page<BookResponse> findAllBookResponsesByBookCategory(Long categoryId, Pageable pageable);
 
-//    Optional<BookCategoryMapResponse> findBookCategoryMapResponseByBookIdAndCategoryId(Long bookId, Long categoryId);
-
     int countBookCategoryByBookId(Long bookId);
 
     // 주문 api 에서 받아갈 정보

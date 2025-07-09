@@ -1,13 +1,10 @@
 package com.nhnacademy.bookapi.bookcategory.service;
 
-import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-
-import java.util.List;
 
 public interface BookCategoryService {
     // 생성(Create)

@@ -3,7 +3,6 @@ package com.nhnacademy.bookapi.book.domain;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
-import com.nhnacademy.bookapi.booklike.domain.BookLike;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import jakarta.persistence.*;
 import lombok.*;
