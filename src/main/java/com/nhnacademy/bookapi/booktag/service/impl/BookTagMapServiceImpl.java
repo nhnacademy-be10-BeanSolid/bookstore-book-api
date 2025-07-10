@@ -22,8 +22,8 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BookTagMapServiceImpl implements BookTagMapService {
 
-    private final BookTagRepository bookTagRepository;
     private final BookRepository bookRepository;
+    private final BookTagRepository bookTagRepository;
     private final BookDocumentRepository bookDocumentRepository;
 
     // 도서에 태그 추가
@@ -42,11 +42,9 @@ public class BookTagMapServiceImpl implements BookTagMapService {
 
         book.getBookTags().add(bookTag);
         bookRepository.save(book);
-
         bookDocumentRepository.save(BookDocument.from(book));
 
-        return bookRepository.findBookTagMapResponseByBookIdAndTagId(bookId, tagId)
-                .orElseThrow(() -> new BookTagMapNotFoundException(bookId, tagId));
+        return getBookTagMapResponse(bookId);
     }
 
     // 도서 태그 삭제
@@ -66,5 +64,11 @@ public class BookTagMapServiceImpl implements BookTagMapService {
 
         bookRepository.save(book);
         bookDocumentRepository.save(BookDocument.from(book));
+    }
+
+    // 도서에 해당하는 태그 조회
+    @Override
+    public BookTagMapResponse getBookTagMapResponse(Long bookId) {
+        return bookTagRepository.findBookTagMapResponse(bookId);
     }
 }

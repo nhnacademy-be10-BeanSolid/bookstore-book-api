@@ -1,11 +1,10 @@
 package com.nhnacademy.bookapi.booktag.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
 
-@ResponseStatus(value = HttpStatus.CONFLICT)
-public class BookTagAlreadyExistsException extends RuntimeException {
+import com.nhnacademy.bookapi.common.exception.ConflictException;
+
+public class BookTagAlreadyExistsException extends ConflictException {
     public BookTagAlreadyExistsException(String name) {
-        super("BookTag " + name + " already exists");
+        super(String.format("BookTag '%s' already exists", name));
     }
 }

@@ -1,12 +1,9 @@
 package com.nhnacademy.bookapi.book.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import com.nhnacademy.bookapi.common.exception.ConflictException;
 
-@ResponseStatus(HttpStatus.CONFLICT)
-public class BookAlreadyExistsException extends RuntimeException {
-
+public class BookAlreadyExistsException extends ConflictException {
     public BookAlreadyExistsException(String isbn) {
-        super(String.format("ISBN 코드 %s에 해당하는 도서는 이미 존재합니다.", isbn));
+        super(String.format("ISBN : %s already exists", isbn));
     }
 }

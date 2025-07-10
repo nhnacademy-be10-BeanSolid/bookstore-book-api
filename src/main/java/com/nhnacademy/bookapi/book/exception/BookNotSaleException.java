@@ -1,15 +1,12 @@
 package com.nhnacademy.bookapi.book.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import com.nhnacademy.bookapi.common.exception.BadRequestException;
 
 import java.util.Set;
 
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public class BookNotSaleException extends RuntimeException {
-
+public class BookNotSaleException extends BadRequestException {
     public BookNotSaleException(Set<Long> ids) {
-        super(String.format("다음 도서 아이디는 현재 판매하지 않습니다: %s",
+        super(String.format("Not sale with Book ID: %s",
                 ids.toString()));
     }
 }

@@ -150,7 +150,7 @@ class BookTagServiceImplTest {
 
         bookTagService.deleteBookTag(1L);
 
-        verify(bookTagRepository).deleteById(1L);
+        verify(bookTagRepository, times(1)).deleteById(1L);
     }
 
     @Test

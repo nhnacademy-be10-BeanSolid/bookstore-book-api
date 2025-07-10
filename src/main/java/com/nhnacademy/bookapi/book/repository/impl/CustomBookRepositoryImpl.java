@@ -6,12 +6,11 @@ import com.nhnacademy.bookapi.book.domain.QBook;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
+import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.repository.CustomBookRepository;
 import com.nhnacademy.bookapi.bookcategory.domain.QBookCategory;
-import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
 import com.nhnacademy.bookapi.booklike.domain.QBookLike;
 import com.nhnacademy.bookapi.booktag.domain.QBookTag;
-import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
@@ -48,78 +47,78 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
         QBook book = QBook.book;
         QBookTag tag = QBookTag.bookTag;
         QBookCategory category = QBookCategory.bookCategory;
-        QBookLike likes = QBookLike.bookLike;
+        QBookLike like = QBookLike.bookLike;
 
         Book result = queryFactory
                 .selectFrom(book)
                 .leftJoin(book.bookTags, tag).fetchJoin()
                 .leftJoin(book.bookCategories, category).fetchJoin()
-                .leftJoin(book.bookLikes, likes).fetchJoin()
                 .where(book.id.eq(bookId))
                 .distinct()
                 .fetchOne();
 
-        return Optional.ofNullable(result).map(BookDetailResponse::from);
+        Long likeCount = queryFactory
+                .select(like.count())
+                .from(like)
+                .where(like.book.id.eq(bookId))
+                .fetchOne();
+
+        return Optional.ofNullable(result)
+                .map(r -> BookDetailResponse.from(r, likeCount != null ? likeCount.intValue() : 0));
     }
 
     @Override
-    public Page<BookResponse> findAllBookResponses(Pageable pageable) {
+    public Page<SimpleBookResponse> findAllSimpleBookResponses(Pageable pageable) {
         QBook book = QBook.book;
 
-        List<Book> books = queryFactory
-                .selectFrom(book)
+        List<SimpleBookResponse> content = queryFactory
+                .select(Projections.constructor(SimpleBookResponse.class,
+                        book.id,
+                        book.title,
+                        book.author,
+                        book.salePrice,
+                        book.stock,
+                        book.image
+                ))
+                .from(book)
                 .orderBy(book.id.asc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        List<BookResponse> content = books.stream()
-                .map(BookResponse::from)
-                .toList();
+        Long total = queryFactory
+                .select(book.count())
+                .from(book)
+                .fetchOne();
 
-        Long total = Optional.ofNullable(
-                queryFactory
-                        .select(book.count())
-                        .from(book)
-                        .fetchOne())
-                .orElse(0L);
-
-        return new PageImpl<>(content, pageable, total);
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
     }
 
+    // 카테고리에 해당하는 도서 찾기
     @Override
-    public Optional<BookTagMapResponse> findBookTagMapResponseByBookIdAndTagId(Long bookId, Long tagId) {
-        QBook book = QBook.book;
-        QBookTag tag = QBookTag.bookTag;
-
-        return Optional.ofNullable(
-                queryFactory
-                        .select(Projections.constructor(BookTagMapResponse.class,
-                                book.id,
-                                tag.tagId
-                        ))
-                        .from(book)
-                        .join(book.bookTags, tag)
-                        .where(book.id.eq(bookId).and(tag.tagId.eq(tagId)))
-                        .fetchOne()
-        );
-    }
-
-    @Override
-    public Optional<BookCategoryMapResponse> findBookCategoryMapResponseByBookIdAndCategoryId(Long bookId, Long categoryId) {
+    public Page<BookResponse> findAllBookResponsesByBookCategory(Long categoryId, Pageable pageable) {
         QBook book = QBook.book;
         QBookCategory category = QBookCategory.bookCategory;
 
-        return Optional.ofNullable(
-                queryFactory.select(Projections.constructor(BookCategoryMapResponse.class,
-                                book.id,
-                                category.categoryId
-                        ))
-                        .from(book)
-                        .join(book.bookCategories, category)
-                        .where(book.id.eq(bookId).and(category.categoryId.eq(categoryId)))
-                        .fetchOne()
-        );
+        List<Book> books = queryFactory
+                .selectFrom(book)
+                .join(book.bookCategories, category).fetchJoin()
+                .where(category.categoryId.eq(categoryId))
+                .distinct()
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        List<BookResponse> content = books.stream()
+                .map(BookResponse::from).
+                toList();
+
+        Long total = queryFactory
+                .select(book.count())
+                .from(book)
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0);
     }
 
     @Override

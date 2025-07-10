@@ -1,6 +1,8 @@
 package com.nhnacademy.bookapi.booktag.repository.impl;
 
+import com.nhnacademy.bookapi.book.domain.QBook;
 import com.nhnacademy.bookapi.booktag.domain.QBookTag;
+import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
 import com.nhnacademy.bookapi.booktag.repository.CustomBookTagRepository;
 import com.querydsl.core.types.Projections;
@@ -58,5 +60,23 @@ public class CustomBookTagRepositoryImpl implements CustomBookTagRepository {
                 .fetchOne();
 
         return new PageImpl<>(result, pageable, total != null ? total : 0);
+    }
+
+    @Override
+    public BookTagMapResponse findBookTagMapResponse(Long bookId) {
+        QBook book = QBook.book;
+        QBookTag tag = QBookTag.bookTag;
+
+        List<BookTagResponse> result = queryFactory
+                .select(Projections.constructor(BookTagResponse.class,
+                        tag.tagId,
+                        tag.name
+                ))
+                .from(book)
+                .join(book.bookTags, tag)
+                .where(book.id.eq(bookId))
+                .fetch();
+
+        return new BookTagMapResponse(bookId, result);
     }
 }

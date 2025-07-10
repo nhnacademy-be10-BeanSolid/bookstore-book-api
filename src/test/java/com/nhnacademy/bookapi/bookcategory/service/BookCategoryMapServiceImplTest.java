@@ -5,8 +5,10 @@ import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryMapCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
+import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapAlreadyExistsException;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapCreateException;
+import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapDeleteFailException;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.bookcategory.service.impl.BookCategoryMapServiceImpl;
@@ -19,7 +21,9 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
+import java.time.LocalDateTime;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -62,13 +66,18 @@ class BookCategoryMapServiceImplTest {
         when(bookRepository.countBookCategoryByBookId(bookId)).thenReturn(1);
         when(bookCategoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
-        BookCategoryMapResponse response = new BookCategoryMapResponse(bookId, categoryId);
-        when(bookRepository.findBookCategoryMapResponseByBookIdAndCategoryId(bookId, categoryId))
-                .thenReturn(Optional.of(response));
+        BookCategoryResponse categoryResponse = new BookCategoryResponse(categoryId, "카테고리",
+                null, null, LocalDateTime.now(), null);
+        BookCategoryMapResponse response = new BookCategoryMapResponse(bookId, List.of(categoryResponse));
+        when(bookCategoryRepository.findBookCategoryMapResponse(bookId))
+                .thenReturn(response);
+
         BookCategoryMapResponse result = bookCategoryMapService.createBookCategoryMap(bookId, request);
 
         assertThat(result.bookId()).isEqualTo(bookId);
-        assertThat(result.categoryId()).isEqualTo(categoryId);
+        assertThat(result.categories()).hasSize(1);
+        assertThat(result.categories().getFirst().categoryId()).isEqualTo(categoryId);
+        assertThat(result.categories().getFirst().categoryName()).isEqualTo(category.getName());
     }
 
     @Test
@@ -114,14 +123,34 @@ class BookCategoryMapServiceImplTest {
 
         Set<BookCategory> bookCategorySet = new HashSet<>();
         bookCategorySet.add(category);
+        bookCategorySet.add(new BookCategory("테스트", null));
         book.setBookCategories(bookCategorySet);
 
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookCategoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+        when(bookRepository.countBookCategoryByBookId(bookId)).thenReturn(bookCategorySet.size());
 
         bookCategoryMapService.deleteCategoryMap(bookId, categoryId);
 
         verify(bookRepository, times(1)).save(book);
+    }
+
+    @Test
+    @DisplayName("도서에서 카테고리 삭제 - 카테고리 최소 조건 만족하지 않은 경우")
+    void deleteCategoryMapFailTest() {
+        Long bookId = book.getId();
+        Long categoryId = category.getCategoryId();
+
+        Set<BookCategory> bookCategorySet = new HashSet<>();
+        bookCategorySet.add(category);
+        book.setBookCategories(bookCategorySet);
+
+        when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
+        when(bookCategoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+        when(bookRepository.countBookCategoryByBookId(bookId)).thenReturn(bookCategorySet.size());
+
+        assertThatThrownBy(() -> bookCategoryMapService.deleteCategoryMap(bookId, categoryId))
+                .isInstanceOf(BookCategoryMapDeleteFailException.class);
     }
 
     @Test

@@ -7,11 +7,11 @@ import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.Book;
+import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.exception.BookNotSaleException;
 import com.nhnacademy.bookapi.book.exception.InsufficientStockException;
-//import com.nhnacademy.bookapi.book.feignclient.dto.AladinSearchResponse;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
@@ -61,9 +61,13 @@ public class BookServiceImpl implements BookService {
             image = "/images/default.png";
         }
 
+        log.info("toc: {}", request.toc());
+
         Book book = Book.from(request, categories);
         book.setImage(image);
         Book savedBook = bookRepository.save(book);
+
+        log.info("saved book: {}", savedBook.getToc());
 
         // Elastic Search에 저장
         BookDocument document = BookDocument.from(savedBook);
@@ -86,8 +90,8 @@ public class BookServiceImpl implements BookService {
     // 전체 리스트
     @Override
     @Transactional(readOnly = true)
-    public Page<BookResponse> getAllBooks(Pageable pageable) {
-        return bookRepository.findAllBookResponses(pageable);
+    public Page<SimpleBookResponse> getAllBooks(Pageable pageable) {
+        return bookRepository.findAllSimpleBookResponses(pageable);
     }
 
     // 도서 업데이트
@@ -165,10 +169,4 @@ public class BookServiceImpl implements BookService {
             log.info("Id {}의 재고 {} 차감 성공", bookId, stock);
         }
     }
-
-//    @Override
-//    public AladinSearchResponse getAladinSearchResponseByBookId(String query) {
-//        return null;
-//    }
-
 }

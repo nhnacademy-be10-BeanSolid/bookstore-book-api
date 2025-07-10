@@ -9,6 +9,7 @@ import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundExcepti
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.bookcategory.service.impl.BookCategoryServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -51,6 +52,7 @@ class BookCategoryServiceImplTest {
     }
 
     @Test
+    @DisplayName("최상위 카테고리 생성")
     void createCategory_success() {
         BookCategoryCreateRequest request = new BookCategoryCreateRequest("Parent", null);
 
@@ -77,6 +79,7 @@ class BookCategoryServiceImplTest {
     }
 
     @Test
+    @DisplayName("카테고리 생성 - 이미 존재하는 카테고리")
     void createCategory_alreadyExists() {
         when(bookCategoryRepository.existsByName("Parent")).thenReturn(true);
 
@@ -87,6 +90,7 @@ class BookCategoryServiceImplTest {
     }
 
     @Test
+    @DisplayName("하위 카테고리 생성")
     void createCategory_success_withParentId() {
         BookCategoryCreateRequest request = new BookCategoryCreateRequest("Child", 1L);
 
@@ -106,6 +110,7 @@ class BookCategoryServiceImplTest {
     }
 
     @Test
+    @DisplayName("카테고리 생성 - 존재하지 않는 부모 카테고리")
     void createCategory_InvalidParentId() {
         BookCategoryCreateRequest request = new BookCategoryCreateRequest("Child", 999L);
 
@@ -117,35 +122,7 @@ class BookCategoryServiceImplTest {
     }
 
     @Test
-    void getCategoryById() {
-        String parentName = parentCategory.getParentCategory() != null ? parentCategory.getParentCategory().getName() : null;
-
-        Long parentId = parentCategory.getParentCategory() != null ? parentCategory.getParentCategory().getCategoryId() : 1L;
-
-        BookCategoryResponse bookCategoryResponse = new BookCategoryResponse(parentCategory.getCategoryId(),
-                parentCategory.getName(),
-                parentId,
-                parentName,
-                parentCategory.getCreatedAt(),
-                parentCategory.getUpdatedAt());
-        when(bookCategoryRepository.findBookCategoryResponseById(1L)).thenReturn(Optional.of(bookCategoryResponse));
-
-        BookCategoryResponse result = bookCategoryService.getCategoryById(1L);
-
-        assertThat(result.categoryId()).isEqualTo(1L);
-        assertThat(result.categoryName()).isEqualTo("Parent");
-        assertThat(result.createdAt()).isEqualTo(parentCategory.getCreatedAt());
-    }
-
-    @Test
-    void getCategoryById_notFound() {
-        when(bookCategoryRepository.findBookCategoryResponseById(99L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> bookCategoryService.getCategoryById(99L))
-                .isInstanceOf(BookCategoryNotFoundException.class);
-    }
-
-    @Test
+    @DisplayName("전체 조회")
     void getAllCategories() {
         Pageable pageable = PageRequest.of(0, 10);
         BookCategoryResponse parentResponse = new BookCategoryResponse(
@@ -178,6 +155,38 @@ class BookCategoryServiceImplTest {
     }
 
     @Test
+    @DisplayName("카테고리 조회")
+    void getCategoryById() {
+        Long parentId = parentCategory.getParentCategory() != null ? parentCategory.getParentCategory().getCategoryId() : 1L;
+
+        String parentName = parentCategory.getParentCategory() != null ? parentCategory.getParentCategory().getName() : null;
+
+        BookCategoryResponse bookCategoryResponse = new BookCategoryResponse(parentCategory.getCategoryId(),
+                parentCategory.getName(),
+                parentId,
+                parentName,
+                parentCategory.getCreatedAt(),
+                parentCategory.getUpdatedAt());
+        when(bookCategoryRepository.findBookCategoryResponseById(1L)).thenReturn(Optional.of(bookCategoryResponse));
+
+        BookCategoryResponse result = bookCategoryService.getCategoryById(1L);
+
+        assertThat(result.categoryId()).isEqualTo(1L);
+        assertThat(result.categoryName()).isEqualTo("Parent");
+        assertThat(result.createdAt()).isEqualTo(parentCategory.getCreatedAt());
+    }
+
+    @Test
+    @DisplayName("카테고리 조회 - 존재하지 않는 카테고리")
+    void getCategoryById_notFound() {
+        when(bookCategoryRepository.findBookCategoryResponseById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookCategoryService.getCategoryById(99L))
+                .isInstanceOf(BookCategoryNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("업데이트")
     void updateCategory_success() {
         BookCategoryUpdateRequest request = new BookCategoryUpdateRequest("Updated", null);
         BookCategoryResponse response = new BookCategoryResponse(parentCategory.getCategoryId(), "Updated", null, null,
@@ -192,6 +201,7 @@ class BookCategoryServiceImplTest {
     }
 
     @Test
+    @DisplayName("업데이트 - 존재하지 않는 카테고리")
     void updateCategory_notFound() {
         BookCategoryUpdateRequest request = new BookCategoryUpdateRequest("Updated", null);
 
@@ -202,6 +212,7 @@ class BookCategoryServiceImplTest {
     }
 
     @Test
+    @DisplayName("업데이트 - 존재하지 않는 부모 카테고리")
     void updateCategory_parentNotFound() {
         BookCategoryUpdateRequest request = new BookCategoryUpdateRequest("Parent", 99L);
 
@@ -212,6 +223,7 @@ class BookCategoryServiceImplTest {
     }
 
     @Test
+    @DisplayName("삭제")
     void deleteCategory_success() {
         when(bookCategoryRepository.existsById(1L)).thenReturn(true);
         doNothing().when(bookCategoryRepository).deleteById(1L);
@@ -222,6 +234,7 @@ class BookCategoryServiceImplTest {
     }
 
     @Test
+    @DisplayName("삭제 - 존재하지 않는 카테고리")
     void deleteCategory_notFound() {
         when(bookCategoryRepository.existsById(99L)).thenReturn(false);
 
@@ -230,6 +243,7 @@ class BookCategoryServiceImplTest {
     }
 
     @Test
+    @DisplayName("이름으로 존재 여부")
     void existsCategory_byName() {
         when(bookCategoryRepository.existsByName("Parent")).thenReturn(true);
 
@@ -237,6 +251,7 @@ class BookCategoryServiceImplTest {
     }
 
     @Test
+    @DisplayName("아이디로 존재 여부")
     void existsCategory_ById() {
         when(bookCategoryRepository.existsById(1L)).thenReturn(true);
 

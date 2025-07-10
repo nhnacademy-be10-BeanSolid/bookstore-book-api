@@ -1,8 +1,8 @@
 package com.nhnacademy.bookapi.booktag.repository;
 
+import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
-import com.nhnacademy.bookapi.config.QuerydslConfig;
-import com.querydsl.core.QueryFactory;
+import com.nhnacademy.bookapi.common.config.QuerydslConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -12,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -50,5 +49,14 @@ class BookTagRepositoryImplTest {
                 .hasSize(2)
                 .extracting(BookTagResponse::tagName)
                 .containsExactlyInAnyOrder("태그1", "태그2");
+    }
+
+    @Test
+    void findBookTagMapResponseTest() {
+        BookTagMapResponse result = bookTagRepository.findBookTagMapResponse(1L);
+
+        assertThat(result).isNotNull();
+        assertThat(result.bookId()).isEqualTo(1L);
+        assertThat(result.tags()).hasSize(2);
     }
 }

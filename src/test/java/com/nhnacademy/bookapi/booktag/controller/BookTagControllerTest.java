@@ -52,7 +52,8 @@ class BookTagControllerTest {
 
         given(bookTagService.getBookTags(any(Pageable.class))).willReturn(page);
 
-        mockMvc.perform(get("/book-tags"))
+        mockMvc.perform(get("/book-tags")
+                        .header("X-USER-ID", "test"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(2)))
                 .andExpect(jsonPath("$.content[0].tagId").value(1L))
@@ -62,13 +63,22 @@ class BookTagControllerTest {
     }
 
     @Test
+    @DisplayName("전체 조회 - 헤더 검증 실패")
+    void getBookTags_headerException() throws Exception {
+        mockMvc.perform(get("/book-tags")
+                        .header("X-USER-ID", ""))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("단일 조회")
     void getBookTag() throws Exception {
         BookTagResponse response = new BookTagResponse(1L, "tag1");
 
         given(bookTagService.getBookTag(1L)).willReturn(response);
 
-        mockMvc.perform(get("/book-tags/1"))
+        mockMvc.perform(get("/book-tags/1")
+                        .header("X-USER-ID", "test"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tagId").value(1L))
                 .andExpect(jsonPath("$.tagName").value("tag1"));
@@ -84,7 +94,8 @@ class BookTagControllerTest {
 
         mockMvc.perform(post("/book-tags")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-USER-ID", "test"))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/book-tags/1"))
                 .andExpect(jsonPath("$.tagId").value(1L))
@@ -92,8 +103,20 @@ class BookTagControllerTest {
     }
 
     @Test
+    @DisplayName("태그 생성 - 헤더 검증 실패")
+    void createBookTag_headerException() throws Exception {
+        BookTagCreateRequest request = new BookTagCreateRequest("tag1");
+
+        mockMvc.perform(post("/book-tags")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-USER-ID", "asfghjklqwertyuiopzxcvbnm".repeat(20)))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     @DisplayName("태그 생성 - 유효성 검사 실패")
-    void createBookTagValidFailTest() throws Exception {
+    void createBookTag_validationFail() throws Exception {
         BookTagCreateRequest request = new BookTagCreateRequest(null);
 
         mockMvc.perform(post("/book-tags")
@@ -113,7 +136,8 @@ class BookTagControllerTest {
 
         mockMvc.perform(put("/book-tags/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-USER-ID", "test"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.tagId").value(1L))
                 .andExpect(jsonPath("$.tagName").value("tag2"));
@@ -126,7 +150,8 @@ class BookTagControllerTest {
 
         mockMvc.perform(put("/book-tags/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-USER-ID", "test"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -135,7 +160,16 @@ class BookTagControllerTest {
     void deleteBookTag() throws Exception {
         willDoNothing().given(bookTagService).deleteBookTag(1L);
 
-        mockMvc.perform(delete("/book-tags/1"))
+        mockMvc.perform(delete("/book-tags/1")
+                        .header("X-USER-ID", "test"))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("태그 삭제 - 헤더 검증 실패")
+    void deleteBookTag_headerException() throws Exception {
+        mockMvc.perform(delete("/book-tags/1")
+                        .header("X-USER-ID", ""))
+                .andExpect(status().isBadRequest());
     }
 }

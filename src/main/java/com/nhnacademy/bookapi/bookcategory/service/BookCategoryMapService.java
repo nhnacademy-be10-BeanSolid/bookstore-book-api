@@ -8,4 +8,6 @@ public interface BookCategoryMapService {
     BookCategoryMapResponse createBookCategoryMap(Long bookId , BookCategoryMapCreateRequest request);
 
     void deleteCategoryMap(Long bookId, Long categoryId);
+
+    BookCategoryMapResponse getBookCategoryMapResponse(Long bookId);
 }

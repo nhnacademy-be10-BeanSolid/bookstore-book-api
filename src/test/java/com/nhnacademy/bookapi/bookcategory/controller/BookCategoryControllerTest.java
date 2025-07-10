@@ -6,7 +6,6 @@ import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequ
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
-import com.nhnacademy.bookapi.bookcategory.service.CategoryCsvFileReadService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,8 +36,6 @@ class BookCategoryControllerTest {
 
     @MockBean
     BookCategoryService bookCategoryService;
-    @MockBean
-    CategoryCsvFileReadService categoryCsvFileReadService;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -92,7 +89,8 @@ class BookCategoryControllerTest {
 
         mockMvc.perform(post("/categories")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(request)))
+                    .content(objectMapper.writeValueAsString(request))
+                    .header("X-USER-ID", "test"))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/categories/10"))
                 .andExpect(jsonPath("$.categoryId").value(10L))
@@ -106,7 +104,8 @@ class BookCategoryControllerTest {
 
         mockMvc.perform(post("/categories")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-USER-ID", "test"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -132,7 +131,8 @@ class BookCategoryControllerTest {
 
         mockMvc.perform(post("/categories")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-USER-ID", "test"))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/categories/2"))
                 .andExpect(jsonPath("$.categoryId").value(2L))
@@ -151,7 +151,8 @@ class BookCategoryControllerTest {
 
         mockMvc.perform(put("/categories/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-USER-ID", "test"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.categoryId").value(1L))
                 .andExpect(jsonPath("$.categoryName").value("Updated"));
@@ -164,7 +165,8 @@ class BookCategoryControllerTest {
 
         mockMvc.perform(put("/categories/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-USER-ID", "test"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -173,7 +175,18 @@ class BookCategoryControllerTest {
     void deleteCategory() throws Exception {
         willDoNothing().given(bookCategoryService).deleteCategory(1L);
 
-        mockMvc.perform(delete("/categories/1"))
+        mockMvc.perform(delete("/categories/1")
+                        .header("X-USER-ID", "test"))
                 .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @DisplayName("카테고리 삭제 - 헤더 검증 실패")
+    void deleteCategory_headerException() throws Exception {
+        willDoNothing().given(bookCategoryService).deleteCategory(1L);
+
+        mockMvc.perform(delete("/categories/1")
+                        .header("X-USER-ID", ""))
+                .andExpect(status().isBadRequest());
     }
 }

@@ -3,7 +3,6 @@ package com.nhnacademy.bookapi.book.domain;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
-import com.nhnacademy.bookapi.booklike.domain.BookLike;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import jakarta.persistence.*;
 import lombok.*;
@@ -89,14 +88,11 @@ public class Book {
     )
     private Set<BookCategory> bookCategories = new HashSet<>();
 
-    // CascadeType
-    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<BookLike> bookLikes = new HashSet<>();
-
     public static Book from(BookCreateRequest request, Set<BookCategory> categories) {
         Book book = new Book();
         book.title = request.title();
         book.description = request.description();
+        book.toc = request.toc();
         book.publisher = request.publisher();
         book.author = request.author();
         book.publishAt = request.publishAt();

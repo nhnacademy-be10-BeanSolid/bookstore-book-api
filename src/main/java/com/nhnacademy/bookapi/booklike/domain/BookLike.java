@@ -11,7 +11,12 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 @Entity
-@Table(name = "book_like")
+@Table(
+        name = "book_like",
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"book_id", "user_id"})
+        }
+)
 @NoArgsConstructor
 @AllArgsConstructor
 public class BookLike {
@@ -27,7 +32,7 @@ public class BookLike {
     @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 

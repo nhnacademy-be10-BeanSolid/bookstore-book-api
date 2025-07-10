@@ -1,10 +1,8 @@
 package com.nhnacademy.bookapi.booklike.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import com.nhnacademy.bookapi.common.exception.NotFoundException;
 
-@ResponseStatus(HttpStatus.NOT_FOUND)
-public class BookLikeNotFoundException extends RuntimeException {
+public class BookLikeNotFoundException extends NotFoundException {
 
     public BookLikeNotFoundException(String userId, Long bookId) {
         super(String.format("User '%s' has not liked the book with ID %d.", userId, bookId));

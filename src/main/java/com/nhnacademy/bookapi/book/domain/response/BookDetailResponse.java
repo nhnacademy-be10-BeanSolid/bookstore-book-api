@@ -4,11 +4,14 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
-import com.nhnacademy.bookapi.booklike.domain.BookLike;
+import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
+import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -25,34 +28,37 @@ public record BookDetailResponse(
         int salePrice,
         Boolean wrappable,
 
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime createAt,
-        @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
         LocalDateTime updateAt,
 
         BookStatus status,
         int stock,
         String image,
 
-        Set<String> bookCategories,
-        Set<String> bookTags,
-        Set<String> likedUsers
+        List<BookCategoryResponse> bookCategories,
+        List<BookTagResponse> bookTags,
+
+        int likeCount
 ) {
-    public static BookDetailResponse from (Book book) {
-        Set<String> categories = book.getBookCategories()
+    public static BookDetailResponse from (Book book, int likeCount) {
+        List<BookCategoryResponse> categories = book.getBookCategories()
                 .stream()
-                .map(BookCategory::getName)
-                .collect(Collectors.toSet());
+                .map(category -> new BookCategoryResponse(
+                        category.getCategoryId(),
+                        category.getName(),
+                        category.getParentCategory() != null ? category.getParentCategory().getCategoryId() : null,
+                        category.getParentCategory() != null ? category.getParentCategory().getName() : null,
+                        category.getCreatedAt(),
+                        category.getUpdatedAt()
+                ))
+                .sorted(Comparator.comparing(BookCategoryResponse::categoryId))
+                .collect(Collectors.toList());
 
-        Set<String> tags = book.getBookTags()
+        List<BookTagResponse> tags = book.getBookTags()
                 .stream()
-                .map(BookTag::getName)
-                .collect(Collectors.toSet());
-
-        Set<String> likeUsers = book.getBookLikes()
-                .stream()
-                .map(BookLike::getUserId)
-                .collect(Collectors.toSet());
+                .map(tag -> new BookTagResponse(tag.getTagId(), tag.getName()))
+                .sorted(Comparator.comparing(BookTagResponse::tagId))
+                .collect(Collectors.toList());
 
         return new BookDetailResponse(
                 book.getId(),
@@ -73,6 +79,6 @@ public record BookDetailResponse(
                 book.getImage(),
                 categories,
                 tags,
-                likeUsers);
+                likeCount);
     }
 }

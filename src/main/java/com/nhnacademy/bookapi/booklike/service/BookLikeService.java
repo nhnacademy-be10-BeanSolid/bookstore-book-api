@@ -1,18 +1,17 @@
 package com.nhnacademy.bookapi.booklike.service;
 
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import java.util.List;
 
 public interface BookLikeService {
 
     BookLikeResponse createBookLike(Long bookId, String userId);
 
-    List<BookLikeResponse> getBookLikesByUserId(String userId);
+    Page<BookLikeResponse> getBookLikesByUserId(String userId, Pageable pageable);
 
-    List<BookLikeResponse> getBookLikesByBookId(Long bookId);
+    Page<BookLikeResponse> getBookLikesByBookId(Long bookId, Pageable pageable);
 
     void deleteBookLikeByUserIdAndBookId(String userId, Long bookId);
-
-    void deleteBookLikeByBookId(Long bookId);
 }

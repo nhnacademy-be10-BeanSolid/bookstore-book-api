@@ -1,11 +1,9 @@
 package com.nhnacademy.bookapi.bookcategory.exception;
 
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.ResponseStatus;
+import com.nhnacademy.bookapi.common.exception.BadRequestException;
 
-@ResponseStatus(HttpStatus.BAD_REQUEST)
-public class BookCategoryMapCreateException extends RuntimeException {
-    public BookCategoryMapCreateException(Long bookId, String title) {
-        super("Book ID: " + bookId + ", Title: " + title + " Book category count over 10");
+public class BookCategoryMapCreateException extends BadRequestException {
+    public BookCategoryMapCreateException(Long bookId) {
+        super(String.format("Book ID: %d  - Book category count over 10", bookId));
     }
 }

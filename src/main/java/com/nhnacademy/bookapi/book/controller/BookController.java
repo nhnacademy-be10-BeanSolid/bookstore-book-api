@@ -4,7 +4,8 @@ import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.*;
-import com.nhnacademy.bookapi.advice.ValidationFailedException;
+import com.nhnacademy.bookapi.common.exception.InvalidHeaderException;
+import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.book.feignclient.BookSearchApiService;
 import com.nhnacademy.bookapi.document.BookDocument;
@@ -36,12 +37,14 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.OK).body(naverBookSearchService.searchBook(query, start));
     }
 
+    // 메인페이지 간단 정보
     @GetMapping("/books")
-    public ResponseEntity<Page<BookResponse>> getAllBookResponses(Pageable pageable) {
-        Page<BookResponse> responses = bookService.getAllBooks(pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(responses);
+    public ResponseEntity<Page<SimpleBookResponse>> getAllBookResponses(Pageable pageable) {
+        Page<SimpleBookResponse> responses = bookService.getAllBooks(pageable);
+        return ResponseEntity.ok(responses);
     }
 
+    // Dto를 나누려면?
     @GetMapping("/books/{id}")
     public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
         BookDetailResponse response = bookService.getBookDetailResponseByBookId(id);
@@ -49,11 +52,16 @@ public class BookController {
     }
 
     @PostMapping("/books")
-    public ResponseEntity<BookResponse> createBook(@Valid @RequestBody BookCreateRequest request,
-                                                   BindingResult bindingResult) {
+    public ResponseEntity<BookResponse> createBook(@RequestHeader("X-USER-ID") String userId,
+                                                   @Valid @RequestBody BookCreateRequest request,
+                                                   BindingResult bindingResult)
+    {
         if (bindingResult.hasErrors()) {
-            throw new ValidationFailedException();
+            throw new ValidationFailedException(bindingResult);
         }
+
+        log.info("userId = {}", userId);
+
         BookResponse response = bookService.createBook(request);
         URI location = URI.create("/books/" + response.id());
         return ResponseEntity.created(location).body(response);
@@ -64,7 +72,7 @@ public class BookController {
                                                          @Valid @RequestBody BookUpdateRequest request,
                                                          BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ValidationFailedException();
+            throw new ValidationFailedException(bindingResult);
         }
         BookDetailResponse response = bookService.updateBook(bookId, request);
         return ResponseEntity.status(HttpStatus.OK).body(response);
@@ -92,11 +100,11 @@ public class BookController {
     }
 
     // 재고 최신화
-    @PatchMapping("/book-reduce")
+    @PutMapping("/book-reduce")
     public ResponseEntity<Void> stockUpdate(@RequestBody List<BookStockReduceRequest> request,
                                             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            throw new ValidationFailedException();
+            throw new ValidationFailedException(bindingResult);
         }
         bookService.updateBookStock(request);
         return ResponseEntity.status(HttpStatus.OK).build();

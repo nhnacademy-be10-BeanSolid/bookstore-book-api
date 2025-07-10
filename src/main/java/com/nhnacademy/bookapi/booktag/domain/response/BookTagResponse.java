@@ -1,4 +1,6 @@
 package com.nhnacademy.bookapi.booktag.domain.response;
 
-public record BookTagResponse(Long tagId, String tagName) {
+public record BookTagResponse(
+        Long tagId,
+        String tagName) {
 }

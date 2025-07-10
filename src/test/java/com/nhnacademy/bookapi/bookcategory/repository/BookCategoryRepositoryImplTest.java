@@ -1,7 +1,8 @@
 package com.nhnacademy.bookapi.bookcategory.repository;
 
+import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
-import com.nhnacademy.bookapi.config.QuerydslConfig;
+import com.nhnacademy.bookapi.common.config.QuerydslConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
@@ -11,7 +12,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
-import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,5 +51,14 @@ class BookCategoryRepositoryImplTest {
                 .hasSize(3)
                 .extracting(BookCategoryResponse::categoryName)
                 .containsExactlyInAnyOrder("소설", "추리소설", "공포소설");
+    }
+
+    @Test
+    void findBookTagMapResponseTest() {
+        BookCategoryMapResponse result = bookCategoryRepository.findBookCategoryMapResponse(1L);
+
+        assertThat(result).isNotNull();
+        assertThat(result.bookId()).isEqualTo(1L);
+        assertThat(result.categories()).hasSize(2);
     }
 }

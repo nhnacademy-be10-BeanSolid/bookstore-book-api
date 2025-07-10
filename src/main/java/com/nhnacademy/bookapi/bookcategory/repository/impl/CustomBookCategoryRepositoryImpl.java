@@ -1,6 +1,8 @@
 package com.nhnacademy.bookapi.bookcategory.repository.impl;
 
+import com.nhnacademy.bookapi.book.domain.QBook;
 import com.nhnacademy.bookapi.bookcategory.domain.QBookCategory;
+import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.repository.CustomBookCategoryRepository;
 import com.querydsl.core.types.Projections;
@@ -66,5 +68,29 @@ public class CustomBookCategoryRepositoryImpl implements CustomBookCategoryRepos
                 .fetchOne();
 
         return new PageImpl<>(result, pageable, total != null ? total : 0);
+    }
+
+    @Override
+    public BookCategoryMapResponse findBookCategoryMapResponse(Long bookId) {
+        QBook book = QBook.book;
+        QBookCategory category = QBookCategory.bookCategory;
+        QBookCategory parent = new QBookCategory("parent");
+
+        List<BookCategoryResponse> categories = queryFactory
+                .select(Projections.constructor(BookCategoryResponse.class,
+                        category.categoryId,
+                        category.name,
+                        parent.categoryId,
+                        parent.name,
+                        category.createdAt,
+                        category.updatedAt
+                ))
+                .from(book)
+                .join(book.bookCategories, category)
+                .leftJoin(category.parentCategory, parent)
+                .where(book.id.eq(bookId))
+                .fetch();
+
+        return new BookCategoryMapResponse(bookId, categories);
     }
 }

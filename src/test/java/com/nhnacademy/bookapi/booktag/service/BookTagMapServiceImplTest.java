@@ -5,6 +5,7 @@ import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagMapCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
+import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
 import com.nhnacademy.bookapi.booktag.exception.BookTagMapAlreadyExistsException;
 import com.nhnacademy.bookapi.booktag.exception.BookTagMapNotFoundException;
 import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
@@ -20,6 +21,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -67,17 +69,20 @@ class BookTagMapServiceImplTest {
         when(bookRepository.save(any(Book.class))).thenReturn(book);
         when(bookDocumentRepository.save(any())).thenReturn(null);
 
-        BookTagMapResponse response = new BookTagMapResponse(bookId, tagId);
-        when(bookRepository.findBookTagMapResponseByBookIdAndTagId(bookId, tagId))
-                .thenReturn(Optional.of(response));
+        BookTagResponse tagResponse = new BookTagResponse(tagId, tag.getName());
+        BookTagMapResponse mapResponse = new BookTagMapResponse(bookId, List.of(tagResponse));
+        when(bookTagRepository.findBookTagMapResponse(bookId)).thenReturn(mapResponse);
+
         BookTagMapResponse result = bookTagMapService.createBookTag(bookId, request);
 
         assertThat(result.bookId()).isEqualTo(bookId);
-        assertThat(result.tagId()).isEqualTo(tagId);
+        assertThat(result.tags()).hasSize(1);
+        assertThat(result.tags().getFirst().tagId()).isEqualTo(tagId);
+        assertThat(result.tags().getFirst().tagName()).isEqualTo(tag.getName());
     }
 
     @Test
-    @DisplayName("도서에 태그 추가 - 해당 태그가 존재하는 경우")
+    @DisplayName("도서에 태그 추가 - 존재하는 태그")
     void createBookTagExceptionTest(){
         Long bookId = book.getId();
         Long tagId = tag.getTagId();
