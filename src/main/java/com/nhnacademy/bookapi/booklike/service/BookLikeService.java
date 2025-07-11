@@ -14,4 +14,6 @@ public interface BookLikeService {
     Page<BookLikeResponse> getBookLikesByBookId(Long bookId, Pageable pageable);
 
     void deleteBookLikeByUserIdAndBookId(String userId, Long bookId);
+
+//    boolean isUserLikedBook(Long userId, Long bookId);
 }

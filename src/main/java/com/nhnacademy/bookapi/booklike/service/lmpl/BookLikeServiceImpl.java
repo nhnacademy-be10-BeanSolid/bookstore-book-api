@@ -67,4 +67,9 @@ public class BookLikeServiceImpl implements BookLikeService {
         }
         bookLikeRepository.deleteByUserIdAndBookId(userId, bookId);
     }
+
+//    @Override
+//    public boolean isUserLikedBook(String userId, Long bookId) {
+//        return bookLikeRepository.existsByUserIdAndBookId(userId, bookId);
+//    }
 }

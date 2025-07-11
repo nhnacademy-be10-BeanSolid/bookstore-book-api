@@ -10,12 +10,12 @@
       }
     },
     "analyzer": {
-      "korean_icu_analyzer": {
+      "icu_analyzer": {
         "type": "custom",
         "tokenizer": "nori_tokenizer",
         "filter": [
           "lowercase",
-          "icu_folding"
+          "icu_normalizer"
         ]
       },
       "jaso_analyzer": {

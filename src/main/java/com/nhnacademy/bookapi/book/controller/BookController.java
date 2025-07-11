@@ -4,11 +4,9 @@ import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.*;
-import com.nhnacademy.bookapi.common.exception.InvalidHeaderException;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.book.feignclient.BookSearchApiService;
-import com.nhnacademy.bookapi.document.BookDocument;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,11 +38,13 @@ public class BookController {
     // 메인페이지 간단 정보
     @GetMapping("/books")
     public ResponseEntity<Page<SimpleBookResponse>> getAllBookResponses(Pageable pageable) {
+        log.info("page number: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
+        log.info("sort - {}", pageable.getSort());
         Page<SimpleBookResponse> responses = bookService.getAllBooks(pageable);
+        log.info("responses - {}", responses);
         return ResponseEntity.ok(responses);
     }
 
-    // Dto를 나누려면?
     @GetMapping("/books/{id}")
     public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
         BookDetailResponse response = bookService.getBookDetailResponseByBookId(id);
@@ -94,8 +94,8 @@ public class BookController {
 
     // 엘라스틱 서치
     @GetMapping("/search")
-    public ResponseEntity<Page<BookDocument>> getBookDocumentByKeyword(@RequestParam String keyword, Pageable pageable) {
-        Page<BookDocument> response = bookService.getBookDocumentByKeyword(keyword, pageable);
+    public ResponseEntity<Page<SimpleBookResponse>> getBookDocumentByKeyword(@RequestParam String keyword, Pageable pageable) {
+        Page<SimpleBookResponse> response = bookService.getBookDocumentByKeyword(keyword, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
