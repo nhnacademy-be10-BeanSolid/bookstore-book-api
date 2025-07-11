@@ -42,6 +42,7 @@ DELETE http://localhost:10346/books/1
 
 ### 샵 메인페이지 도서 출력
 GET http://localhost:10346/shop
+X-USER-ID: "user"
 
 ### 정보 전달 테스트
 GET http://localhost:10346/books/ids?ids=2,3

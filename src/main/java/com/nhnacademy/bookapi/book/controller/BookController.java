@@ -45,9 +45,11 @@ public class BookController {
         return ResponseEntity.ok(responses);
     }
 
+    // 상세 정보, 조회수 증가
     @GetMapping("/books/{id}")
     public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
         BookDetailResponse response = bookService.getBookDetailResponseByBookId(id);
+        bookService.increaseViewCount(id);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

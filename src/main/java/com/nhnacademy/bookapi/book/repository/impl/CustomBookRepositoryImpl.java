@@ -75,9 +75,10 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
     public Page<SimpleBookResponse> findAllSimpleBookResponses(Pageable pageable) {
         QBook book = QBook.book;
 
+        log.info("findAllSimpleBookResponses");
+
         // QueryDSL 정렬할 때 OrderSpecifier 객체 사용
         PathBuilder<Book> pathBuilder = new PathBuilder<>(Book.class, "book");
-
 
         List<OrderSpecifier<Comparable>> orderSpecifiers = pageable.getSort().stream()
                 .map(order -> new OrderSpecifier<>(
@@ -96,7 +97,8 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
                         book.author,
                         book.salePrice,
                         book.stock,
-                        book.image
+                        book.image,
+                        book.viewCount
                 ))
                 .from(book)
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
@@ -108,6 +110,8 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
                 .select(book.count())
                 .from(book)
                 .fetchOne();
+
+        log.info("end findAllSimpleBookResponses");
 
         return new PageImpl<>(content, pageable, total != null ? total : 0);
     }

@@ -82,7 +82,8 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                         book.getAuthor(),
                         book.getSalePrice(),
                         book.getStock(),
-                        book.getImage()
+                        book.getImage(),
+                        book.getViewCount()
                 ))
                 .toList();
 

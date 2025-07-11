@@ -14,4 +14,5 @@ public class SimpleBookResponse {
     private int salePrice;
     private int stock;
     private String image;
+    private long viewCount;
 }

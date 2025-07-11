@@ -19,6 +19,8 @@ public interface BookService {
 
     BookDetailResponse getBookDetailResponseByBookId(Long id);
 
+    void increaseViewCount(Long id);
+
     Page<SimpleBookResponse> getAllBooks(Pageable pageable);
 
     BookDetailResponse updateBook(Long id, BookUpdateRequest request);

@@ -79,7 +79,7 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new BookNotFoundException(savedBook.getId()));
     }
 
-    // 도서 상세정보 (좋아요한 유저까지 포함)
+    // 도서 상세정보
     @Override
     @Transactional(readOnly = true)
     public BookDetailResponse getBookDetailResponseByBookId(Long id) {
@@ -87,10 +87,17 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new BookNotFoundException(id));
     }
 
+    @Override
+    @Transactional
+    public void increaseViewCount(Long id) {
+        bookRepository.incrementViewCount(id);
+    }
+
     // 전체 리스트
     @Override
     @Transactional(readOnly = true)
     public Page<SimpleBookResponse> getAllBooks(Pageable pageable) {
+        log.info("service start");
         return bookRepository.findAllSimpleBookResponses(pageable);
     }
 
