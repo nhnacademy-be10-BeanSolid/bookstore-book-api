@@ -6,7 +6,7 @@ import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.*;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
-import com.nhnacademy.bookapi.book.feignclient.BookSearchApiService;
+import com.nhnacademy.bookapi.book.service.BookSearchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -26,7 +26,7 @@ import java.util.List;
 public class BookController {
 
     private final BookService bookService;
-    private final BookSearchApiService naverBookSearchService;
+    private final BookSearchService naverBookSearchService;
 
     @GetMapping("/books-search")
     public ResponseEntity<BookSearchResponse> searchBook(
@@ -37,7 +37,7 @@ public class BookController {
 
     // 메인페이지 간단 정보
     @GetMapping("/books")
-    public ResponseEntity<Page<SimpleBookResponse>> getAllBookResponses(Pageable pageable) {
+    public ResponseEntity<Page<SimpleBookResponse>> getAllBooks(Pageable pageable) {
         log.info("page number: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
         log.info("sort - {}", pageable.getSort());
         Page<SimpleBookResponse> responses = bookService.getAllBooks(pageable);
@@ -94,13 +94,6 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    // 엘라스틱 서치
-    @GetMapping("/search")
-    public ResponseEntity<Page<SimpleBookResponse>> getBookDocumentByKeyword(@RequestParam String keyword, Pageable pageable) {
-        Page<SimpleBookResponse> response = bookService.getBookDocumentByKeyword(keyword, pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
     // 재고 최신화
     @PutMapping("/book-reduce")
     public ResponseEntity<Void> stockUpdate(@RequestBody List<BookStockReduceRequest> request,
@@ -110,5 +103,12 @@ public class BookController {
         }
         bookService.updateBookStock(request);
         return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
+    // 엘라스틱 서치
+    @GetMapping("/search")
+    public ResponseEntity<Page<SimpleBookResponse>> getSimpleBookResponseByKeyword(@RequestParam String keyword, Pageable pageable) {
+        Page<SimpleBookResponse> response = bookService.getSimpleBookResponseByKeyword(keyword, pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

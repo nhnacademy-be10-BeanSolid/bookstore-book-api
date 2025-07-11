@@ -55,25 +55,17 @@ public class BookServiceImpl implements BookService {
 
         String image = request.image();
 
-        log.info("image: {}", image);
-
         if (image == null || image.isEmpty()) {
             image = "/images/default.png";
         }
-
-        log.info("toc: {}", request.toc());
 
         Book book = Book.from(request, categories);
         book.setImage(image);
         Book savedBook = bookRepository.save(book);
 
-        log.info("saved book: {}", savedBook.getToc());
-
-        // Elastic Search에 저장
+        // Document 저장
         BookDocument document = BookDocument.from(savedBook);
         bookDocumentRepository.save(document);
-
-        log.info("Book created: {}", document);
 
         return bookRepository.findBookResponseById(savedBook.getId())
                 .orElseThrow(() -> new BookNotFoundException(savedBook.getId()));
@@ -87,8 +79,8 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new BookNotFoundException(id));
     }
 
+    // 조회 카운트 증가
     @Override
-    @Transactional
     public void increaseViewCount(Long id) {
         bookRepository.incrementViewCount(id);
     }
@@ -127,7 +119,7 @@ public class BookServiceImpl implements BookService {
 
     // 검색
     @Override
-    public Page<SimpleBookResponse> getBookDocumentByKeyword(String keyword, Pageable pageable) {
+    public Page<SimpleBookResponse> getSimpleBookResponseByKeyword(String keyword, Pageable pageable) {
         return bookDocumentRepository.searchByKeyword(keyword, pageable);
     }
 
