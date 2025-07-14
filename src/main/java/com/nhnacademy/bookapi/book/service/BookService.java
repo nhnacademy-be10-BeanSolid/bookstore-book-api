@@ -26,7 +26,7 @@ public interface BookService {
     void deleteBook(Long id);
 
     // 도서 키워드로 검색
-    Page<SimpleBookResponse> getBookDocumentByKeyword(String keyword, Pageable pageable);
+    Page<SimpleBookResponse> getSimpleBookResponseByKeyword(String keyword, Pageable pageable);
 
     // 주문 api 정보 전달
     List<BookOrderResponse> getBookOrderResponseByBookIds(List<Long> ids);

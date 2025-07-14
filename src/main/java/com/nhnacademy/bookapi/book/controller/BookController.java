@@ -4,11 +4,9 @@ import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.*;
-import com.nhnacademy.bookapi.common.exception.InvalidHeaderException;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
-import com.nhnacademy.bookapi.book.feignclient.BookSearchApiService;
-import com.nhnacademy.bookapi.document.BookDocument;
+import com.nhnacademy.bookapi.book.service.BookSearchService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,27 +26,32 @@ import java.util.List;
 public class BookController {
 
     private final BookService bookService;
-    private final BookSearchApiService naverBookSearchService;
+    private final BookSearchService naverBookSearchService;
 
     @GetMapping("/books-search")
     public ResponseEntity<BookSearchResponse> searchBook(
             @RequestParam String query,
             @RequestParam(defaultValue = "1") int start) {
-        return ResponseEntity.status(HttpStatus.OK).body(naverBookSearchService.searchBook(query, start));
+        BookSearchResponse response = naverBookSearchService.searchBook(query, start);
+        return ResponseEntity.ok(response);
     }
 
     // 메인페이지 간단 정보
     @GetMapping("/books")
-    public ResponseEntity<Page<SimpleBookResponse>> getAllBookResponses(Pageable pageable) {
+    public ResponseEntity<Page<SimpleBookResponse>> getAllBooks(Pageable pageable) {
+        log.info("page number: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
+        log.info("sort - {}", pageable.getSort());
         Page<SimpleBookResponse> responses = bookService.getAllBooks(pageable);
+        log.info("responses - {}", responses);
         return ResponseEntity.ok(responses);
     }
 
-    // Dto를 나누려면?
+    // 상세 정보, 조회수 증가
     @GetMapping("/books/{id}")
     public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
         BookDetailResponse response = bookService.getBookDetailResponseByBookId(id);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        bookService.increaseViewCount(id);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/books")
@@ -75,7 +78,7 @@ public class BookController {
             throw new ValidationFailedException(bindingResult);
         }
         BookDetailResponse response = bookService.updateBook(bookId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/books/{bookId}")
@@ -89,14 +92,7 @@ public class BookController {
     public ResponseEntity<List<BookOrderResponse>> getBookOrderResponse(@RequestParam List<Long> ids) {
         log.info("요청!");
         List<BookOrderResponse> response = bookService.getBookOrderResponseByBookIds(ids);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    // 엘라스틱 서치
-    @GetMapping("/search")
-    public ResponseEntity<Page<BookDocument>> getBookDocumentByKeyword(@RequestParam String keyword, Pageable pageable) {
-        Page<BookDocument> response = bookService.getBookDocumentByKeyword(keyword, pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     // 재고 최신화
@@ -107,6 +103,13 @@ public class BookController {
             throw new ValidationFailedException(bindingResult);
         }
         bookService.updateBookStock(request);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
+    }
+
+    // 엘라스틱 서치
+    @GetMapping("/search")
+    public ResponseEntity<Page<SimpleBookResponse>> getSimpleBookResponseByKeyword(@RequestParam String keyword, Pageable pageable) {
+        Page<SimpleBookResponse> response = bookService.getSimpleBookResponseByKeyword(keyword, pageable);
+        return ResponseEntity.ok(response);
     }
 }

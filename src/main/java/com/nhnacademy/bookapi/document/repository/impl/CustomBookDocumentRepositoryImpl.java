@@ -66,7 +66,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                                 "tags^5"
                         )
                 ))
-//                .withSort(sortOptionsList)
+                .withSort(sortOptionsList)
                 .withPageable(pageable) // 현재 페이지만
                 .build();
 

@@ -120,7 +120,7 @@ public class BookServiceImpl implements BookService {
 
     // 검색
     @Override
-    public Page<SimpleBookResponse> getBookDocumentByKeyword(String keyword, Pageable pageable) {
+    public Page<SimpleBookResponse> getSimpleBookResponseByKeyword(String keyword, Pageable pageable) {
         return bookDocumentRepository.searchByKeyword(keyword, pageable);
     }
 
