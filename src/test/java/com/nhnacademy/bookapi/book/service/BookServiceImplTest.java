@@ -143,6 +143,11 @@ class BookServiceImplTest {
     @Test
     @DisplayName("조회 카운트 증가")
     void increaseViewCount() {
+        Book book = new Book();
+        ReflectionTestUtils.setField(book, "status", BookStatus.ON_SALE);
+
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+
         bookService.increaseViewCount(1L);
 
         verify(bookRepository, times(1)).incrementViewCount(1L);
@@ -151,8 +156,8 @@ class BookServiceImplTest {
     @Test
     @DisplayName("도서 리스트")
     void getAllBooksTest() {
-        SimpleBookResponse response1 = new SimpleBookResponse(1L, "제목", "작가", 1000, 20, null, 0);
-        SimpleBookResponse response2 = new SimpleBookResponse(2L, "제목1", "작가1", 500, 30, null, 1);
+        SimpleBookResponse response1 = new SimpleBookResponse(1L, "제목", "작가", 1000, 20, null, 0L);
+        SimpleBookResponse response2 = new SimpleBookResponse(2L, "제목1", "작가1", 500, 30, null, 1L);
 
         Pageable pageable = PageRequest.of(0, 4);
 
