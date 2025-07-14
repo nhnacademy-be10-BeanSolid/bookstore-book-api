@@ -11,7 +11,10 @@ import com.nhnacademy.bookapi.book.repository.CustomBookRepository;
 import com.nhnacademy.bookapi.bookcategory.domain.QBookCategory;
 import com.nhnacademy.bookapi.booklike.domain.QBookLike;
 import com.nhnacademy.bookapi.booktag.domain.QBookTag;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -71,6 +75,21 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
     public Page<SimpleBookResponse> findAllSimpleBookResponses(Pageable pageable) {
         QBook book = QBook.book;
 
+        log.info("findAllSimpleBookResponses");
+
+        // QueryDSL 정렬할 때 OrderSpecifier 객체 사용
+        PathBuilder<Book> pathBuilder = new PathBuilder<>(Book.class, "book");
+
+        List<OrderSpecifier<Comparable>> orderSpecifiers = pageable.getSort().stream()
+                .map(order -> new OrderSpecifier<>(
+                        order.isAscending() ? Order.ASC : Order.DESC,
+                        pathBuilder.getComparable(order.getProperty(), Comparable.class)
+                ))
+                .collect(Collectors.toList());
+
+        // 보조 정렬 조건 추가
+        orderSpecifiers.add(new OrderSpecifier<>(Order.ASC, pathBuilder.getComparable("id", Comparable.class)));
+
         List<SimpleBookResponse> content = queryFactory
                 .select(Projections.constructor(SimpleBookResponse.class,
                         book.id,
@@ -82,7 +101,11 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
                         book.viewCount
                 ))
                 .from(book)
-                .orderBy(book.id.asc())
+                // 판매중인 도서만 보여주기
+//                .where(
+//                        book.status.eq(BookStatus.ON_SALE)
+//                )
+                .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -91,6 +114,8 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
                 .select(book.count())
                 .from(book)
                 .fetchOne();
+
+        log.info("end findAllSimpleBookResponses");
 
         return new PageImpl<>(content, pageable, total != null ? total : 0);
     }

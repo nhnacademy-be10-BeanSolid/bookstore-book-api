@@ -10,10 +10,7 @@ import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.document.repository.CustomBookDocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -46,33 +43,42 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
         } else {
             for (Sort.Order order : sort) {
                 String property = order.getProperty();
+                if(property.contains(":")) {
+                    property = property.substring(0, property.indexOf(":")).trim();
+                }
                 SortOrder sortOrder = order.isAscending() ? SortOrder.Asc : SortOrder.Desc;
+                log.info("정렬 필드 123 : {}, isAscending: {}, direction: {}", property, order.isAscending(), order.getDirection());
+                log.info("정렬 필드: {}, 방향: {}", property, order.getDirection()); // Direction 출력
 
-                sortOptionsList.add(SortOptions.of(s -> s.field(f -> f.field(property).order(sortOrder))));
+                String finalProperty = property;
+                sortOptionsList.add(SortOptions.of(s -> s.field(f -> f.field(finalProperty).order(sortOrder))));
             }
         }
 
-        log.info("정렬 : {}", sortOptionsList.stream()
-                .map(Object::toString)
-                .collect(Collectors.joining(", ")));
+        log.info("정렬 옵션: {}",
+                sortOptionsList.stream()
+                        .map(Object::toString)
+                        .collect(Collectors.joining(", "))
+        );
+
+        Pageable pageWithoutSort = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
 
         // 쿼리 객체
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q.multiMatch(m -> m
                         .query(keyword)
                         .fields(
-                                "title^5",
+                                "title^10",
                                 "title.synonym^5",
                                 "title.jaso^5",
                                 "description^1",
                                 "author^3",
                                 "publisher^3",
-                                "isbn^5",
                                 "tags^5"
                         )
                 ))
                 .withSort(sortOptionsList)
-                .withPageable(pageable) // 현재 페이지만
+                .withPageable(pageWithoutSort) // 현재 페이지(정렬 정보없는 객체)
                 .build();
 
         // 검색 결과를 담고있는 컨테이너

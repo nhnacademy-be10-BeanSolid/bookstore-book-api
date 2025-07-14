@@ -45,7 +45,7 @@ public class BookDocument {
     private Set<String> tags;
 
     @Field(type = FieldType.Date, format = DateFormat.date)
-    private LocalDate publishedAt;
+    private LocalDate publishAt;
 
     @Field(type = FieldType.Integer)
     private Integer salePrice;

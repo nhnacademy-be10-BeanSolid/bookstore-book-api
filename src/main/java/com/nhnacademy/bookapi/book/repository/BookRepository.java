@@ -11,7 +11,7 @@ import org.springframework.stereotype.Repository;
 public interface BookRepository extends JpaRepository<Book, Long>, CustomBookRepository {
     boolean existsByIsbn(String isbn);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE Book b SET b.viewCount = b.viewCount + 1 WHERE b.id = :id")
     void incrementViewCount(@Param("id") Long id);
 }

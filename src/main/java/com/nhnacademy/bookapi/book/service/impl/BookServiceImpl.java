@@ -83,6 +83,14 @@ public class BookServiceImpl implements BookService {
     @Override
     public void increaseViewCount(Long id) {
         bookRepository.incrementViewCount(id);
+
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
+
+        log.info("View count is {}", book.getViewCount());
+        BookDocument document = BookDocument.from(book);
+
+        bookDocumentRepository.save(document);
     }
 
     // 전체 리스트

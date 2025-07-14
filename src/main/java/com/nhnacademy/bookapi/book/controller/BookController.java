@@ -13,6 +13,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -108,8 +109,17 @@ public class BookController {
 
     // 엘라스틱 서치
     @GetMapping("/search")
-    public ResponseEntity<Page<SimpleBookResponse>> getSimpleBookResponseByKeyword(@RequestParam String keyword, Pageable pageable) {
+    public ResponseEntity<Page<SimpleBookResponse>> getSimpleBookResponseByKeyword(@RequestParam String keyword,
+//                                                                                   @RequestParam(required = false) String sort,
+                                                                                   Pageable pageable) {
         Page<SimpleBookResponse> response = bookService.getSimpleBookResponseByKeyword(keyword, pageable);
+        Sort sort = pageable.getSort();
+
+        for (Sort.Order order : sort) {
+            log.info("property: {}, direction: {}, isAscending: {}",
+                    order.getProperty(), order.getDirection(), order.isAscending());
+        }
+//        log.info("pageable sort: {}", pageable.getSort());
         return ResponseEntity.ok(response);
     }
 }
