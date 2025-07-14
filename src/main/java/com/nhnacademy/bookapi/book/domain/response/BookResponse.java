@@ -21,7 +21,7 @@ public record BookResponse(
     int originalPrice,
     int salePrice,
     Boolean wrappable,
-    BookStatus status,
+    String status,
     int stock,
     String image,
 
@@ -51,7 +51,7 @@ public static BookResponse from(Book book) {
             book.getOriginalPrice(),
             book.getSalePrice(),
             book.isWrappable(),
-            book.getStatus(),
+            book.getStatus().getLabel(),
             book.getStock(),
             book.getImage(),
             categories,

@@ -108,6 +108,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-elasticsearch</artifactId>
         </dependency>
+
         <!--        feign-client-->
         <dependency>
             <groupId>org.springframework.cloud</groupId>

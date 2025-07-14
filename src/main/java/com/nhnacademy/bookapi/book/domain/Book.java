@@ -88,7 +88,7 @@ public class Book {
     private Set<BookCategory> bookCategories = new HashSet<>();
 
     @Column(name = "view_count", nullable = false)
-    private long viewCount = 0L;
+    private long viewCount;
 
     public static Book from(BookCreateRequest request, Set<BookCategory> categories) {
         Book book = new Book();

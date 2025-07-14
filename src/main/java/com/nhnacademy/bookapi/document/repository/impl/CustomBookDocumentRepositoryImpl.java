@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.document.repository.impl;
 
-import co.elastic.clients.elasticsearch._types.SortOrder;
+//import co.elastic.clients.elasticsearch._types.SortOptions;
+//import co.elastic.clients.elasticsearch._types.SortOrder;
 import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
@@ -12,7 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+//import org.springframework.data.domain.Sort;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
@@ -35,6 +36,21 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
 
         log.info("검색시작");
 
+        // 정렬 정보
+//        Sort sort = pageable.getSort();
+//        List<SortOptions> sortOptionsList = new ArrayList<>();
+//
+//        if (sort.isUnsorted()) {
+//            sortOptionsList.add(SortOptions.of(s -> s.field(f -> f.field("id").order(SortOrder.Desc))));
+//        } else {
+//            for (Sort.Order order : sort) {
+//                String property = order.getProperty();
+//                SortOrder sortOrder = order.isAscending() ? SortOrder.Asc : SortOrder.Desc;
+//
+//                sortOptionsList.add(SortOptions.of(s -> s.field(f -> f.field(property).order(sortOrder))));
+//            }
+//        }
+
         // 쿼리 객체
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q.multiMatch(m -> m
@@ -50,11 +66,9 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                                 "tags^5"
                         )
                 ))
-                .withSort(s -> s.field(f -> f.field("id").order(SortOrder.Desc)))
+//                .withSort(sortOptionsList)
                 .withPageable(pageable) // 현재 페이지만
                 .build();
-
-        log.info("query {}", query);
 
         // 검색 결과를 담고있는 컨테이너
         SearchHits<BookDocument> hits = elasticsearchOperations.search(query, BookDocument.class); // 검색 실행(쿼리를 보냄)

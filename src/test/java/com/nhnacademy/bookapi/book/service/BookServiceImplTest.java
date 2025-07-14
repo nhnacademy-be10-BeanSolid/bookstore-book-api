@@ -120,6 +120,7 @@ class BookServiceImplTest {
         Long id = 1L;
         int likeCount = 2;
         Book book = new Book();
+        ReflectionTestUtils.setField(book, "status", BookStatus.ON_SALE);
         BookDetailResponse response = BookDetailResponse.from(book, likeCount);
 
         when(bookRepository.findBookDetailResponseByBookId(id)).thenReturn(Optional.of(response));
@@ -184,7 +185,7 @@ class BookServiceImplTest {
 
         assertThat(result.id()).isEqualTo(1L);
         assertThat(result.wrappable()).isTrue();
-        assertThat(result.status()).isEqualTo(BookStatus.SALE_END);
+        assertThat(result.status()).isEqualTo(BookStatus.SALE_END.getLabel());
     }
 
     @Test

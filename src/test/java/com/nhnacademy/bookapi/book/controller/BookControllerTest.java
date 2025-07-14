@@ -119,7 +119,7 @@ class BookControllerTest {
                 true,
                 LocalDateTime.of(2020, 12,3, 12, 10),
                 null,
-                BookStatus.ON_SALE,
+                BookStatus.ON_SALE.getLabel(),
                 100,
                 null,
                 List.of(new BookCategoryResponse(1L, "카테고리", null, null,
@@ -152,6 +152,7 @@ class BookControllerTest {
         ReflectionTestUtils.setField(book, "author", "작가");
         ReflectionTestUtils.setField(book, "isbn", "test000000000");
         ReflectionTestUtils.setField(book, "bookCategories", Set.of(category));
+        ReflectionTestUtils.setField(book, "status", BookStatus.ON_SALE);
 
         given(bookService.createBook(any(BookCreateRequest.class))).willReturn(BookResponse.from(book));
 
@@ -205,7 +206,7 @@ class BookControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.wrappable").value(false))
-                .andExpect(jsonPath("$.status").value(BookStatus.SALE_END.toString()));
+                .andExpect(jsonPath("$.status").value(BookStatus.SALE_END.getLabel()));
 
         verify(bookService, times(1)).updateBook(eq(1L), any(BookUpdateRequest.class));
     }

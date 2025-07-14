@@ -101,6 +101,10 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
                         book.viewCount
                 ))
                 .from(book)
+                // 판매중인 도서만 보여주기
+//                .where(
+//                        book.status.eq(BookStatus.ON_SALE)
+//                )
                 .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

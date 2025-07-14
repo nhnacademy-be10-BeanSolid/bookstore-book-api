@@ -32,7 +32,8 @@ public class BookController {
     public ResponseEntity<BookSearchResponse> searchBook(
             @RequestParam String query,
             @RequestParam(defaultValue = "1") int start) {
-        return ResponseEntity.status(HttpStatus.OK).body(naverBookSearchService.searchBook(query, start));
+        BookSearchResponse response = naverBookSearchService.searchBook(query, start);
+        return ResponseEntity.ok(response);
     }
 
     // 메인페이지 간단 정보
@@ -50,7 +51,7 @@ public class BookController {
     public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
         BookDetailResponse response = bookService.getBookDetailResponseByBookId(id);
         bookService.increaseViewCount(id);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/books")
@@ -77,7 +78,7 @@ public class BookController {
             throw new ValidationFailedException(bindingResult);
         }
         BookDetailResponse response = bookService.updateBook(bookId, request);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     @DeleteMapping("/books/{bookId}")
@@ -91,7 +92,7 @@ public class BookController {
     public ResponseEntity<List<BookOrderResponse>> getBookOrderResponse(@RequestParam List<Long> ids) {
         log.info("요청!");
         List<BookOrderResponse> response = bookService.getBookOrderResponseByBookIds(ids);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 
     // 재고 최신화
@@ -102,13 +103,13 @@ public class BookController {
             throw new ValidationFailedException(bindingResult);
         }
         bookService.updateBookStock(request);
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
 
     // 엘라스틱 서치
     @GetMapping("/search")
     public ResponseEntity<Page<SimpleBookResponse>> getSimpleBookResponseByKeyword(@RequestParam String keyword, Pageable pageable) {
         Page<SimpleBookResponse> response = bookService.getSimpleBookResponseByKeyword(keyword, pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(response);
     }
 }
