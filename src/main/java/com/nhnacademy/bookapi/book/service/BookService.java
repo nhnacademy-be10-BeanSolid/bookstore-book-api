@@ -33,4 +33,6 @@ public interface BookService {
 
     // 주문 재고 변경
     void updateBookStock(List<BookStockReduceRequest> requests);
+
+    void increaseViewCount(Long id);
 }
