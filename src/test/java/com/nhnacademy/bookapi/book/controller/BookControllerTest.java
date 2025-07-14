@@ -256,7 +256,7 @@ class BookControllerTest {
                 null,
                 Set.of(tag),
                 Set.of(category),
-                0
+                0L
         );
         Book book1 = new Book(
                 2L,
@@ -277,7 +277,7 @@ class BookControllerTest {
                 null,
                 Set.of(tag),
                 Set.of(category),
-                0
+                0L
         );
 
         List<BookOrderResponse> response = List.of(

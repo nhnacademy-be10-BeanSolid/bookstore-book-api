@@ -74,7 +74,7 @@ class BookLikeServiceImplTest {
                 null,
                 new HashSet<>(),
                 Set.of(category),
-                0
+                0L
         );
         bookLike = new BookLike("user1", book);
         bookLike1 = new BookLike("user2", book);
