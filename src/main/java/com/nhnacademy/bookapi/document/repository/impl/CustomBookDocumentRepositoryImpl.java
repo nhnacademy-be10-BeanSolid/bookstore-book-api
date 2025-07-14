@@ -22,6 +22,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -50,6 +51,10 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                 sortOptionsList.add(SortOptions.of(s -> s.field(f -> f.field(property).order(sortOrder))));
             }
         }
+
+        log.info("정렬 : {}", sortOptionsList.stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(", ")));
 
         // 쿼리 객체
         NativeQuery query = NativeQuery.builder()

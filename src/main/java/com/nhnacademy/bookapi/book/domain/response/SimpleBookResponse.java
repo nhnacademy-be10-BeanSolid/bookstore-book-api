@@ -1,12 +1,11 @@
 package com.nhnacademy.bookapi.book.domain.response;
 
 public record SimpleBookResponse(
-        long id,
+        Long id,
         String title,
         String author,
-        int salePrice,
-        int stock,
+        Integer salePrice,
+        Integer stock,
         String image,
-        long viewCount
-) {
-}
+        Long viewCount
+) {}

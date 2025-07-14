@@ -78,7 +78,8 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
                         book.author,
                         book.salePrice,
                         book.stock,
-                        book.image
+                        book.image,
+                        book.viewCount
                 ))
                 .from(book)
                 .orderBy(book.id.asc())

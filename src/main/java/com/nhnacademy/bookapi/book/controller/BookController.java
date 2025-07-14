@@ -4,15 +4,15 @@ import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.*;
+import com.nhnacademy.bookapi.book.feignclient.BookSearchService;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
-import com.nhnacademy.bookapi.book.service.BookSearchService;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
