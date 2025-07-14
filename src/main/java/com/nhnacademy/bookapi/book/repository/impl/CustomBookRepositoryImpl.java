@@ -88,7 +88,7 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
                 .collect(Collectors.toList());
 
         // 보조 정렬 조건 추가
-        orderSpecifiers.add(new OrderSpecifier<>(Order.ASC, pathBuilder.getComparable("id", Comparable.class)));
+        orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, pathBuilder.getComparable("id", Comparable.class)));
 
         List<SimpleBookResponse> content = queryFactory
                 .select(Projections.constructor(SimpleBookResponse.class,

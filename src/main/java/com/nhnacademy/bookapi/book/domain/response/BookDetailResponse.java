@@ -31,7 +31,7 @@ public record BookDetailResponse(
         LocalDateTime createAt,
         LocalDateTime updateAt,
 
-        BookStatus status,
+        String status,
         int stock,
         String image,
 
@@ -74,7 +74,7 @@ public record BookDetailResponse(
                 book.isWrappable(),
                 book.getCreateAt(),
                 book.getUpdateAt(),
-                book.getStatus(),
+                book.getStatus().getLabel(),
                 book.getStock(),
                 book.getImage(),
                 categories,

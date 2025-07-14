@@ -38,22 +38,20 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
         Sort sort = pageable.getSort();
         List<SortOptions> sortOptionsList = new ArrayList<>();
 
-        if (sort.isUnsorted()) {
-            sortOptionsList.add(SortOptions.of(s -> s.field(f -> f.field("id").order(SortOrder.Desc))));
-        } else {
+        if (sort.isSorted()) {
             for (Sort.Order order : sort) {
                 String property = order.getProperty();
                 if(property.contains(":")) {
                     property = property.substring(0, property.indexOf(":")).trim();
                 }
                 SortOrder sortOrder = order.isAscending() ? SortOrder.Asc : SortOrder.Desc;
-                log.info("정렬 필드 123 : {}, isAscending: {}, direction: {}", property, order.isAscending(), order.getDirection());
-                log.info("정렬 필드: {}, 방향: {}", property, order.getDirection()); // Direction 출력
-
                 String finalProperty = property;
                 sortOptionsList.add(SortOptions.of(s -> s.field(f -> f.field(finalProperty).order(sortOrder))));
             }
         }
+
+        // 보조 조건 추가
+        sortOptionsList.add(SortOptions.of(s -> s.field(f -> f.field("id").order(SortOrder.Desc))));
 
         log.info("정렬 옵션: {}",
                 sortOptionsList.stream()
