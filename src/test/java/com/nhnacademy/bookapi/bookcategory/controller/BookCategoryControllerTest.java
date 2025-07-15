@@ -20,6 +20,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -194,11 +195,11 @@ class BookCategoryControllerTest {
     @Test
     @DisplayName("카테고리 트리 정보")
     void getCategoryTree() throws Exception {
-        BookCategoryNodeResponse child1 = new BookCategoryNodeResponse(2L, "추리소설", null);
-        BookCategoryNodeResponse child2 = new BookCategoryNodeResponse(3L, "공포소설", null);
+        BookCategoryNodeResponse child1 = new BookCategoryNodeResponse(2L, "추리소설", new ArrayList<>());
+        BookCategoryNodeResponse child2 = new BookCategoryNodeResponse(3L, "공포소설", new ArrayList<>());
         BookCategoryNodeResponse root = new BookCategoryNodeResponse(1L, "소설", List.of(child1, child2));
 
-        BookCategoryNodeResponse root1 = new BookCategoryNodeResponse(4L, "만화", null);
+        BookCategoryNodeResponse root1 = new BookCategoryNodeResponse(4L, "만화", new ArrayList<>());
 
         given(bookCategoryService.getCategoryTree()).willReturn(List.of(root, root1));
 
