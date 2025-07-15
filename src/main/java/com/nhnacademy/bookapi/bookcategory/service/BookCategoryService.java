@@ -29,5 +29,5 @@ public interface BookCategoryService {
 
     boolean existsCategory(Long categoryId);
 
-    List<BookCategoryNodeResponse> getCategoryNode();
+    List<BookCategoryNodeResponse> getCategoryTree();
 }

@@ -12,9 +12,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,6 +53,7 @@ class BookRepositoryImplTest {
 
         assertThat(result).isPresent();
         assertThat(result.get().title()).isEqualTo("테스트책1");
+        assertThat(result.get().createAt()).isNotNull();
     }
 
     @Test
@@ -62,13 +65,27 @@ class BookRepositoryImplTest {
 
     @Test
     void findAllBookResponsesTest() {
-        Pageable pageable = PageRequest.of(0, 10);
+        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("id")));
         Page<SimpleBookResponse> result = bookRepository.findAllSimpleBookResponses(pageable);
 
         assertThat(result.getContent())
                 .hasSize(3)
                 .extracting(SimpleBookResponse::title)
                 .containsExactlyInAnyOrder("테스트책1", "테스트책2", "테스트책3");
+        assertThat(result.getContent()).isSortedAccordingTo(Comparator.comparing(SimpleBookResponse::id));
+    }
+
+    @Test
+    void findAllBookResponsesByCategoryIdTest() {
+        Pageable pageable = PageRequest.of(0, 10);
+        Long categoryId = 2L;
+
+        Page<SimpleBookResponse> result = bookRepository.findAllSimpleBookResponses(categoryId, pageable);
+
+        assertThat(result.getContent())
+                .hasSize(1)
+                .extracting(SimpleBookResponse::title)
+                .containsExactlyInAnyOrder("테스트책1");
     }
 
     @Test

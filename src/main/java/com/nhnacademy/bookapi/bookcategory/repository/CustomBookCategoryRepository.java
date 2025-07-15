@@ -17,5 +17,5 @@ public interface CustomBookCategoryRepository {
 
     BookCategoryMapResponse findBookCategoryMapResponse(Long bookId);
 
-    List<BookCategoryNodeResponse> buildCategoryNode();
+    List<BookCategoryNodeResponse> buildCategoryTree();
 }

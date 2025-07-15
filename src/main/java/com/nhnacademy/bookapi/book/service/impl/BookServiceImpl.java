@@ -87,7 +87,6 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
 
-        log.info("View count is {}", book.getViewCount());
         BookDocument document = BookDocument.from(book);
 
         bookDocumentRepository.save(document);
@@ -100,7 +99,9 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findAllSimpleBookResponses(pageable);
     }
 
+    // 카테고리를 가지고 있는 도서 리스트
     @Override
+    @Transactional(readOnly = true)
     public Page<SimpleBookResponse> getAllBooks(Long categoryId, Pageable pageable) {
         return bookRepository.findAllSimpleBookResponses(categoryId, pageable);
     }

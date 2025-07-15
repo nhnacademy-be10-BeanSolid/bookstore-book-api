@@ -125,7 +125,7 @@ class BookServiceImplTest {
 
         when(bookRepository.findBookDetailResponseByBookId(id)).thenReturn(Optional.of(response));
 
-        BookDetailResponse result = bookService.getBookDetailResponseByBookId(id);
+        BookDetailResponse result = bookService.getBookDetailResponseByBookId(id); // 1L
 
         assertThat(result).isNotNull();
         assertThat(result.likeCount()).isEqualTo(2);
@@ -144,7 +144,6 @@ class BookServiceImplTest {
     @DisplayName("조회 카운트 증가")
     void increaseViewCount() {
         Book book = new Book();
-        ReflectionTestUtils.setField(book, "status", BookStatus.ON_SALE);
 
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
 
@@ -173,10 +172,34 @@ class BookServiceImplTest {
     }
 
     @Test
+    @DisplayName("카테고리를 가지고 있는 도서 리스트")
+    void getAllBooksByCategoryTest() {
+        Long categoryId = 1L;
+
+        SimpleBookResponse response1 = new SimpleBookResponse(1L, "제목", "작가", 1000, 20, null, 0L);
+        SimpleBookResponse response2 = new SimpleBookResponse(2L, "제목1", "작가1", 500, 30, null, 1L);
+        SimpleBookResponse response3 = new SimpleBookResponse(3L, "제목2", "작가2", 777, 30, null, 0L);
+
+        Pageable pageable = PageRequest.of(0, 4);
+
+        when(bookRepository.findAllSimpleBookResponses(categoryId, pageable))
+                .thenReturn(new PageImpl<>(List.of(response1, response2, response3), pageable, 3));
+
+        Page<SimpleBookResponse> pageResult = bookService.getAllBooks(categoryId, pageable);
+
+        assertThat(pageResult).isNotNull();
+        assertThat(pageResult).hasSize(3);
+        assertThat(pageResult.getContent().get(0)).isEqualTo(response1);
+        assertThat(pageResult.getContent().get(1)).isEqualTo(response2);
+        assertThat(pageResult.getContent().get(2)).isEqualTo(response3);
+    }
+
+    @Test
     @DisplayName("도서 업데이트")
     void updateBook_success() {
         Book book = new Book();
         ReflectionTestUtils.setField(book, "id", 1L);
+        ReflectionTestUtils.setField(book, "status", BookStatus.ON_SALE);
 
         BookUpdateRequest request = new BookUpdateRequest("타이틀", "설명", "목차", "출판사", "작가",
                 LocalDate.of(2020,10,19), 10000, 5000, true, BookStatus.SALE_END.toString(), 100);

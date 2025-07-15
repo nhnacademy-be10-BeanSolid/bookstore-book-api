@@ -13,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -37,7 +36,7 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
-    // 메인페이지 간단 정보
+    // 메인페이지 도서 리스트
     @GetMapping("/books")
     public ResponseEntity<Page<SimpleBookResponse>> getAllBooks(Pageable pageable) {
         log.info("page number: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
@@ -46,7 +45,7 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
-    // 카테고리로 도서 간단 정보
+    // 카테고리를 가지고 있는 도서 리스트
     @GetMapping("/books/categories/{categoryId}")
     public ResponseEntity<Page<SimpleBookResponse>> getAllBooksByCategory(@PathVariable Long categoryId, Pageable pageable) {
         Page<SimpleBookResponse> response = bookService.getAllBooks(categoryId, pageable);

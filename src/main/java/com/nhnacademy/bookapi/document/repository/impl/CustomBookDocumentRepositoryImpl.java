@@ -60,8 +60,6 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
         // 검색 결과를 담고있는 컨테이너
         SearchHits<BookDocument> hits = elasticsearchOperations.search(query, BookDocument.class); // 검색 실행(쿼리를 보냄)
 
-        log.info("hits: {}", hits.getSearchHits());
-
         // 현재 페이지의 검색 결과 아이디
         List<String> ids = hits.getSearchHits().stream()
                 .map(SearchHit::getId)

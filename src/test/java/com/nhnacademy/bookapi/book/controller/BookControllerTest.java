@@ -103,6 +103,29 @@ class BookControllerTest {
     }
 
     @Test
+    @DisplayName("카테고리를 가지고 있는 도서 리스트")
+    void getAllBooksByCategory() throws Exception {
+        Long categoryId = 1L;
+        Pageable pageable = PageRequest.of(0, 4);
+
+        List<SimpleBookResponse> content = List.of(
+                new SimpleBookResponse(1L, "테스트1", "작가", 10000, 20, null, 1L),
+                new SimpleBookResponse(2L, "테스트2", "작가", 2000, 30, null, 3L)
+        );
+        Page<SimpleBookResponse> pageResult = new PageImpl<>(content, pageable, content.size());
+
+        given(bookService.getAllBooks(categoryId, pageable)).willReturn(pageResult);
+
+        mockMvc.perform(get("/books/categories/1")
+                        .param("page", "0")
+                        .param("size", "4"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content", hasSize(2)))
+                .andExpect(jsonPath("$.content[0].id").value(1L))
+                .andExpect(jsonPath("$.content[1].id").value(2L));
+    }
+
+    @Test
     @DisplayName("도서 상세정보 조회")
     void getBookDetailById() throws Exception{
         BookDetailResponse mockResponse = new BookDetailResponse(

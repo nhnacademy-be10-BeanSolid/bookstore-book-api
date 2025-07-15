@@ -74,7 +74,7 @@ public class BookCategoryController {
 
     @GetMapping("/tree")
     public ResponseEntity<List<BookCategoryNodeResponse>> getCategoryTree() {
-        List<BookCategoryNodeResponse> response = bookCategoryService.getCategoryNode();
+        List<BookCategoryNodeResponse> response = bookCategoryService.getCategoryTree();
         return ResponseEntity.ok(response);
     }
 }

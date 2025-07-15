@@ -95,7 +95,7 @@ public class CustomBookCategoryRepositoryImpl implements CustomBookCategoryRepos
     }
 
     @Override
-    public List<BookCategoryNodeResponse> buildCategoryNode(){
+    public List<BookCategoryNodeResponse> buildCategoryTree(){
         QBookCategory bookCategory = QBookCategory.bookCategory;
         QBookCategory parent = new QBookCategory("parent");
 

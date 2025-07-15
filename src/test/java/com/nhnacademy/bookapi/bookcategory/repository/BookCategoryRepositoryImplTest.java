@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.bookcategory.repository;
 
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
+import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryNodeResponse;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.common.config.QuerydslConfig;
 import org.junit.jupiter.api.Test;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,5 +62,21 @@ class BookCategoryRepositoryImplTest {
         assertThat(result).isNotNull();
         assertThat(result.bookId()).isEqualTo(1L);
         assertThat(result.categories()).hasSize(2);
+    }
+
+    @Test
+    void buildCategoryNodeTest() {
+        List<BookCategoryNodeResponse> result = bookCategoryRepository.buildCategoryTree();
+
+        List<BookCategoryNodeResponse> children = result.getFirst().children();
+
+        assertThat(result).isNotNull();
+        assertThat(result.getFirst().categoryId()).isEqualTo(1L);
+
+        assertThat(children).hasSize(2);
+        assertThat(children).extracting(BookCategoryNodeResponse::categoryId)
+                .containsExactlyInAnyOrder(2L, 3L);
+        assertThat(children).extracting(BookCategoryNodeResponse::categoryName)
+                .containsExactlyInAnyOrder("추리소설", "공포소설");
     }
 }

@@ -3,7 +3,6 @@ package com.nhnacademy.bookapi.book.domain.response;
 import lombok.Data;
 
 // 개별 검색 결과
-
 @Data
 public class BookItemResponse {
 

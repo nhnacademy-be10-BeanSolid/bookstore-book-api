@@ -11,7 +11,6 @@ import java.time.LocalDate;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
 @Getter
 @Document(indexName = "beansolid_v3")
 @AllArgsConstructor

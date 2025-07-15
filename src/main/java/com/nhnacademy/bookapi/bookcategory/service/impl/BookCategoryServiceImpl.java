@@ -91,7 +91,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
     }
 
     @Override
-    public List<BookCategoryNodeResponse> getCategoryNode() {
-        return bookCategoryRepository.buildCategoryNode();
+    public List<BookCategoryNodeResponse> getCategoryTree() {
+        return bookCategoryRepository.buildCategoryTree();
     }
 }

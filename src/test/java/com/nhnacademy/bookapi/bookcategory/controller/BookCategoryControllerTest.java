@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
+import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryNodeResponse;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
 import org.junit.jupiter.api.DisplayName;
@@ -188,5 +189,25 @@ class BookCategoryControllerTest {
         mockMvc.perform(delete("/categories/1")
                         .header("X-USER-ID", ""))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    @DisplayName("카테고리 트리 정보")
+    void getCategoryTree() throws Exception {
+        BookCategoryNodeResponse child1 = new BookCategoryNodeResponse(2L, "추리소설", null);
+        BookCategoryNodeResponse child2 = new BookCategoryNodeResponse(3L, "공포소설", null);
+        BookCategoryNodeResponse root = new BookCategoryNodeResponse(1L, "소설", List.of(child1, child2));
+
+        BookCategoryNodeResponse root1 = new BookCategoryNodeResponse(4L, "만화", null);
+
+        given(bookCategoryService.getCategoryTree()).willReturn(List.of(root, root1));
+
+        mockMvc.perform(get("/categories/tree"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].categoryId").value(1L))
+                .andExpect(jsonPath("$[0].children.length()").value(2))
+                .andExpect(jsonPath("$[0].children[0].categoryName").value("추리소설"))
+                .andExpect(jsonPath("$[0].children[1].categoryName").value("공포소설"))
+                .andExpect(jsonPath("$[1].categoryId").value(4L));
     }
 }
