@@ -107,6 +107,7 @@ public class Book {
         book.image = request.image();
         book.status = BookStatus.ON_SALE;
         book.bookCategories = categories;
+        book.viewCount = 0L;
         return book;
     }
 

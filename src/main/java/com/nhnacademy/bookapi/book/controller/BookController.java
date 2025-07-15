@@ -42,9 +42,15 @@ public class BookController {
     public ResponseEntity<Page<SimpleBookResponse>> getAllBooks(Pageable pageable) {
         log.info("page number: {}, size: {}", pageable.getPageNumber(), pageable.getPageSize());
         log.info("sort - {}", pageable.getSort());
-        Page<SimpleBookResponse> responses = bookService.getAllBooks(pageable);
-        log.info("responses - {}", responses);
-        return ResponseEntity.ok(responses);
+        Page<SimpleBookResponse> response = bookService.getAllBooks(pageable);
+        return ResponseEntity.ok(response);
+    }
+
+    // 카테고리로 도서 간단 정보
+    @GetMapping("/books/categories/{categoryId}")
+    public ResponseEntity<Page<SimpleBookResponse>> getAllBooksByCategory(@PathVariable Long categoryId, Pageable pageable) {
+        Page<SimpleBookResponse> response = bookService.getAllBooks(categoryId, pageable);
+        return ResponseEntity.ok(response);
     }
 
     // 상세 정보, 조회수 증가
@@ -110,16 +116,9 @@ public class BookController {
     // 엘라스틱 서치
     @GetMapping("/search")
     public ResponseEntity<Page<SimpleBookResponse>> getSimpleBookResponseByKeyword(@RequestParam String keyword,
-//                                                                                   @RequestParam(required = false) String sort,
                                                                                    Pageable pageable) {
         Page<SimpleBookResponse> response = bookService.getSimpleBookResponseByKeyword(keyword, pageable);
-        Sort sort = pageable.getSort();
 
-        for (Sort.Order order : sort) {
-            log.info("property: {}, direction: {}, isAscending: {}",
-                    order.getProperty(), order.getDirection(), order.isAscending());
-        }
-//        log.info("pageable sort: {}", pageable.getSort());
         return ResponseEntity.ok(response);
     }
 }

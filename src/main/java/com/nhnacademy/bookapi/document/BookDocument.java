@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 
 
 @Getter
-@Document(indexName = "beansolid")
+@Document(indexName = "beansolid_v3")
 @AllArgsConstructor
 @Setting(settingPath = "/elasticsearch/settings.json")
 public class BookDocument {
@@ -27,11 +27,11 @@ public class BookDocument {
             otherFields = {
                     @InnerField(suffix = "jaso", type = FieldType.Text, analyzer = "jaso_analyzer"),        // 자소
                     @InnerField(suffix = "synonym", type = FieldType.Text, analyzer = "korean_synonym_analyzer"), // 동의어 분석기
+                    @InnerField(suffix = "chosung", type = FieldType.Text, analyzer = "chosung_analyzer")  // 초성 분석기
             }
     )
     private String title;
 
-    //        @Field(type = FieldType.Text, analyzer = "korean_analyzer", termVector = TermVector.with_positions_offsets)
     @Field(type = FieldType.Text, analyzer = "korean_analyzer")
     private String description;
 

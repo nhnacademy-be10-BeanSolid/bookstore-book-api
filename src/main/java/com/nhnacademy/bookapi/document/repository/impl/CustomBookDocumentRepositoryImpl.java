@@ -1,7 +1,5 @@
 package com.nhnacademy.bookapi.document.repository.impl;
 
-import co.elastic.clients.elasticsearch._types.SortOptions;
-import co.elastic.clients.elasticsearch._types.SortOrder;
 import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
@@ -19,7 +17,6 @@ import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Repository
@@ -34,49 +31,30 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
 
         log.info("검색시작");
 
-        // 정렬 정보
-        Sort sort = pageable.getSort();
-        List<SortOptions> sortOptionsList = new ArrayList<>();
+        Sort currentSort = pageable.getSort();
+        // 보조정렬
+        Sort newSort = currentSort.and(Sort.by(Sort.Order.desc("id")));
+        Pageable newPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), newSort);
 
-        if (sort.isSorted()) {
-            for (Sort.Order order : sort) {
-                String property = order.getProperty();
-                if(property.contains(":")) {
-                    property = property.substring(0, property.indexOf(":")).trim();
-                }
-                SortOrder sortOrder = order.isAscending() ? SortOrder.Asc : SortOrder.Desc;
-                String finalProperty = property;
-                sortOptionsList.add(SortOptions.of(s -> s.field(f -> f.field(finalProperty).order(sortOrder))));
-            }
-        }
-
-        // 보조 조건 추가
-        sortOptionsList.add(SortOptions.of(s -> s.field(f -> f.field("id").order(SortOrder.Desc))));
-
-        log.info("정렬 옵션: {}",
-                sortOptionsList.stream()
-                        .map(Object::toString)
-                        .collect(Collectors.joining(", "))
-        );
-
-        Pageable pageWithoutSort = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize());
+        log.info("page number: {}", pageable.getPageNumber());
+        log.info("page size: {}", pageable.getPageSize());
 
         // 쿼리 객체
         NativeQuery query = NativeQuery.builder()
                 .withQuery(q -> q.multiMatch(m -> m
                         .query(keyword)
                         .fields(
-                                "title^10",
-                                "title.synonym^5",
-                                "title.jaso^5",
-                                "description^1",
-                                "author^3",
-                                "publisher^3",
-                                "tags^5"
+                                "title^100",
+                                "title.synonym^90",
+                                "title.jaso^90",
+                                "title.chosung^90",
+                                "description^10",
+                                "author^10",
+                                "publisher^10",
+                                "tags^50"
                         )
                 ))
-                .withSort(sortOptionsList)
-                .withPageable(pageWithoutSort) // 현재 페이지(정렬 정보없는 객체)
+                .withPageable(newPageable)
                 .build();
 
         // 검색 결과를 담고있는 컨테이너

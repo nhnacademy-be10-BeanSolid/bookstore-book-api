@@ -97,8 +97,12 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional(readOnly = true)
     public Page<SimpleBookResponse> getAllBooks(Pageable pageable) {
-        log.info("service start");
         return bookRepository.findAllSimpleBookResponses(pageable);
+    }
+
+    @Override
+    public Page<SimpleBookResponse> getAllBooks(Long categoryId, Pageable pageable) {
+        return bookRepository.findAllSimpleBookResponses(categoryId, pageable);
     }
 
     // 도서 업데이트

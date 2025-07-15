@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.book.service;
 
+import com.nhnacademy.bookapi.book.domain.QBook;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
@@ -20,6 +21,8 @@ public interface BookService {
     BookDetailResponse getBookDetailResponseByBookId(Long id);
 
     Page<SimpleBookResponse> getAllBooks(Pageable pageable);
+
+    Page<SimpleBookResponse> getAllBooks(Long categoryId, Pageable pageable);
 
     BookDetailResponse updateBook(Long id, BookUpdateRequest request);
 
