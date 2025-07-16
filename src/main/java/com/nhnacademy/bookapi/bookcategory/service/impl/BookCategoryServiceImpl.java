@@ -3,6 +3,7 @@ package com.nhnacademy.bookapi.bookcategory.service.impl;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
+import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryNodeResponse;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryAlreadyExistsException;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @Transactional
@@ -86,5 +88,10 @@ public class BookCategoryServiceImpl implements BookCategoryService {
     @Override
     public boolean existsCategory(Long categoryId) {
         return bookCategoryRepository.existsById(categoryId);
+    }
+
+    @Override
+    public List<BookCategoryNodeResponse> getCategoryTree() {
+        return bookCategoryRepository.buildCategoryTree();
     }
 }

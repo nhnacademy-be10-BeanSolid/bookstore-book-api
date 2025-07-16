@@ -88,6 +88,9 @@ public class Book {
     )
     private Set<BookCategory> bookCategories = new HashSet<>();
 
+    @Column(name = "view_count", nullable = false)
+    private Long viewCount;
+
     public static Book from(BookCreateRequest request, Set<BookCategory> categories) {
         Book book = new Book();
         book.title = request.title();
@@ -104,6 +107,7 @@ public class Book {
         book.image = request.image();
         book.status = BookStatus.ON_SALE;
         book.bookCategories = categories;
+        book.viewCount = 0L;
         return book;
     }
 
@@ -133,5 +137,4 @@ public class Book {
     public void preUpdate() {
         this.updateAt = LocalDateTime.now();
     }
-
 }

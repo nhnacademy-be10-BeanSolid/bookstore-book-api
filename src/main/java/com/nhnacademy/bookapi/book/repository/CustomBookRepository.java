@@ -22,7 +22,7 @@ public interface CustomBookRepository {
 
     Page<SimpleBookResponse> findAllSimpleBookResponses(Pageable pageable);
 
-    Page<BookResponse> findAllBookResponsesByBookCategory(Long categoryId, Pageable pageable);
+    Page<SimpleBookResponse> findAllSimpleBookResponses(Long categoryId, Pageable pageable);
 
     int countBookCategoryByBookId(Long bookId);
 

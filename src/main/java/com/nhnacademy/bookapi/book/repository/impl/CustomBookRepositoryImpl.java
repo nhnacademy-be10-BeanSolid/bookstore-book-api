@@ -11,7 +11,10 @@ import com.nhnacademy.bookapi.book.repository.CustomBookRepository;
 import com.nhnacademy.bookapi.bookcategory.domain.QBookCategory;
 import com.nhnacademy.bookapi.booklike.domain.QBookLike;
 import com.nhnacademy.bookapi.booktag.domain.QBookTag;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,6 +25,7 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -71,6 +75,8 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
     public Page<SimpleBookResponse> findAllSimpleBookResponses(Pageable pageable) {
         QBook book = QBook.book;
 
+        List<OrderSpecifier<?>> orderSpecifiers = createOrderSpecifiers(pageable);
+
         List<SimpleBookResponse> content = queryFactory
                 .select(Projections.constructor(SimpleBookResponse.class,
                         book.id,
@@ -78,10 +84,11 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
                         book.author,
                         book.salePrice,
                         book.stock,
-                        book.image
+                        book.image,
+                        book.viewCount
                 ))
                 .from(book)
-                .orderBy(book.id.asc())
+                .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -94,28 +101,36 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
         return new PageImpl<>(content, pageable, total != null ? total : 0);
     }
 
-    // 카테고리에 해당하는 도서 찾기
     @Override
-    public Page<BookResponse> findAllBookResponsesByBookCategory(Long categoryId, Pageable pageable) {
+    public Page<SimpleBookResponse> findAllSimpleBookResponses(Long categoryId, Pageable pageable) {
         QBook book = QBook.book;
         QBookCategory category = QBookCategory.bookCategory;
 
-        List<Book> books = queryFactory
-                .selectFrom(book)
-                .join(book.bookCategories, category).fetchJoin()
+        List<OrderSpecifier<?>> orderSpecifiers = createOrderSpecifiers(pageable);
+
+        List<SimpleBookResponse> content = queryFactory
+                .select(Projections.constructor(SimpleBookResponse.class,
+                        book.id,
+                        book.title,
+                        book.author,
+                        book.salePrice,
+                        book.stock,
+                        book.image,
+                        book.viewCount
+                ))
+                .from(book)
+                .join(book.bookCategories, category)
                 .where(category.categoryId.eq(categoryId))
-                .distinct()
+                .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
 
-        List<BookResponse> content = books.stream()
-                .map(BookResponse::from).
-                toList();
-
         Long total = queryFactory
                 .select(book.count())
                 .from(book)
+                .join(book.bookCategories, category)
+                .where(category.categoryId.eq(categoryId))
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0);
@@ -150,5 +165,23 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
         return results.stream()
                 .map(BookOrderResponse::from)
                 .toList();
+    }
+
+    // 정렬 조건
+    private List<OrderSpecifier<?>> createOrderSpecifiers(Pageable pageable) {
+        PathBuilder<Book> pathBuilder = new PathBuilder<>(Book.class, "book");
+
+        // querydsl 에서 정렬에 사용하는 객체
+        List<OrderSpecifier<?>> orderSpecifiers = pageable.getSort().stream()
+                .map(order -> new OrderSpecifier<>(
+                        order.isAscending() ? Order.ASC : Order.DESC,
+                        pathBuilder.getComparable(order.getProperty(), Comparable.class)
+                ))
+                .collect(Collectors.toList());
+
+        // 보조 정렬 조건 추가 (id 내림차순)
+        orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, pathBuilder.getComparable("id", Comparable.class)));
+
+        return orderSpecifiers;
     }
 }

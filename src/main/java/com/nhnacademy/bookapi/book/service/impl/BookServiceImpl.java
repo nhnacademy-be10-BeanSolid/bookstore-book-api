@@ -55,31 +55,23 @@ public class BookServiceImpl implements BookService {
 
         String image = request.image();
 
-        log.info("image: {}", image);
-
         if (image == null || image.isEmpty()) {
             image = "/images/default.png";
         }
-
-        log.info("toc: {}", request.toc());
 
         Book book = Book.from(request, categories);
         book.setImage(image);
         Book savedBook = bookRepository.save(book);
 
-        log.info("saved book: {}", savedBook.getToc());
-
-        // Elastic Search에 저장
+        // Document 저장
         BookDocument document = BookDocument.from(savedBook);
         bookDocumentRepository.save(document);
-
-        log.info("Book created: {}", document);
 
         return bookRepository.findBookResponseById(savedBook.getId())
                 .orElseThrow(() -> new BookNotFoundException(savedBook.getId()));
     }
 
-    // 도서 상세정보 (좋아요한 유저까지 포함)
+    // 도서 상세정보
     @Override
     @Transactional(readOnly = true)
     public BookDetailResponse getBookDetailResponseByBookId(Long id) {
@@ -87,11 +79,31 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new BookNotFoundException(id));
     }
 
+    // 조회 카운트 증가
+    @Override
+    public void increaseViewCount(Long id) {
+        bookRepository.incrementViewCount(id);
+
+        Book book = bookRepository.findById(id)
+                .orElseThrow(() -> new BookNotFoundException(id));
+
+        BookDocument document = BookDocument.from(book);
+
+        bookDocumentRepository.save(document);
+    }
+
     // 전체 리스트
     @Override
     @Transactional(readOnly = true)
     public Page<SimpleBookResponse> getAllBooks(Pageable pageable) {
         return bookRepository.findAllSimpleBookResponses(pageable);
+    }
+
+    // 카테고리를 가지고 있는 도서 리스트
+    @Override
+    @Transactional(readOnly = true)
+    public Page<SimpleBookResponse> getAllBooks(Long categoryId, Pageable pageable) {
+        return bookRepository.findAllSimpleBookResponses(categoryId, pageable);
     }
 
     // 도서 업데이트
@@ -120,7 +132,7 @@ public class BookServiceImpl implements BookService {
 
     // 검색
     @Override
-    public Page<BookDocument> getBookDocumentByKeyword(String keyword, Pageable pageable) {
+    public Page<SimpleBookResponse> getSimpleBookResponseByKeyword(String keyword, Pageable pageable) {
         return bookDocumentRepository.searchByKeyword(keyword, pageable);
     }
 

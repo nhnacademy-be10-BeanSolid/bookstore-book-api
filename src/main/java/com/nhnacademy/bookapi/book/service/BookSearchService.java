@@ -1,18 +1,17 @@
-package com.nhnacademy.bookapi.book.feignclient;
+package com.nhnacademy.bookapi.book.service;
 
 import com.nhnacademy.bookapi.book.domain.response.BookItemResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
+import com.nhnacademy.bookapi.book.adpater.NaverBookClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class BookSearchApiService {
+public class BookSearchService {
 
     private final NaverBookClient naverBookClient;
 

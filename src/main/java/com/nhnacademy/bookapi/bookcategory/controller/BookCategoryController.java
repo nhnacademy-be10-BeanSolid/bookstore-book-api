@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.bookcategory.controller;
 
+import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryNodeResponse;
 import com.nhnacademy.bookapi.common.annotation.AuthenticatedUserId;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
@@ -16,6 +17,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -68,5 +70,11 @@ public class BookCategoryController {
                                                @PathVariable("categoryId") Long categoryId) {
         bookCategoryService.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/tree")
+    public ResponseEntity<List<BookCategoryNodeResponse>> getCategoryTree() {
+        List<BookCategoryNodeResponse> response = bookCategoryService.getCategoryTree();
+        return ResponseEntity.ok(response);
     }
 }

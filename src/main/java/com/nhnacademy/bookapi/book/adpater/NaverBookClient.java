@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.book.feignclient;
+package com.nhnacademy.bookapi.book.adpater;
 
 import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import org.springframework.cloud.openfeign.FeignClient;
