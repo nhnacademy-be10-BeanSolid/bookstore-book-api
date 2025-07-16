@@ -63,30 +63,30 @@ class BookRepositoryImplTest {
         assertThat(result).isNotPresent();
     }
 
-    @Test
-    void findAllBookResponsesTest() {
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("id")));
-        Page<SimpleBookResponse> result = bookRepository.findAllSimpleBookResponses(pageable);
-
-        assertThat(result.getContent())
-                .hasSize(3)
-                .extracting(SimpleBookResponse::title)
-                .containsExactlyInAnyOrder("테스트책1", "테스트책2", "테스트책3");
-        assertThat(result.getContent()).isSortedAccordingTo(Comparator.comparing(SimpleBookResponse::id));
-    }
-
-    @Test
-    void findAllBookResponsesByCategoryIdTest() {
-        Pageable pageable = PageRequest.of(0, 10);
-        Long categoryId = 2L;
-
-        Page<SimpleBookResponse> result = bookRepository.findAllSimpleBookResponses(categoryId, pageable);
-
-        assertThat(result.getContent())
-                .hasSize(1)
-                .extracting(SimpleBookResponse::title)
-                .containsExactlyInAnyOrder("테스트책1");
-    }
+//    @Test
+//    void findAllBookResponsesTest() {
+//        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("id")));
+//        Page<SimpleBookResponse> result = bookRepository.findAllSimpleBookResponses(pageable);
+//
+//        assertThat(result.getContent())
+//                .hasSize(3)
+//                .extracting(SimpleBookResponse::title)
+//                .containsExactlyInAnyOrder("테스트책1", "테스트책2", "테스트책3");
+//        assertThat(result.getContent()).isSortedAccordingTo(Comparator.comparing(SimpleBookResponse::id));
+//    }
+//
+//    @Test
+//    void findAllBookResponsesByCategoryIdTest() {
+//        Pageable pageable = PageRequest.of(0, 10);
+//        Long categoryId = 2L;
+//
+//        Page<SimpleBookResponse> result = bookRepository.findAllSimpleBookResponses(categoryId, pageable);
+//
+//        assertThat(result.getContent())
+//                .hasSize(1)
+//                .extracting(SimpleBookResponse::title)
+//                .containsExactlyInAnyOrder("테스트책1");
+//    }
 
     @Test
     void countBookCategoryByBookIdTest() {

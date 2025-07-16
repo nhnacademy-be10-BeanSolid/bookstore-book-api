@@ -86,8 +86,8 @@ class BookControllerTest {
     void getAllBooks() throws Exception{
         Pageable pageable = PageRequest.of(0, 4);
         List<SimpleBookResponse> content = List.of(
-                new SimpleBookResponse(1L, "테스트1", "작가", 10000, 20, null, 1L),
-                new SimpleBookResponse(2L, "테스트2", "작가", 2000, 30, null, 3L)
+                new SimpleBookResponse(1L, "테스트1", "작가", 10000, 20, null, 1L, 0L, 0.0),
+                new SimpleBookResponse(2L, "테스트2", "작가", 2000, 30, null, 3L, 0L, 0.0)
         );
         Page<SimpleBookResponse> pageResult = new PageImpl<>(content, pageable, content.size());
 
@@ -109,8 +109,8 @@ class BookControllerTest {
         Pageable pageable = PageRequest.of(0, 4);
 
         List<SimpleBookResponse> content = List.of(
-                new SimpleBookResponse(1L, "테스트1", "작가", 10000, 20, null, 1L),
-                new SimpleBookResponse(2L, "테스트2", "작가", 2000, 30, null, 3L)
+                new SimpleBookResponse(1L, "테스트1", "작가", 10000, 20, null, 1L, 0L, 0.0),
+                new SimpleBookResponse(2L, "테스트2", "작가", 2000, 30, null, 3L, 0L, 0.0)
         );
         Page<SimpleBookResponse> pageResult = new PageImpl<>(content, pageable, content.size());
 
@@ -339,8 +339,8 @@ class BookControllerTest {
         String keyword = "작가1";
         Pageable pageable = PageRequest.of(0, 4);
         List<SimpleBookResponse> content = List.of(
-                new SimpleBookResponse(1L, "테스트책1", "작가1", 10000, 10, null, 5L),
-                new SimpleBookResponse(2L, "테스트책2", "작가1", 8000, 3, null, 8L)
+                new SimpleBookResponse(1L, "테스트책1", "작가1", 10000, 10, null, 5L, 0L, 0.0),
+                new SimpleBookResponse(2L, "테스트책2", "작가1", 8000, 3, null, 8L, 0L, 0.0)
         );
         Page<SimpleBookResponse> mockPage = new PageImpl<>(content, pageable, content.size());
 

@@ -1,6 +1,5 @@
 package com.nhnacademy.bookapi.book.service.impl;
 
-import com.nhnacademy.bookapi.adpater.UserAdapter;
 import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
@@ -100,7 +99,6 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional(readOnly = true)
     public Page<SimpleBookResponse> getAllBooks(Pageable pageable) {
-
         return bookDocumentRepository.findAllSimpleBookResponses(pageable);
     }
 

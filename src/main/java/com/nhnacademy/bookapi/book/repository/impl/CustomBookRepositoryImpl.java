@@ -33,7 +33,6 @@ import java.util.stream.Collectors;
 public class CustomBookRepositoryImpl implements CustomBookRepository {
 
     private final JPAQueryFactory queryFactory;
-    private final UserAdapter userAdapter;
 
     public Optional<BookResponse> findBookResponseById(Long id) {
         QBook book = QBook.book;
