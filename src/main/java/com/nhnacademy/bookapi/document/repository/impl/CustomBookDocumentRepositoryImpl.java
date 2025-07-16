@@ -130,7 +130,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                 .withDocument(Document.from(updateFields))
                 .build();
 
-        elasticsearchOperations.update(updateQuery, IndexCoordinates.of("beansolid_v3"));
+        elasticsearchOperations.update(updateQuery, IndexCoordinates.of("beansolid"));
     }
 
     @Override

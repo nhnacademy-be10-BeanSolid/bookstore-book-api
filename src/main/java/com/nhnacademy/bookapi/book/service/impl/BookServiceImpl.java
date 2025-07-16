@@ -65,12 +65,10 @@ public class BookServiceImpl implements BookService {
         book.setImage(image);
         Book savedBook = bookRepository.save(book);
 
-        // Document 저장
-        Long reviewCount = userService.countReviewsByBookId(savedBook.getId());
-        Double reviewAverage = userService.getAverageEvaluationScoreByBookId(savedBook.getId());
-
-        BookDocument document = BookDocument.from(savedBook, reviewCount, reviewAverage);
+        BookDocument document = BookDocument.from(savedBook);
         bookDocumentRepository.save(document);
+
+        log.info("Saving BookDocument to Elasticsearch index: beansolid, document id: {}", document.getId());
 
         return bookRepository.findBookResponseById(savedBook.getId())
                 .orElseThrow(() -> new BookNotFoundException(savedBook.getId()));

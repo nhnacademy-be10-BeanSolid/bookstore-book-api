@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
-@Document(indexName = "beansolid_v4")
+@Document(indexName = "beansolid")
 @AllArgsConstructor
 @Setting(settingPath = "/elasticsearch/settings.json")
 public class BookDocument {
