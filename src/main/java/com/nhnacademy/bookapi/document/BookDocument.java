@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
-@Document(indexName = "beansolid_v3")
+@Document(indexName = "beansolid_v4")
 @AllArgsConstructor
 @Setting(settingPath = "/elasticsearch/settings.json")
 public class BookDocument {
@@ -52,7 +52,17 @@ public class BookDocument {
     @Field(type = FieldType.Long)
     private Long viewCount;
 
+    @Field(type = FieldType.Long)
+    private Long reviewCount;
+
+    @Field(type = FieldType.Double)
+    private Double rating;
+
     public static BookDocument from(Book book) {
+        return from(book, 0L, 0.0);
+    }
+
+    public static BookDocument from(Book book, Long reviewCount, Double reviewAverage) {
         Set<String> tags = book.getBookTags()
                 .stream()
                 .map(BookTag::getName)
@@ -67,7 +77,9 @@ public class BookDocument {
                 tags,
                 book.getPublishAt(),
                 book.getSalePrice(),
-                book.getViewCount()
+                book.getViewCount(),
+                reviewCount,
+                reviewAverage
         );
     }
 }

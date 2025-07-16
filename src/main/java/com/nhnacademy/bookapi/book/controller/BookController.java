@@ -4,7 +4,7 @@ import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.*;
-import com.nhnacademy.bookapi.book.service.BookSearchService;
+import com.nhnacademy.bookapi.adpater.service.NaverBookService;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
 
@@ -26,7 +26,7 @@ import java.util.List;
 public class BookController {
 
     private final BookService bookService;
-    private final BookSearchService naverBookSearchService;
+    private final NaverBookService naverBookSearchService;
 
     @GetMapping("/books-search")
     public ResponseEntity<BookSearchResponse> searchBook(
@@ -119,5 +119,17 @@ public class BookController {
         Page<SimpleBookResponse> response = bookService.getSimpleBookResponseByKeyword(keyword, pageable);
 
         return ResponseEntity.ok(response);
+    }
+
+    // TODO 테스트 코드
+    // 유저 서비스에서 리뷰 작성시 도큐먼트 최신화
+    @PostMapping("/{bookId}/document")
+    public ResponseEntity<Void> updateBookDocument(
+            @PathVariable Long bookId,
+            @RequestParam Long reviewCount,
+            @RequestParam Double reviewAverage) {
+
+        bookService.updateBookDocument(bookId, reviewCount, reviewAverage);
+        return ResponseEntity.noContent().build();
     }
 }

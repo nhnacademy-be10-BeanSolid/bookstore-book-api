@@ -1,5 +1,7 @@
 package com.nhnacademy.bookapi.book.service.impl;
 
+import com.nhnacademy.bookapi.adpater.UserAdapter;
+import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
@@ -40,6 +42,7 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookCategoryRepository bookCategoryRepository;
     private final BookDocumentRepository bookDocumentRepository;
+    private final UserService userService;
 
     // 도서 추가
     @Override
@@ -64,7 +67,10 @@ public class BookServiceImpl implements BookService {
         Book savedBook = bookRepository.save(book);
 
         // Document 저장
-        BookDocument document = BookDocument.from(savedBook);
+        Long reviewCount = userService.countReviewsByBookId(savedBook.getId());
+        Double reviewAverage = userService.getAverageEvaluationScoreByBookId(savedBook.getId());
+
+        BookDocument document = BookDocument.from(savedBook, reviewCount, reviewAverage);
         bookDocumentRepository.save(document);
 
         return bookRepository.findBookResponseById(savedBook.getId())
@@ -87,16 +93,15 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
 
-        BookDocument document = BookDocument.from(book);
-
-        bookDocumentRepository.save(document);
+        bookDocumentRepository.increaseViewCount(String.valueOf(id), book.getViewCount());
     }
 
     // 전체 리스트
     @Override
     @Transactional(readOnly = true)
     public Page<SimpleBookResponse> getAllBooks(Pageable pageable) {
-        return bookRepository.findAllSimpleBookResponses(pageable);
+
+        return bookDocumentRepository.findAllSimpleBookResponses(pageable);
     }
 
     // 카테고리를 가지고 있는 도서 리스트
@@ -113,9 +118,7 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new BookNotFoundException(id));
 
         book.updateFrom(request);
-
-        BookDocument updateDocument = BookDocument.from(book);
-        bookDocumentRepository.save(updateDocument);
+        updateBookDocument(book);
 
         return bookRepository.findBookDetailResponseByBookId(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
@@ -180,5 +183,23 @@ public class BookServiceImpl implements BookService {
             bookRepository.save(book);
             log.info("Id {}의 재고 {} 차감 성공", bookId, stock);
         }
+    }
+
+    // 인덱스 최신화
+    private void updateBookDocument(Book book) {
+        Long reviewCount = userService.countReviewsByBookId(book.getId());
+        Double reviewAverage = userService.getAverageEvaluationScoreByBookId(book.getId());
+
+        BookDocument document = BookDocument.from(book, reviewCount, reviewAverage);
+        bookDocumentRepository.save(document);
+    }
+
+    // 유저 서비스에서 최신화
+    public void updateBookDocument(Long bookId, Long reviewCount, Double reviewAverage) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException(bookId));
+
+        BookDocument document = BookDocument.from(book, reviewCount, reviewAverage);
+        bookDocumentRepository.save(document);
     }
 }

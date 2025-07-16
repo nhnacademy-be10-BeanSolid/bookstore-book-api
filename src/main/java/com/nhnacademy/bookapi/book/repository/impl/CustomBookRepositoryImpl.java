@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.book.repository.impl;
 
+import com.nhnacademy.bookapi.adpater.UserAdapter;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.domain.QBook;
@@ -32,6 +33,7 @@ import java.util.stream.Collectors;
 public class CustomBookRepositoryImpl implements CustomBookRepository {
 
     private final JPAQueryFactory queryFactory;
+    private final UserAdapter userAdapter;
 
     public Optional<BookResponse> findBookResponseById(Long id) {
         QBook book = QBook.book;

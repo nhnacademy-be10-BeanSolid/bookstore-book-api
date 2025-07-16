@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.book.service;
 
-import com.nhnacademy.bookapi.book.adpater.NaverBookClient;
+import com.nhnacademy.bookapi.adpater.NaverBookAdapter;
+import com.nhnacademy.bookapi.adpater.service.NaverBookService;
 import com.nhnacademy.bookapi.book.domain.response.BookItemResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import org.junit.jupiter.api.BeforeEach;
@@ -21,10 +22,10 @@ import static org.mockito.Mockito.*;
 public class BookSearchServiceTest {
 
     @Mock
-    private NaverBookClient naverBookClient;
+    private NaverBookAdapter naverBookClient;
 
     @InjectMocks
-    private BookSearchService bookSearchService;
+    private NaverBookService bookSearchService;
 
     @BeforeEach
     void setup() {
