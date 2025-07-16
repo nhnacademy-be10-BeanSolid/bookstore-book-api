@@ -62,7 +62,7 @@ public class BookDocument {
         return from(book, 0L, 0.0);
     }
 
-    public static BookDocument from(Book book, Long reviewCount, Double reviewAverage) {
+    public static BookDocument from(Book book, Long reviewCount, Double rating) {
         Set<String> tags = book.getBookTags()
                 .stream()
                 .map(BookTag::getName)
@@ -79,7 +79,7 @@ public class BookDocument {
                 book.getSalePrice(),
                 book.getViewCount(),
                 reviewCount,
-                reviewAverage
+                rating
         );
     }
 }
