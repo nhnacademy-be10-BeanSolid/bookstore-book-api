@@ -9,6 +9,8 @@ import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapRespon
 import com.nhnacademy.bookapi.bookcategory.exception.*;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryMapService;
+import com.nhnacademy.bookapi.document.BookDocument;
+import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,8 +21,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class BookCategoryMapServiceImpl implements BookCategoryMapService {
 
     private final BookRepository bookRepository;
-
     private final BookCategoryRepository bookCategoryRepository;
+    private final BookDocumentRepository bookDocumentRepository;
 
     // 도서에 카테고리 추가
     @Override
@@ -43,6 +45,7 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
 
         book.getBookCategories().add(category);
         bookRepository.save(book);
+        bookDocumentRepository.save(BookDocument.from(book));
 
         return getBookCategoryMapResponse(bookId);
     }
@@ -67,10 +70,12 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
 
         book.getBookCategories().remove(category);
         bookRepository.save(book);
+        bookDocumentRepository.save(BookDocument.from(book));
     }
 
     // 도서의 카테고리 조회
     @Override
+    @Transactional(readOnly = true)
     public BookCategoryMapResponse getBookCategoryMapResponse (Long bookId) {
         return bookCategoryRepository.findBookCategoryMapResponse(bookId);
     }

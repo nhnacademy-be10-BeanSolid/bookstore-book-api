@@ -347,7 +347,7 @@ class BookControllerTest {
         when(bookService.getSimpleBookResponseByKeyword(eq(keyword), any(Pageable.class)))
                 .thenReturn(mockPage);
 
-        mockMvc.perform(get("/search")
+        mockMvc.perform(get("/books/search")
                         .param("keyword", keyword)
                         .param("page", "0")
                         .param("size", "4"))
@@ -357,5 +357,33 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.content[1].title").value("테스트책2"));
 
         verify(bookService, times(1)).getSimpleBookResponseByKeyword(eq(keyword), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("유저 서비스에서 인덱스 최신화")
+    void updateBookDocumentResponse_success() throws Exception {
+        Long reviewCount = 5L;
+        Double reviewAverage = 4.3;
+
+        mockMvc.perform(post("/books/1/document")
+                        .param("reviewCount", reviewCount.toString())
+                        .param("reviewAverage", reviewAverage.toString()))
+                .andExpect(status().isNoContent());
+
+        verify(bookService, times(1)).updateBookDocument(1L, reviewCount, reviewAverage);
+    }
+
+    @Test
+    @DisplayName("유저 서비스에서 도서 제목 받기")
+    void getTitleByBookId_success() throws Exception {
+        String title = "제목";
+
+        when(bookService.getTitleByBookId(anyLong())).thenReturn(title);
+
+        mockMvc.perform(get("/books/1/title"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(title));
+
+        verify(bookService, times(1)).getTitleByBookId(anyLong());
     }
 }

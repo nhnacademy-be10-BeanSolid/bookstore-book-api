@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.book.service;
 
+import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -52,6 +54,8 @@ class BookServiceImplTest {
     private BookCategoryRepository bookCategoryRepository;
     @Mock
     private BookDocumentRepository bookDocumentRepository;
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private BookServiceImpl bookService;
@@ -63,31 +67,31 @@ class BookServiceImplTest {
         bookCategory = new BookCategory("소설", null);
     }
 
-//    @Test
-//    @DisplayName("도서 생성")
-//    void createBook_success() {
-//        BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
-//                LocalDate.of(2020,10,19) , "test000000000", 10000, 5000, false, 100, null, Set.of(1L));
-//        Book book = Book.from(request, Set.of(bookCategory));
-//        ReflectionTestUtils.setField(book, "id", 1L);
-//
-//        when(bookRepository.existsByIsbn("test000000000")).thenReturn(false);
-//        when(bookCategoryRepository.findById(1L)).thenReturn(Optional.of(bookCategory));
-//
-//        BookResponse bookResponse = BookResponse.from(book);
-//
-//        when(bookRepository.save(any(Book.class))).thenReturn(book);
-//        when(bookRepository.findBookResponseById(1L)).thenReturn(Optional.of(bookResponse));
-//        when(bookDocumentRepository.save(any(BookDocument.class))).thenReturn(BookDocument.from(book));
-//
-//        BookResponse response = bookService.createBook(request);
-//
-//        assertThat(response).isNotNull();
-//        assertThat(response.title()).isEqualTo("타이틀");
-//        assertThat(response.isbn()).isEqualTo("test000000000");
-//        assertThat(response.bookCategories()).contains("소설");
-//        assertThat(response.publishAt()).isEqualTo(LocalDate.of(2020,10,19));
-//    }
+    @Test
+    @DisplayName("도서 생성")
+    void createBook_success() {
+        BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
+                LocalDate.of(2020,10,19) , "test000000000", 10000, 5000, false, 100, null, Set.of(1L));
+        Book book = Book.from(request, Set.of(bookCategory));
+        ReflectionTestUtils.setField(book, "id", 1L);
+
+        when(bookRepository.existsByIsbn("test000000000")).thenReturn(false);
+        when(bookCategoryRepository.findById(1L)).thenReturn(Optional.of(bookCategory));
+
+        BookResponse bookResponse = BookResponse.from(book);
+
+        when(bookRepository.save(any(Book.class))).thenReturn(book);
+        when(bookRepository.findBookResponseById(1L)).thenReturn(Optional.of(bookResponse));
+        when(bookDocumentRepository.save(any(BookDocument.class))).thenReturn(BookDocument.from(book));
+
+        BookResponse response = bookService.createBook(request);
+
+        assertThat(response).isNotNull();
+        assertThat(response.title()).isEqualTo("타이틀");
+        assertThat(response.isbn()).isEqualTo("test000000000");
+        assertThat(response.bookCategories()).contains("소설");
+        assertThat(response.publishAt()).isEqualTo(LocalDate.of(2020,10,19));
+    }
 
     @Test
     @DisplayName("도서 생성 - 존재하는 도서")
@@ -152,24 +156,24 @@ class BookServiceImplTest {
         verify(bookRepository, times(1)).incrementViewCount(1L);
     }
 
-//    @Test
-//    @DisplayName("도서 리스트")
-//    void getAllBooksTest() {
-//        SimpleBookResponse response1 = new SimpleBookResponse(1L, "제목", "작가", 1000, 20, null, 0L, 0L, 0.0);
-//        SimpleBookResponse response2 = new SimpleBookResponse(2L, "제목1", "작가1", 500, 30, null, 1L, 0L, 0.0);
-//
-//        Pageable pageable = PageRequest.of(0, 4);
-//
-//        when(bookRepository.findAllSimpleBookResponses(pageable))
-//                .thenReturn(new PageImpl<>(List.of(response1, response2), pageable, 2));
-//
-//        Page<SimpleBookResponse> pageResult = bookService.getAllBooks(pageable);
-//
-//        assertThat(pageResult).isNotNull();
-//        assertThat(pageResult).hasSize(2);
-//        assertThat(pageResult.getContent().get(0)).isEqualTo(response1);
-//        assertThat(pageResult.getContent().get(1)).isEqualTo(response2);
-//    }
+    @Test
+    @DisplayName("도서 리스트")
+    void getAllBooksTest() {
+        SimpleBookResponse response1 = new SimpleBookResponse(1L, "제목", "작가", 1000, 20, null, 0L, 0L, 0.0);
+        SimpleBookResponse response2 = new SimpleBookResponse(2L, "제목1", "작가1", 500, 30, null, 1L, 0L, 0.0);
+
+        Pageable pageable = PageRequest.of(0, 4);
+
+        when(bookDocumentRepository.findAllSimpleBookResponses(pageable))
+                .thenReturn(new PageImpl<>(List.of(response1, response2), pageable, 2));
+
+        Page<SimpleBookResponse> pageResult = bookService.getAllBooks(pageable);
+
+        assertThat(pageResult).isNotNull();
+        assertThat(pageResult).hasSize(2);
+        assertThat(pageResult.getContent().get(0)).isEqualTo(response1);
+        assertThat(pageResult.getContent().get(1)).isEqualTo(response2);
+    }
 
     @Test
     @DisplayName("카테고리를 가지고 있는 도서 리스트")
@@ -182,7 +186,7 @@ class BookServiceImplTest {
 
         Pageable pageable = PageRequest.of(0, 4);
 
-        when(bookRepository.findAllSimpleBookResponses(categoryId, pageable))
+        when(bookDocumentRepository.findAllSimpleBookResponses(categoryId, pageable))
                 .thenReturn(new PageImpl<>(List.of(response1, response2, response3), pageable, 3));
 
         Page<SimpleBookResponse> pageResult = bookService.getAllBooks(categoryId, pageable);
@@ -194,27 +198,29 @@ class BookServiceImplTest {
         assertThat(pageResult.getContent().get(2)).isEqualTo(response3);
     }
 
-//    @Test
-//    @DisplayName("도서 업데이트")
-//    void updateBook_success() {
-//        Book book = new Book();
-//        ReflectionTestUtils.setField(book, "id", 1L);
-//        ReflectionTestUtils.setField(book, "status", BookStatus.ON_SALE);
-//
-//        BookUpdateRequest request = new BookUpdateRequest("타이틀", "설명", "목차", "출판사", "작가",
-//                LocalDate.of(2020,10,19), 10000, 5000, true, BookStatus.SALE_END.toString(), 100);
-//
-//        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
-//
-//        book.updateFrom(request);
-//        when(bookRepository.findBookDetailResponseByBookId(1L)).thenReturn(Optional.of(BookDetailResponse.from(book, 2)));
-//
-//        BookDetailResponse result = bookService.updateBook(1L, request);
-//
-//        assertThat(result.id()).isEqualTo(1L);
-//        assertThat(result.wrappable()).isTrue();
-//        assertThat(result.status()).isEqualTo(BookStatus.SALE_END.getLabel());
-//    }
+    @Test
+    @DisplayName("도서 업데이트")
+    void updateBook_success() {
+        Book book = new Book();
+        ReflectionTestUtils.setField(book, "id", 1L);
+        ReflectionTestUtils.setField(book, "status", BookStatus.ON_SALE);
+
+        BookUpdateRequest request = new BookUpdateRequest("타이틀", "설명", "목차", "출판사", "작가",
+                LocalDate.of(2020,10,19), 10000, 5000, true, BookStatus.SALE_END.toString(), 100);
+
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+
+        book.updateFrom(request);
+        when(bookRepository.findBookDetailResponseByBookId(1L)).thenReturn(Optional.of(BookDetailResponse.from(book, 2)));
+
+        BookDetailResponse result = bookService.updateBook(1L, request);
+
+        assertThat(result.id()).isEqualTo(1L);
+        assertThat(result.wrappable()).isTrue();
+        assertThat(result.status()).isEqualTo(BookStatus.SALE_END.getLabel());
+
+        verify(bookDocumentRepository).save(any(BookDocument.class));
+    }
 
     @Test
     @DisplayName("도서 업데이트 - 존재하지 않는 도서")
@@ -350,6 +356,81 @@ class BookServiceImplTest {
 
         assertThatThrownBy(() -> bookService.updateBookStock(requests))
                 .isInstanceOf(InsufficientStockException.class);
+    }
+
+    @Test
+    @DisplayName("도서 아이디로 이름 반환")
+    void getTitleByBookId_success() {
+        Book book = new Book();
+        ReflectionTestUtils.setField(book, "id", 1L);
+        ReflectionTestUtils.setField(book, "title", "제목");
+
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+
+        String title = bookService.getTitleByBookId(1L);
+
+        assertThat(title).isEqualTo("제목");
+    }
+
+    @Test
+    @DisplayName("도서 아이디로 이름 반환 - 존재하지 않은 도서 요청")
+    void getTitleByBookId_bookNotFound() {
+        when(bookRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookService.getTitleByBookId(1L))
+                .isInstanceOf(BookNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("인덱스 최신화")
+    void updateBookDocument() {
+        Book book = new Book();
+        ReflectionTestUtils.setField(book, "id", 1L);
+        Long reviewCount = 1L;
+        Double reviewAverage = 4.5;
+
+        when(userService.countReviewsByBookId(1L)).thenReturn(reviewCount);
+        when(userService.getAverageEvaluationScoreByBookId(1L)).thenReturn(reviewAverage);
+
+        bookService.updateBookDocument(book);
+
+        ArgumentCaptor<BookDocument> captor = ArgumentCaptor.forClass(BookDocument.class);
+        verify(bookDocumentRepository).save(captor.capture());
+
+        BookDocument saved = captor.getValue();
+        assertThat(saved.getId()).isEqualTo("1");
+        assertThat(saved.getReviewCount()).isEqualTo(reviewCount);
+        assertThat(saved.getRating()).isEqualTo(reviewAverage);
+    }
+
+    @Test
+    @DisplayName("유저 서비스에서 리뷰 작성시 인덱스 최신화")
+    void updateBookDocument_success() {
+        Book book = new Book();
+        ReflectionTestUtils.setField(book, "id", 1L);
+        Long reviewCount = 3L;
+        Double reviewAverage = 4.2;
+
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+
+        bookService.updateBookDocument(1L, reviewCount, reviewAverage);
+
+        ArgumentCaptor<BookDocument> captor = ArgumentCaptor.forClass(BookDocument.class);
+        verify(bookDocumentRepository).save(captor.capture());
+
+        BookDocument saved = captor.getValue();
+        assertThat(saved.getId()).isEqualTo("1");
+        assertThat(saved.getReviewCount()).isEqualTo(reviewCount);
+        assertThat(saved.getRating()).isEqualTo(reviewAverage);
+    }
+
+    @Test
+    @DisplayName("유저 서비스에서 리뷰 작성시 인덱스 최신화 - 존재하지 않은 도서 요청")
+    void updateBookDocument_bookNotFound() {
+        when(bookRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookService.updateBookDocument(1L, 99L, 0.0))
+                .isInstanceOf(BookNotFoundException.class);
     }
 }
 

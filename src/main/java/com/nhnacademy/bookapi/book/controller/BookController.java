@@ -28,6 +28,8 @@ public class BookController {
     private final BookService bookService;
     private final NaverBookService naverBookSearchService;
 
+    // TODO 헤더 테스트 추가
+
     @GetMapping("/books-search")
     public ResponseEntity<BookSearchResponse> searchBook(
             @RequestParam String query,
@@ -93,6 +95,18 @@ public class BookController {
         return ResponseEntity.noContent().build();
     }
 
+    // 엘라스틱 서치
+    @GetMapping("/books/search")
+    public ResponseEntity<Page<SimpleBookResponse>> getSimpleBookResponseByKeyword(@RequestParam String keyword,
+                                                                                   Pageable pageable) {
+        Page<SimpleBookResponse> response = bookService.getSimpleBookResponseByKeyword(keyword, pageable);
+
+        return ResponseEntity.ok(response);
+    }
+
+
+    // 외부 api 에서 호출
+
     // 주문 api 전달
     @GetMapping("/books/ids")
     public ResponseEntity<List<BookOrderResponse>> getBookOrderResponse(@RequestParam List<Long> ids) {
@@ -112,18 +126,8 @@ public class BookController {
         return ResponseEntity.ok().build();
     }
 
-    // 엘라스틱 서치
-    @GetMapping("/search")
-    public ResponseEntity<Page<SimpleBookResponse>> getSimpleBookResponseByKeyword(@RequestParam String keyword,
-                                                                                   Pageable pageable) {
-        Page<SimpleBookResponse> response = bookService.getSimpleBookResponseByKeyword(keyword, pageable);
-
-        return ResponseEntity.ok(response);
-    }
-
-    // TODO 테스트 코드
-    // 유저 서비스에서 리뷰 작성시 도큐먼트 최신화
-    @PostMapping("/{bookId}/document")
+    // 유저 api 에서 리뷰 작성시 인덱스 최신화
+    @PostMapping("/books/{bookId}/document")
     public ResponseEntity<Void> updateBookDocument(
             @PathVariable Long bookId,
             @RequestParam Long reviewCount,
@@ -131,5 +135,12 @@ public class BookController {
 
         bookService.updateBookDocument(bookId, reviewCount, reviewAverage);
         return ResponseEntity.noContent().build();
+    }
+
+    // 유저 api 에서 첵 제목 받기
+    @GetMapping("/books/{bookId}/title")
+    public ResponseEntity<String> getTitleByBookId(@PathVariable Long bookId) {
+        String title = bookService.getTitleByBookId(bookId);
+        return ResponseEntity.ok(title);
     }
 }

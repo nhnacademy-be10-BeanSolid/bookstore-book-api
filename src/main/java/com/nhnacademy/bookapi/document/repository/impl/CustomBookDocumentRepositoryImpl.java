@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.document.repository.impl;
 
+import co.elastic.clients.elasticsearch._types.FieldValue;
 import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
@@ -177,4 +178,56 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
 
         return new PageImpl<>(content, pageable, total);
     }
+
+    @Override
+    public Page<SimpleBookResponse> findAllSimpleBookResponses(Long categoryId, Pageable pageable) {
+
+        Sort currentSort = pageable.getSort();
+        Sort newSort = currentSort.and(Sort.by(Sort.Order.desc("id")));
+        Pageable newPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), newSort);
+
+        NativeQuery query = NativeQuery.builder()
+                .withQuery(q -> q
+                        .terms(t -> t
+                                .field("categoryIds")
+                                .terms(c -> c.value(List.of(FieldValue.of(categoryId))))
+                        )
+                )
+                .withPageable(newPageable)
+                .build();
+
+        SearchHits<BookDocument> hits = elasticsearchOperations.search(query, BookDocument.class);
+
+        List<String> ids = hits.getSearchHits().stream()
+                .map(SearchHit::getId)
+                .toList();
+
+        Map<Long, Book> bookMap = bookRepository.findAllById(ids.stream().map(Long::valueOf).toList())
+                .stream()
+                .collect(Collectors.toMap(Book::getId, Function.identity()));
+
+        List<SimpleBookResponse> content = hits.getSearchHits().stream()
+                .map(hit -> {
+                    BookDocument doc = hit.getContent();
+                    Book book = bookMap.get(Long.valueOf(doc.getId()));
+                    return new SimpleBookResponse(
+                            book.getId(),
+                            book.getTitle(),
+                            book.getAuthor(),
+                            book.getSalePrice(),
+                            book.getStock(),
+                            book.getImage(),
+                            book.getViewCount(),
+                            doc.getReviewCount(),
+                            doc.getRating()
+                    );
+                })
+                .toList();
+
+        long total = hits.getTotalHits();
+
+        return new PageImpl<>(content, pageable, total);
+    }
+
+
 }

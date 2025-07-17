@@ -104,7 +104,7 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional(readOnly = true)
     public Page<SimpleBookResponse> getAllBooks(Long categoryId, Pageable pageable) {
-        return bookRepository.findAllSimpleBookResponses(categoryId, pageable);
+        return bookDocumentRepository.findAllSimpleBookResponses(categoryId, pageable);
     }
 
     // 도서 업데이트
@@ -181,8 +181,17 @@ public class BookServiceImpl implements BookService {
         }
     }
 
+    // 유저 서비스에서 필요한 정보 - 아이디로 책이름 반환
+    @Override
+    public String getTitleByBookId(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException(bookId));
+
+        return book.getTitle();
+    }
+
     // 인덱스 최신화
-    private void updateBookDocument(Book book) {
+    public void updateBookDocument(Book book) {
         Long reviewCount = userService.countReviewsByBookId(book.getId());
         Double reviewAverage = userService.getAverageEvaluationScoreByBookId(book.getId());
 

@@ -10,4 +10,6 @@ public interface CustomBookDocumentRepository {
     void increaseViewCount(String id, Long viewCount);
 
     Page<SimpleBookResponse> findAllSimpleBookResponses(Pageable pageable);
+
+    Page<SimpleBookResponse> findAllSimpleBookResponses(Long categoryId, Pageable pageable);
 }

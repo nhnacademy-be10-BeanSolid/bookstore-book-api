@@ -12,6 +12,7 @@ import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapDeleteFailEx
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.bookcategory.service.impl.BookCategoryMapServiceImpl;
+import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,9 @@ class BookCategoryMapServiceImplTest {
 
     @Mock
     BookCategoryRepository bookCategoryRepository;
+
+    @Mock
+    BookDocumentRepository bookDocumentRepository;
 
     @InjectMocks
     BookCategoryMapServiceImpl bookCategoryMapService;
