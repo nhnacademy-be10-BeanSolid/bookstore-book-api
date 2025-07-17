@@ -398,7 +398,7 @@ class BookServiceImplTest {
         verify(bookDocumentRepository).save(captor.capture());
 
         BookDocument saved = captor.getValue();
-        assertThat(saved.getId()).isEqualTo("1");
+        assertThat(saved.getId()).isEqualTo(1);
         assertThat(saved.getReviewCount()).isEqualTo(reviewCount);
         assertThat(saved.getRating()).isEqualTo(reviewAverage);
     }
@@ -419,7 +419,7 @@ class BookServiceImplTest {
         verify(bookDocumentRepository).save(captor.capture());
 
         BookDocument saved = captor.getValue();
-        assertThat(saved.getId()).isEqualTo("1");
+        assertThat(saved.getId()).isEqualTo(1);
         assertThat(saved.getReviewCount()).isEqualTo(reviewCount);
         assertThat(saved.getRating()).isEqualTo(reviewAverage);
     }

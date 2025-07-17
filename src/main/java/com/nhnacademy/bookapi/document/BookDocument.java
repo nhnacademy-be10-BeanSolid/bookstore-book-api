@@ -13,14 +13,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
-@Document(indexName = "beansolid_v1")
+@Document(indexName = "beansolid")
 @AllArgsConstructor
 @Setting(settingPath = "/elasticsearch/settings.json")
 public class BookDocument {
 
     @Id
-    @Field(type = FieldType.Keyword)
-    private String id;
+    @Field(type = FieldType.Long)
+    private Long id;
 
     @MultiField(
             mainField = @Field(type = FieldType.Text, analyzer = "korean_analyzer"),
@@ -80,7 +80,7 @@ public class BookDocument {
                 .collect(Collectors.toSet());
 
         return new BookDocument(
-                String.valueOf(book.getId()),
+                book.getId(),
                 book.getTitle(),
                 book.getDescription(),
                 book.getAuthor(),

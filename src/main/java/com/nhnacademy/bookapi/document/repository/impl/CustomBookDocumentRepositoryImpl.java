@@ -2,7 +2,6 @@ package com.nhnacademy.bookapi.document.repository.impl;
 
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
-import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.book.domain.Book;
@@ -12,7 +11,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.*;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
-import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
 import org.springframework.data.elasticsearch.core.document.Document;
 import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Repository;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -68,8 +65,8 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
         SearchHits<BookDocument> hits = elasticsearchOperations.search(query, BookDocument.class); // 검색 실행(쿼리를 보냄)
 
         // 현재 페이지의 검색 결과 아이디
-        List<String> ids = hits.getSearchHits().stream()
-                .map(SearchHit::getId)
+        List<Long> ids = hits.getSearchHits().stream()
+                .map(hit -> hit.getContent().getId())
                 .toList();
 
 //        // 도서 엔티티를 담을 리스트
@@ -95,14 +92,14 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
 //                ))
 //                .toList();
 
-        Map<Long, Book> bookMap = bookRepository.findAllById(ids.stream().map(Long::valueOf).toList())
+        Map<Long, Book> bookMap = bookRepository.findAllById(ids)
                 .stream()
                 .collect(Collectors.toMap(Book::getId, Function.identity()));
 
         List<SimpleBookResponse> content = hits.getSearchHits().stream()
                 .map(hit -> {
                     BookDocument doc = hit.getContent();
-                    Book book = bookMap.get(Long.valueOf(doc.getId()));
+                    Book book = bookMap.get(doc.getId());
                     return new SimpleBookResponse(
                             book.getId(),
                             book.getTitle(),
@@ -131,7 +128,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                 .withDocument(Document.from(updateFields))
                 .build();
 
-        elasticsearchOperations.update(updateQuery, IndexCoordinates.of("beansolid_v1"));
+        elasticsearchOperations.update(updateQuery, IndexCoordinates.of("beansolid"));
     }
 
     @Override
@@ -148,18 +145,18 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
 
         SearchHits<BookDocument> hits = elasticsearchOperations.search(query, BookDocument.class);
 
-        List<String> ids = hits.getSearchHits().stream()
-                .map(SearchHit::getId)
+        List<Long> ids = hits.getSearchHits().stream()
+                .map(hit -> hit.getContent().getId())
                 .toList();
 
-        Map<Long, Book> bookMap = bookRepository.findAllById(ids.stream().map(Long::valueOf).toList())
+        Map<Long, Book> bookMap = bookRepository.findAllById(ids)
                 .stream()
                 .collect(Collectors.toMap(Book::getId, Function.identity()));
 
         List<SimpleBookResponse> content = hits.getSearchHits().stream()
                 .map(hit -> {
                     BookDocument doc = hit.getContent();
-                    Book book = bookMap.get(Long.valueOf(doc.getId()));
+                    Book book = bookMap.get(doc.getId());
                     return new SimpleBookResponse(
                             book.getId(),
                             book.getTitle(),
@@ -198,18 +195,18 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
 
         SearchHits<BookDocument> hits = elasticsearchOperations.search(query, BookDocument.class);
 
-        List<String> ids = hits.getSearchHits().stream()
-                .map(SearchHit::getId)
+        List<Long> ids = hits.getSearchHits().stream()
+                .map(hit -> hit.getContent().getId())
                 .toList();
 
-        Map<Long, Book> bookMap = bookRepository.findAllById(ids.stream().map(Long::valueOf).toList())
+        Map<Long, Book> bookMap = bookRepository.findAllById(ids)
                 .stream()
                 .collect(Collectors.toMap(Book::getId, Function.identity()));
 
         List<SimpleBookResponse> content = hits.getSearchHits().stream()
                 .map(hit -> {
                     BookDocument doc = hit.getContent();
-                    Book book = bookMap.get(Long.valueOf(doc.getId()));
+                    Book book = bookMap.get(doc.getId());
                     return new SimpleBookResponse(
                             book.getId(),
                             book.getTitle(),
