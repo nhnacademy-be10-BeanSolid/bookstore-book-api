@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi.book.service;
+package com.nhnacademy.bookapi.adapter.service;
 
 import com.nhnacademy.bookapi.adpater.NaverBookAdapter;
 import com.nhnacademy.bookapi.adpater.service.NaverBookService;

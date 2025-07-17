@@ -131,7 +131,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                 .withDocument(Document.from(updateFields))
                 .build();
 
-        elasticsearchOperations.update(updateQuery, IndexCoordinates.of("beansolid"));
+        elasticsearchOperations.update(updateQuery, IndexCoordinates.of("beansolid_v1"));
     }
 
     @Override
@@ -228,6 +228,4 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
 
         return new PageImpl<>(content, pageable, total);
     }
-
-
 }
