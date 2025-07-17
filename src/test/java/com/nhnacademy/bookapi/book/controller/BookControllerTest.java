@@ -225,6 +225,7 @@ class BookControllerTest {
 
         mockMvc.perform(put("/books/1")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-USER-ID", "tester")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
@@ -251,7 +252,8 @@ class BookControllerTest {
     void deleteBook_success() throws Exception {
         willDoNothing().given(bookService).deleteBook(1L);
 
-        mockMvc.perform(delete("/books/1"))
+        mockMvc.perform(delete("/books/1")
+                .header("X-USER-ID", "tester"))
                 .andExpect(status().isNoContent());
 
         verify(bookService, times(1)).deleteBook(1L);

@@ -20,10 +20,6 @@ public interface CustomBookRepository {
     // 도서 상세 정보
     Optional<BookDetailResponse> findBookDetailResponseByBookId(Long bookId);
 
-//    Page<SimpleBookResponse> findAllSimpleBookResponses(Pageable pageable);
-//
-//    Page<SimpleBookResponse> findAllSimpleBookResponses(Long categoryId, Pageable pageable);
-
     int countBookCategoryByBookId(Long bookId);
 
     // 주문 api 에서 받아갈 정보
