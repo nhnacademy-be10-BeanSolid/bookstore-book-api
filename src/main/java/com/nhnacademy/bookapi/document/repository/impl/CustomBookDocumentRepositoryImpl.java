@@ -69,29 +69,6 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                 .map(hit -> hit.getContent().getId())
                 .toList();
 
-//        // 도서 엔티티를 담을 리스트
-//        List<Book> books = new ArrayList<>();
-//        for (String id : ids) {
-//            Long bookId = Long.valueOf(id);
-//            Book book = bookRepository.findById(bookId)
-//                    .orElseThrow(() -> new BookNotFoundException(bookId));
-//            books.add(book);
-//        }
-//
-//        List<SimpleBookResponse> content = books.stream()
-//                .map(book -> new SimpleBookResponse(
-//                        book.getId(),
-//                        book.getTitle(),
-//                        book.getAuthor(),
-//                        book.getSalePrice(),
-//                        book.getStock(),
-//                        book.getImage(),
-//                        book.getViewCount(),
-//                        1L,
-//                        30.0
-//                ))
-//                .toList();
-
         Map<Long, Book> bookMap = bookRepository.findAllById(ids)
                 .stream()
                 .collect(Collectors.toMap(Book::getId, Function.identity()));

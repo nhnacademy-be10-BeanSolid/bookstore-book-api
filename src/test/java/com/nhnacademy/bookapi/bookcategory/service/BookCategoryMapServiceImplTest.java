@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.bookcategory.service;
 
+import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
@@ -44,6 +45,9 @@ class BookCategoryMapServiceImplTest {
     @Mock
     BookDocumentRepository bookDocumentRepository;
 
+    @Mock
+    UserService userService;
+
     @InjectMocks
     BookCategoryMapServiceImpl bookCategoryMapService;
 
@@ -73,6 +77,8 @@ class BookCategoryMapServiceImplTest {
         BookCategoryResponse categoryResponse = new BookCategoryResponse(categoryId, "카테고리",
                 null, null, LocalDateTime.now(), null);
         BookCategoryMapResponse response = new BookCategoryMapResponse(bookId, List.of(categoryResponse));
+        when(userService.countReviewsByBookId(bookId)).thenReturn(1L);
+        when(userService.getAverageEvaluationScoreByBookId(1L)).thenReturn(4.5);
         when(bookCategoryRepository.findBookCategoryMapResponse(bookId))
                 .thenReturn(response);
 
@@ -82,6 +88,12 @@ class BookCategoryMapServiceImplTest {
         assertThat(result.categories()).hasSize(1);
         assertThat(result.categories().getFirst().categoryId()).isEqualTo(categoryId);
         assertThat(result.categories().getFirst().categoryName()).isEqualTo(category.getName());
+
+        verify(bookDocumentRepository).save(argThat(doc ->
+                doc.getId().equals(book.getId()) &&
+                        doc.getReviewCount() == 1L &&
+                        doc.getRating() == 4.5
+        ));
     }
 
     @Test
@@ -133,10 +145,18 @@ class BookCategoryMapServiceImplTest {
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookCategoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
         when(bookRepository.countBookCategoryByBookId(bookId)).thenReturn(bookCategorySet.size());
+        when(userService.countReviewsByBookId(bookId)).thenReturn(5L);
+        when(userService.getAverageEvaluationScoreByBookId(bookId)).thenReturn(4.5);
 
         bookCategoryMapService.deleteCategoryMap(bookId, categoryId);
 
         verify(bookRepository, times(1)).save(book);
+        verify(bookDocumentRepository).save(argThat(doc ->
+                doc.getId().equals(bookId) &&
+                        doc.getReviewCount() == 5L &&
+                        doc.getRating() == 4.5
+        ));
+
     }
 
     @Test

@@ -70,7 +70,9 @@ public class BookTagMapServiceImpl implements BookTagMapService {
         book.getBookTags().remove(bookTag);
 
         bookRepository.save(book);
-        bookDocumentRepository.save(BookDocument.from(book));
+        Long reviewCount = userService.countReviewsByBookId(bookId);
+        Double rating = userService.getAverageEvaluationScoreByBookId(bookId);
+        bookDocumentRepository.save(BookDocument.from(book, reviewCount, rating));
     }
 
     // 도서에 해당하는 태그 조회
