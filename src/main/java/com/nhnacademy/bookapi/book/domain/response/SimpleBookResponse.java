@@ -7,5 +7,7 @@ public record SimpleBookResponse(
         Integer salePrice,
         Integer stock,
         String image,
-        Long viewCount
+        Long viewCount,
+        Long ReviewCount,
+        Double rating
 ) {}

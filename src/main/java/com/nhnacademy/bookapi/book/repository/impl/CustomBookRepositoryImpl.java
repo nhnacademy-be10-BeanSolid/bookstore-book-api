@@ -6,20 +6,16 @@ import com.nhnacademy.bookapi.book.domain.QBook;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
-import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.repository.CustomBookRepository;
 import com.nhnacademy.bookapi.bookcategory.domain.QBookCategory;
 import com.nhnacademy.bookapi.booklike.domain.QBookLike;
 import com.nhnacademy.bookapi.booktag.domain.QBookTag;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
@@ -69,71 +65,6 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
 
         return Optional.ofNullable(result)
                 .map(r -> BookDetailResponse.from(r, likeCount != null ? likeCount.intValue() : 0));
-    }
-
-    @Override
-    public Page<SimpleBookResponse> findAllSimpleBookResponses(Pageable pageable) {
-        QBook book = QBook.book;
-
-        List<OrderSpecifier<?>> orderSpecifiers = createOrderSpecifiers(pageable);
-
-        List<SimpleBookResponse> content = queryFactory
-                .select(Projections.constructor(SimpleBookResponse.class,
-                        book.id,
-                        book.title,
-                        book.author,
-                        book.salePrice,
-                        book.stock,
-                        book.image,
-                        book.viewCount
-                ))
-                .from(book)
-                .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        Long total = queryFactory
-                .select(book.count())
-                .from(book)
-                .fetchOne();
-
-        return new PageImpl<>(content, pageable, total != null ? total : 0);
-    }
-
-    @Override
-    public Page<SimpleBookResponse> findAllSimpleBookResponses(Long categoryId, Pageable pageable) {
-        QBook book = QBook.book;
-        QBookCategory category = QBookCategory.bookCategory;
-
-        List<OrderSpecifier<?>> orderSpecifiers = createOrderSpecifiers(pageable);
-
-        List<SimpleBookResponse> content = queryFactory
-                .select(Projections.constructor(SimpleBookResponse.class,
-                        book.id,
-                        book.title,
-                        book.author,
-                        book.salePrice,
-                        book.stock,
-                        book.image,
-                        book.viewCount
-                ))
-                .from(book)
-                .join(book.bookCategories, category)
-                .where(category.categoryId.eq(categoryId))
-                .orderBy(orderSpecifiers.toArray(new OrderSpecifier[0]))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        Long total = queryFactory
-                .select(book.count())
-                .from(book)
-                .join(book.bookCategories, category)
-                .where(category.categoryId.eq(categoryId))
-                .fetchOne();
-
-        return new PageImpl<>(content, pageable, total != null ? total : 0);
     }
 
     @Override

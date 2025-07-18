@@ -42,9 +42,14 @@ class CustomBookDocumentRepositoryTest {
         Pageable pageable = PageRequest.of(0, 4);
 
         SearchHit<BookDocument> hit1 = mock(SearchHit.class);
-        when(hit1.getId()).thenReturn("1");
+        BookDocument bookDocument1 = mock(BookDocument.class);
+        when(hit1.getContent()).thenReturn(bookDocument1);
+        when(bookDocument1.getId()).thenReturn(1L);
+
         SearchHit<BookDocument> hit2 = mock(SearchHit.class);
-        when(hit2.getId()).thenReturn("2");
+        BookDocument bookDocument2 = mock(BookDocument.class);
+        when(hit2.getContent()).thenReturn(bookDocument2);
+        when(bookDocument2.getId()).thenReturn(2L);
 
         // 검색 결과를 담고 있는 컨테이너
         SearchHits<BookDocument> searchHits = mock(SearchHits.class);
@@ -71,9 +76,7 @@ class CustomBookDocumentRepositoryTest {
         ReflectionTestUtils.setField(book2, "image", "img2");
         ReflectionTestUtils.setField(book2, "viewCount", 20L);
 
-        when(bookRepository.findById(1L)).thenReturn(Optional.of(book1));
-        when(bookRepository.findById(2L)).thenReturn(Optional.of(book2));
-
+        when(bookRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(book1, book2));
         Page<SimpleBookResponse> result = repository.searchByKeyword(keyword, pageable);
 
         assertThat(result.getTotalElements()).isEqualTo(2);
@@ -82,31 +85,6 @@ class CustomBookDocumentRepositoryTest {
         assertThat(result.getContent().get(1).title()).isEqualTo("Title2");
 
         verify(elasticsearchOperations, times(1)).search((Query) any(), eq(BookDocument.class));
-        verify(bookRepository, times(1)).findById(1L);
-        verify(bookRepository, times(1)).findById(2L);
-    }
-
-    @Test
-    void searchByKeyword_bookNotFoundException() {
-        String keyword = "test";
-        Pageable pageable = PageRequest.of(0, 4);
-
-        SearchHit<BookDocument> hit1 = mock(SearchHit.class);
-        when(hit1.getId()).thenReturn("1");
-
-        SearchHits<BookDocument> searchHits = mock(SearchHits.class);
-        when(searchHits.getSearchHits()).thenReturn(List.of(hit1));
-        when(searchHits.getTotalHits()).thenReturn(1L);
-
-        when(elasticsearchOperations.search((Query) any(), eq(BookDocument.class))).thenReturn(searchHits);
-
-        // 없는 도서
-        when(bookRepository.findById(1L)).thenReturn(Optional.empty());
-
-        assertThatThrownBy(() -> repository.searchByKeyword(keyword, pageable))
-                .isInstanceOf(BookNotFoundException.class);
-
-        verify(elasticsearchOperations, times(1)).search((Query) any(), eq(BookDocument.class));
-        verify(bookRepository, times(1)).findById(1L);
+        verify(bookRepository, times(1)).findAllById(List.of(1L, 2L));
     }
 }

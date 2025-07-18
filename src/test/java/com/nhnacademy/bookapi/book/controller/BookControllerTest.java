@@ -7,7 +7,7 @@ import com.nhnacademy.bookapi.book.domain.response.*;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
-import com.nhnacademy.bookapi.book.service.BookSearchService;
+import com.nhnacademy.bookapi.adpater.service.NaverBookService;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
@@ -51,7 +51,7 @@ class BookControllerTest {
     @MockBean
     BookService bookService;
     @MockBean
-    BookSearchService searchService;
+    NaverBookService searchService;
 
     BookTag tag;
     BookCategory category;
@@ -86,8 +86,8 @@ class BookControllerTest {
     void getAllBooks() throws Exception{
         Pageable pageable = PageRequest.of(0, 4);
         List<SimpleBookResponse> content = List.of(
-                new SimpleBookResponse(1L, "테스트1", "작가", 10000, 20, null, 1L),
-                new SimpleBookResponse(2L, "테스트2", "작가", 2000, 30, null, 3L)
+                new SimpleBookResponse(1L, "테스트1", "작가", 10000, 20, null, 1L, 0L, 0.0),
+                new SimpleBookResponse(2L, "테스트2", "작가", 2000, 30, null, 3L, 0L, 0.0)
         );
         Page<SimpleBookResponse> pageResult = new PageImpl<>(content, pageable, content.size());
 
@@ -109,8 +109,8 @@ class BookControllerTest {
         Pageable pageable = PageRequest.of(0, 4);
 
         List<SimpleBookResponse> content = List.of(
-                new SimpleBookResponse(1L, "테스트1", "작가", 10000, 20, null, 1L),
-                new SimpleBookResponse(2L, "테스트2", "작가", 2000, 30, null, 3L)
+                new SimpleBookResponse(1L, "테스트1", "작가", 10000, 20, null, 1L, 0L, 0.0),
+                new SimpleBookResponse(2L, "테스트2", "작가", 2000, 30, null, 3L, 0L, 0.0)
         );
         Page<SimpleBookResponse> pageResult = new PageImpl<>(content, pageable, content.size());
 
@@ -225,6 +225,7 @@ class BookControllerTest {
 
         mockMvc.perform(put("/books/1")
                         .contentType(MediaType.APPLICATION_JSON)
+                        .header("X-USER-ID", "tester")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
@@ -251,7 +252,8 @@ class BookControllerTest {
     void deleteBook_success() throws Exception {
         willDoNothing().given(bookService).deleteBook(1L);
 
-        mockMvc.perform(delete("/books/1"))
+        mockMvc.perform(delete("/books/1")
+                .header("X-USER-ID", "tester"))
                 .andExpect(status().isNoContent());
 
         verify(bookService, times(1)).deleteBook(1L);
@@ -339,15 +341,15 @@ class BookControllerTest {
         String keyword = "작가1";
         Pageable pageable = PageRequest.of(0, 4);
         List<SimpleBookResponse> content = List.of(
-                new SimpleBookResponse(1L, "테스트책1", "작가1", 10000, 10, null, 5L),
-                new SimpleBookResponse(2L, "테스트책2", "작가1", 8000, 3, null, 8L)
+                new SimpleBookResponse(1L, "테스트책1", "작가1", 10000, 10, null, 5L, 0L, 0.0),
+                new SimpleBookResponse(2L, "테스트책2", "작가1", 8000, 3, null, 8L, 0L, 0.0)
         );
         Page<SimpleBookResponse> mockPage = new PageImpl<>(content, pageable, content.size());
 
         when(bookService.getSimpleBookResponseByKeyword(eq(keyword), any(Pageable.class)))
                 .thenReturn(mockPage);
 
-        mockMvc.perform(get("/search")
+        mockMvc.perform(get("/books/search")
                         .param("keyword", keyword)
                         .param("page", "0")
                         .param("size", "4"))
@@ -357,5 +359,33 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.content[1].title").value("테스트책2"));
 
         verify(bookService, times(1)).getSimpleBookResponseByKeyword(eq(keyword), any(Pageable.class));
+    }
+
+    @Test
+    @DisplayName("유저 서비스에서 인덱스 최신화")
+    void updateBookDocumentResponse_success() throws Exception {
+        Long reviewCount = 5L;
+        Double reviewAverage = 4.3;
+
+        mockMvc.perform(post("/books/1/document")
+                        .param("reviewCount", reviewCount.toString())
+                        .param("reviewAverage", reviewAverage.toString()))
+                .andExpect(status().isNoContent());
+
+        verify(bookService, times(1)).updateBookDocument(1L, reviewCount, reviewAverage);
+    }
+
+    @Test
+    @DisplayName("유저 서비스에서 도서 제목 받기")
+    void getTitleByBookId_success() throws Exception {
+        String title = "제목";
+
+        when(bookService.getTitleByBookId(anyLong())).thenReturn(title);
+
+        mockMvc.perform(get("/books/1/title"))
+                .andExpect(status().isOk())
+                .andExpect(content().string(title));
+
+        verify(bookService, times(1)).getTitleByBookId(anyLong());
     }
 }

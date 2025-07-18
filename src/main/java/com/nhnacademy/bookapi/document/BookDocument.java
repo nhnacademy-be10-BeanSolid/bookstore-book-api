@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.document;
 
 import com.nhnacademy.bookapi.book.domain.Book;
+import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
 import jakarta.persistence.Id;
 import lombok.Getter;
@@ -12,14 +13,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Getter
-@Document(indexName = "beansolid_v3")
+@Document(indexName = "beansolid")
 @AllArgsConstructor
 @Setting(settingPath = "/elasticsearch/settings.json")
 public class BookDocument {
 
     @Id
-    @Field(type = FieldType.Keyword)
-    private String id;
+    @Field(type = FieldType.Long)
+    private Long id;
 
     @MultiField(
             mainField = @Field(type = FieldType.Text, analyzer = "korean_analyzer"),
@@ -40,6 +41,10 @@ public class BookDocument {
     @Field(type = FieldType.Keyword)
     private String publisher;
 
+    // 추가한 부분
+    @Field(type = FieldType.Long)
+    private Set<Long> categoryIds;
+
     @Field(type = FieldType.Keyword)
     private Set<String> tags;
 
@@ -52,22 +57,41 @@ public class BookDocument {
     @Field(type = FieldType.Long)
     private Long viewCount;
 
+    @Field(type = FieldType.Long)
+    private Long reviewCount;
+
+    @Field(type = FieldType.Double)
+    private Double rating;
+
     public static BookDocument from(Book book) {
+        return from(book, 0L, 0.0);
+    }
+
+    public static BookDocument from(Book book, Long reviewCount, Double rating) {
         Set<String> tags = book.getBookTags()
                 .stream()
                 .map(BookTag::getName)
                 .collect(Collectors.toSet());
 
+        // 추가한 부분
+        Set<Long> categoryIds = book.getBookCategories()
+                .stream()
+                .map(BookCategory::getCategoryId)
+                .collect(Collectors.toSet());
+
         return new BookDocument(
-                String.valueOf(book.getId()),
+                book.getId(),
                 book.getTitle(),
                 book.getDescription(),
                 book.getAuthor(),
                 book.getPublisher(),
+                categoryIds,
                 tags,
                 book.getPublishAt(),
                 book.getSalePrice(),
-                book.getViewCount()
+                book.getViewCount(),
+                reviewCount,
+                rating
         );
     }
 }

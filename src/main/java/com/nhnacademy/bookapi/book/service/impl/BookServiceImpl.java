@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.book.service.impl;
 
+import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
@@ -40,7 +41,8 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookCategoryRepository bookCategoryRepository;
     private final BookDocumentRepository bookDocumentRepository;
-
+    private final UserService userService;
+    
     // 도서 추가
     @Override
     public BookResponse createBook(BookCreateRequest request) {
@@ -63,9 +65,10 @@ public class BookServiceImpl implements BookService {
         book.setImage(image);
         Book savedBook = bookRepository.save(book);
 
-        // Document 저장
         BookDocument document = BookDocument.from(savedBook);
         bookDocumentRepository.save(document);
+
+        log.info("Saving BookDocument to Elasticsearch index: beansolid, document id: {}", document.getId());
 
         return bookRepository.findBookResponseById(savedBook.getId())
                 .orElseThrow(() -> new BookNotFoundException(savedBook.getId()));
@@ -87,23 +90,21 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
 
-        BookDocument document = BookDocument.from(book);
-
-        bookDocumentRepository.save(document);
+        bookDocumentRepository.increaseViewCount(String.valueOf(id), book.getViewCount());
     }
 
     // 전체 리스트
     @Override
     @Transactional(readOnly = true)
     public Page<SimpleBookResponse> getAllBooks(Pageable pageable) {
-        return bookRepository.findAllSimpleBookResponses(pageable);
+        return bookDocumentRepository.findAllSimpleBookResponses(pageable);
     }
 
     // 카테고리를 가지고 있는 도서 리스트
     @Override
     @Transactional(readOnly = true)
     public Page<SimpleBookResponse> getAllBooks(Long categoryId, Pageable pageable) {
-        return bookRepository.findAllSimpleBookResponses(categoryId, pageable);
+        return bookDocumentRepository.findAllSimpleBookResponses(categoryId, pageable);
     }
 
     // 도서 업데이트
@@ -113,9 +114,7 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new BookNotFoundException(id));
 
         book.updateFrom(request);
-
-        BookDocument updateDocument = BookDocument.from(book);
-        bookDocumentRepository.save(updateDocument);
+        updateBookDocument(book);
 
         return bookRepository.findBookDetailResponseByBookId(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
@@ -163,6 +162,7 @@ public class BookServiceImpl implements BookService {
     // 결제 후 재고 최신화
     // 동시성 문제
     @Override
+//    @Transactional(isolation = "")
     public void updateBookStock(List<BookStockReduceRequest> requests) {
         for (BookStockReduceRequest request : requests) {
             Long bookId = request.bookId();
@@ -180,5 +180,32 @@ public class BookServiceImpl implements BookService {
             bookRepository.save(book);
             log.info("Id {}의 재고 {} 차감 성공", bookId, stock);
         }
+    }
+
+    // 유저 서비스에서 필요한 정보 - 아이디로 책이름 반환
+    @Override
+    public String getTitleByBookId(Long bookId) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException(bookId));
+
+        return book.getTitle();
+    }
+
+    // 인덱스 최신화
+    public void updateBookDocument(Book book) {
+        Long reviewCount = userService.countReviewsByBookId(book.getId());
+        Double reviewAverage = userService.getAverageEvaluationScoreByBookId(book.getId());
+
+        BookDocument document = BookDocument.from(book, reviewCount, reviewAverage);
+        bookDocumentRepository.save(document);
+    }
+
+    // 유저 서비스에서 최신화
+    public void updateBookDocument(Long bookId, Long reviewCount, Double reviewAverage) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(() -> new BookNotFoundException(bookId));
+
+        BookDocument document = BookDocument.from(book, reviewCount, reviewAverage);
+        bookDocumentRepository.save(document);
     }
 }

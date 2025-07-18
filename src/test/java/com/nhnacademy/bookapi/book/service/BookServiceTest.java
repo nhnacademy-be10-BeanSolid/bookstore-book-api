@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.book.service;
 
+import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
@@ -24,6 +25,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -44,7 +46,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BookServiceImplTest {
+class BookServiceTest {
 
     @Mock
     private BookRepository bookRepository;
@@ -52,6 +54,8 @@ class BookServiceImplTest {
     private BookCategoryRepository bookCategoryRepository;
     @Mock
     private BookDocumentRepository bookDocumentRepository;
+    @Mock
+    private UserService userService;
 
     @InjectMocks
     private BookServiceImpl bookService;
@@ -155,18 +159,19 @@ class BookServiceImplTest {
     @Test
     @DisplayName("도서 리스트")
     void getAllBooksTest() {
-        SimpleBookResponse response1 = new SimpleBookResponse(1L, "제목", "작가", 1000, 20, null, 0L);
-        SimpleBookResponse response2 = new SimpleBookResponse(2L, "제목1", "작가1", 500, 30, null, 1L);
+        SimpleBookResponse response1 = new SimpleBookResponse(1L, "제목", "작가", 1000, 20, null, 0L, 0L, 0.0);
+        SimpleBookResponse response2 = new SimpleBookResponse(2L, "제목1", "작가1", 500, 30, null, 1L, 0L, 0.0);
 
         Pageable pageable = PageRequest.of(0, 4);
 
-        when(bookRepository.findAllSimpleBookResponses(pageable))
+        when(bookDocumentRepository.findAllSimpleBookResponses(pageable))
                 .thenReturn(new PageImpl<>(List.of(response1, response2), pageable, 2));
 
         Page<SimpleBookResponse> pageResult = bookService.getAllBooks(pageable);
 
-        assertThat(pageResult).isNotNull();
-        assertThat(pageResult).hasSize(2);
+        assertThat(pageResult).
+                isNotNull().
+                hasSize(2);
         assertThat(pageResult.getContent().get(0)).isEqualTo(response1);
         assertThat(pageResult.getContent().get(1)).isEqualTo(response2);
     }
@@ -176,19 +181,20 @@ class BookServiceImplTest {
     void getAllBooksByCategoryTest() {
         Long categoryId = 1L;
 
-        SimpleBookResponse response1 = new SimpleBookResponse(1L, "제목", "작가", 1000, 20, null, 0L);
-        SimpleBookResponse response2 = new SimpleBookResponse(2L, "제목1", "작가1", 500, 30, null, 1L);
-        SimpleBookResponse response3 = new SimpleBookResponse(3L, "제목2", "작가2", 777, 30, null, 0L);
+        SimpleBookResponse response1 = new SimpleBookResponse(1L, "제목", "작가", 1000, 20, null, 0L, 0L, 0.0);
+        SimpleBookResponse response2 = new SimpleBookResponse(2L, "제목1", "작가1", 500, 30, null, 1L, 0L, 0.0);
+        SimpleBookResponse response3 = new SimpleBookResponse(3L, "제목2", "작가2", 777, 30, null, 0L, 0L, 0.0);
 
         Pageable pageable = PageRequest.of(0, 4);
 
-        when(bookRepository.findAllSimpleBookResponses(categoryId, pageable))
+        when(bookDocumentRepository.findAllSimpleBookResponses(categoryId, pageable))
                 .thenReturn(new PageImpl<>(List.of(response1, response2, response3), pageable, 3));
 
         Page<SimpleBookResponse> pageResult = bookService.getAllBooks(categoryId, pageable);
 
-        assertThat(pageResult).isNotNull();
-        assertThat(pageResult).hasSize(3);
+        assertThat(pageResult)
+                .isNotNull()
+                .hasSize(3);
         assertThat(pageResult.getContent().get(0)).isEqualTo(response1);
         assertThat(pageResult.getContent().get(1)).isEqualTo(response2);
         assertThat(pageResult.getContent().get(2)).isEqualTo(response3);
@@ -214,6 +220,8 @@ class BookServiceImplTest {
         assertThat(result.id()).isEqualTo(1L);
         assertThat(result.wrappable()).isTrue();
         assertThat(result.status()).isEqualTo(BookStatus.SALE_END.getLabel());
+
+        verify(bookDocumentRepository).save(any(BookDocument.class));
     }
 
     @Test
@@ -260,8 +268,8 @@ class BookServiceImplTest {
 
         Pageable pageable = PageRequest.of(0, 4);
         List<SimpleBookResponse> content = List.of(
-                new SimpleBookResponse(1L, "프랑켄슈타인", "박사", 10000, 20, null, 1L),
-                new SimpleBookResponse(2L, "지식", "프랑켄슈타인", 2000, 30, null, 3L)
+                new SimpleBookResponse(1L, "프랑켄슈타인", "박사", 10000, 20, null, 1L, 0L, 0.0),
+                new SimpleBookResponse(2L, "지식", "프랑켄슈타인", 2000, 30, null, 3L, 0L, 0.0)
         );
         Page<SimpleBookResponse> expectedPage = new PageImpl<>(content, pageable, content.size());
 
@@ -298,10 +306,11 @@ class BookServiceImplTest {
     void getBookOrderResponseByBookIds_notSaleException() {
         Book book = new Book();
         ReflectionTestUtils.setField(book, "status", BookStatus.SALE_END);
+        List<Long> ids = List.of(1L);
 
         when(bookRepository.findBookOrderResponsesById(List.of(1L))).thenReturn(List.of());
 
-        assertThatThrownBy(() -> bookService.getBookOrderResponseByBookIds(List.of(1L)))
+        assertThatThrownBy(() -> bookService.getBookOrderResponseByBookIds(ids))
                 .isInstanceOf(BookNotSaleException.class);
     }
 
@@ -351,5 +360,79 @@ class BookServiceImplTest {
         assertThatThrownBy(() -> bookService.updateBookStock(requests))
                 .isInstanceOf(InsufficientStockException.class);
     }
-}
 
+    @Test
+    @DisplayName("도서 아이디로 이름 반환")
+    void getTitleByBookId_success() {
+        Book book = new Book();
+        ReflectionTestUtils.setField(book, "id", 1L);
+        ReflectionTestUtils.setField(book, "title", "제목");
+
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+
+        String title = bookService.getTitleByBookId(1L);
+
+        assertThat(title).isEqualTo("제목");
+    }
+
+    @Test
+    @DisplayName("도서 아이디로 이름 반환 - 존재하지 않은 도서 요청")
+    void getTitleByBookId_bookNotFound() {
+        when(bookRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookService.getTitleByBookId(1L))
+                .isInstanceOf(BookNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("인덱스 최신화")
+    void updateBookDocument() {
+        Book book = new Book();
+        ReflectionTestUtils.setField(book, "id", 1L);
+        Long reviewCount = 1L;
+        Double reviewAverage = 4.5;
+
+        when(userService.countReviewsByBookId(1L)).thenReturn(reviewCount);
+        when(userService.getAverageEvaluationScoreByBookId(1L)).thenReturn(reviewAverage);
+
+        bookService.updateBookDocument(book);
+
+        ArgumentCaptor<BookDocument> captor = ArgumentCaptor.forClass(BookDocument.class);
+        verify(bookDocumentRepository).save(captor.capture());
+
+        BookDocument saved = captor.getValue();
+        assertThat(saved.getId()).isEqualTo(1);
+        assertThat(saved.getReviewCount()).isEqualTo(reviewCount);
+        assertThat(saved.getRating()).isEqualTo(reviewAverage);
+    }
+
+    @Test
+    @DisplayName("유저 서비스에서 리뷰 작성시 인덱스 최신화")
+    void updateBookDocument_success() {
+        Book book = new Book();
+        ReflectionTestUtils.setField(book, "id", 1L);
+        Long reviewCount = 3L;
+        Double reviewAverage = 4.2;
+
+        when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+
+        bookService.updateBookDocument(1L, reviewCount, reviewAverage);
+
+        ArgumentCaptor<BookDocument> captor = ArgumentCaptor.forClass(BookDocument.class);
+        verify(bookDocumentRepository).save(captor.capture());
+
+        BookDocument saved = captor.getValue();
+        assertThat(saved.getId()).isEqualTo(1);
+        assertThat(saved.getReviewCount()).isEqualTo(reviewCount);
+        assertThat(saved.getRating()).isEqualTo(reviewAverage);
+    }
+
+    @Test
+    @DisplayName("유저 서비스에서 리뷰 작성시 인덱스 최신화 - 존재하지 않은 도서 요청")
+    void updateBookDocument_bookNotFound() {
+        when(bookRepository.findById(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> bookService.updateBookDocument(1L, 99L, 0.0))
+                .isInstanceOf(BookNotFoundException.class);
+    }
+}

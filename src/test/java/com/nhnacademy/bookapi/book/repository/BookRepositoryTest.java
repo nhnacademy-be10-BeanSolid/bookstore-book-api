@@ -3,20 +3,14 @@ package com.nhnacademy.bookapi.book.repository;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
-import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.common.config.QuerydslConfig;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.util.Arrays;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @ActiveProfiles("test")
 @Import(QuerydslConfig.class)
-class BookRepositoryImplTest {
+class BookRepositoryTest {
 
     @Autowired
     private BookRepository bookRepository;
@@ -64,31 +58,6 @@ class BookRepositoryImplTest {
     }
 
     @Test
-    void findAllBookResponsesTest() {
-        Pageable pageable = PageRequest.of(0, 10, Sort.by(Sort.Order.asc("id")));
-        Page<SimpleBookResponse> result = bookRepository.findAllSimpleBookResponses(pageable);
-
-        assertThat(result.getContent())
-                .hasSize(3)
-                .extracting(SimpleBookResponse::title)
-                .containsExactlyInAnyOrder("테스트책1", "테스트책2", "테스트책3");
-        assertThat(result.getContent()).isSortedAccordingTo(Comparator.comparing(SimpleBookResponse::id));
-    }
-
-    @Test
-    void findAllBookResponsesByCategoryIdTest() {
-        Pageable pageable = PageRequest.of(0, 10);
-        Long categoryId = 2L;
-
-        Page<SimpleBookResponse> result = bookRepository.findAllSimpleBookResponses(categoryId, pageable);
-
-        assertThat(result.getContent())
-                .hasSize(1)
-                .extracting(SimpleBookResponse::title)
-                .containsExactlyInAnyOrder("테스트책1");
-    }
-
-    @Test
     void countBookCategoryByBookIdTest() {
         int result = bookRepository.countBookCategoryByBookId(1L);
 
@@ -108,7 +77,7 @@ class BookRepositoryImplTest {
         List<BookOrderResponse> result = bookRepository.findBookOrderResponsesById(ids);
 
         assertThat(result).isNotEmpty();
-        assertThat(result.size()).isEqualTo(2);
+        assertThat(result).hasSize(2);
         assertThat(result.get(0).id()).isEqualTo(1L);
         assertThat(result.get(1).id()).isEqualTo(2L);
     }

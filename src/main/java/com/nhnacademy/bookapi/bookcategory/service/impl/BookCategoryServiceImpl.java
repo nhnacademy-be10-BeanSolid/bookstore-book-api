@@ -10,6 +10,7 @@ import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundExcepti
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -77,6 +79,13 @@ public class BookCategoryServiceImpl implements BookCategoryService {
         if(!existsCategory(categoryId)) {
             throw new BookCategoryNotFoundException(categoryId);
         }
+
+        List<BookCategory> children = bookCategoryRepository.findByParentCategory_CategoryId(categoryId);
+        for (BookCategory child : children) {
+            log.info("Deleting child category: {}", child.getCategoryId());
+            deleteCategory(child.getCategoryId());
+        }
+
         bookCategoryRepository.deleteById(categoryId);
     }
 

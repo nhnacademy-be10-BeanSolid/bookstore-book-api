@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.booktag.service;
 
+import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
@@ -30,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BookTagMapServiceImplTest {
+class BookTagMapServiceTest {
 
     @Mock
     BookTagRepository bookTagRepository;
@@ -40,6 +41,9 @@ class BookTagMapServiceImplTest {
 
     @Mock
     BookDocumentRepository bookDocumentRepository;
+
+    @Mock
+    UserService userService;
 
     @InjectMocks
     private BookTagMapServiceImpl bookTagMapService;
@@ -72,6 +76,8 @@ class BookTagMapServiceImplTest {
         BookTagResponse tagResponse = new BookTagResponse(tagId, tag.getName());
         BookTagMapResponse mapResponse = new BookTagMapResponse(bookId, List.of(tagResponse));
         when(bookTagRepository.findBookTagMapResponse(bookId)).thenReturn(mapResponse);
+        when(userService.countReviewsByBookId(bookId)).thenReturn(1L);
+        when(userService.getAverageEvaluationScoreByBookId(1L)).thenReturn(4.5);
 
         BookTagMapResponse result = bookTagMapService.createBookTag(bookId, request);
 
@@ -79,6 +85,12 @@ class BookTagMapServiceImplTest {
         assertThat(result.tags()).hasSize(1);
         assertThat(result.tags().getFirst().tagId()).isEqualTo(tagId);
         assertThat(result.tags().getFirst().tagName()).isEqualTo(tag.getName());
+
+        verify(bookDocumentRepository).save(argThat(doc ->
+                doc.getId().equals(book.getId()) &&
+                        doc.getReviewCount() == 1L &&
+                        doc.getRating() == 4.5
+        ));
     }
 
     @Test
