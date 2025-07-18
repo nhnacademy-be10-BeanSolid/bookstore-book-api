@@ -88,7 +88,7 @@ class BookTagMapServiceImplTest {
         assertThat(result.tags().getFirst().tagName()).isEqualTo(tag.getName());
 
         verify(bookDocumentRepository).save(argThat(doc ->
-                doc.getId().equals(book.getId()) &&
+                doc.getBookId().equals(book.getId()) &&
                         doc.getReviewCount() == 1L &&
                         doc.getRating() == 4.5
         ));

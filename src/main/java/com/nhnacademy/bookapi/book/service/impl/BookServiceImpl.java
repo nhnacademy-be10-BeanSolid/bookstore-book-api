@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.book.service.impl;
 
+import com.nhnacademy.bookapi.BookCreatedEvent;
 import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
@@ -22,6 +23,7 @@ import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,7 +44,10 @@ public class BookServiceImpl implements BookService {
     private final BookCategoryRepository bookCategoryRepository;
     private final BookDocumentRepository bookDocumentRepository;
     private final UserService userService;
-    
+
+    // 이벤트 발행용 인터페이스
+    private final ApplicationEventPublisher applicationEventPublisher;
+
     // 도서 추가
     @Override
     public BookResponse createBook(BookCreateRequest request) {
@@ -65,10 +70,7 @@ public class BookServiceImpl implements BookService {
         book.setImage(image);
         Book savedBook = bookRepository.save(book);
 
-        BookDocument document = BookDocument.from(savedBook);
-        bookDocumentRepository.save(document);
-
-        log.info("Saving BookDocument to Elasticsearch index: beansolid, document id: {}", document.getId());
+        applicationEventPublisher.publishEvent(new BookCreatedEvent(savedBook));
 
         return bookRepository.findBookResponseById(savedBook.getId())
                 .orElseThrow(() -> new BookNotFoundException(savedBook.getId()));
@@ -125,7 +127,7 @@ public class BookServiceImpl implements BookService {
     public void deleteBook(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
-        bookDocumentRepository.deleteById(String.valueOf(book.getId())); // 인덱스 다시 저장
+        bookDocumentRepository.deleteById(String.valueOf(id)); // 인덱스 다시 저장
         bookRepository.delete(book);
     }
 

@@ -90,7 +90,7 @@ class BookCategoryMapServiceImplTest {
         assertThat(result.categories().getFirst().categoryName()).isEqualTo(category.getName());
 
         verify(bookDocumentRepository).save(argThat(doc ->
-                doc.getId().equals(book.getId()) &&
+                doc.getBookId().equals(book.getId()) &&
                         doc.getReviewCount() == 1L &&
                         doc.getRating() == 4.5
         ));
@@ -152,7 +152,7 @@ class BookCategoryMapServiceImplTest {
 
         verify(bookRepository, times(1)).save(book);
         verify(bookDocumentRepository).save(argThat(doc ->
-                doc.getId().equals(bookId) &&
+                doc.getBookId().equals(bookId) &&
                         doc.getReviewCount() == 5L &&
                         doc.getRating() == 4.5
         ));

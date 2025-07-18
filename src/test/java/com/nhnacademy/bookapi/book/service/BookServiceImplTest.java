@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.book.service;
 
+import com.nhnacademy.bookapi.BookCreatedEvent;
 import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
@@ -29,6 +30,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -56,6 +58,8 @@ class BookServiceImplTest {
     private BookDocumentRepository bookDocumentRepository;
     @Mock
     private UserService userService;
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     private BookServiceImpl bookService;
@@ -82,7 +86,6 @@ class BookServiceImplTest {
 
         when(bookRepository.save(any(Book.class))).thenReturn(book);
         when(bookRepository.findBookResponseById(1L)).thenReturn(Optional.of(bookResponse));
-        when(bookDocumentRepository.save(any(BookDocument.class))).thenReturn(BookDocument.from(book));
 
         BookResponse response = bookService.createBook(request);
 
@@ -91,6 +94,8 @@ class BookServiceImplTest {
         assertThat(response.isbn()).isEqualTo("test000000000");
         assertThat(response.bookCategories()).contains("소설");
         assertThat(response.publishAt()).isEqualTo(LocalDate.of(2020,10,19));
+
+        verify(applicationEventPublisher, times(1)).publishEvent(isA(BookCreatedEvent.class));
     }
 
     @Test
@@ -242,11 +247,11 @@ class BookServiceImplTest {
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
 
         doNothing().when(bookRepository).delete(book);
-        doNothing().when(bookDocumentRepository).deleteById(String.valueOf(1L));
+        doNothing().when(bookDocumentRepository).deleteById("1");
 
         bookService.deleteBook(1L);
 
-        verify(bookDocumentRepository, times(1)).deleteById(String.valueOf(1L));
+        verify(bookDocumentRepository, times(1)).deleteById("1");
         verify(bookRepository, times(1)).delete(book);
     }
 
@@ -398,7 +403,7 @@ class BookServiceImplTest {
         verify(bookDocumentRepository).save(captor.capture());
 
         BookDocument saved = captor.getValue();
-        assertThat(saved.getId()).isEqualTo(1);
+        assertThat(saved.getId()).isEqualTo("1");
         assertThat(saved.getReviewCount()).isEqualTo(reviewCount);
         assertThat(saved.getRating()).isEqualTo(reviewAverage);
     }
@@ -419,7 +424,7 @@ class BookServiceImplTest {
         verify(bookDocumentRepository).save(captor.capture());
 
         BookDocument saved = captor.getValue();
-        assertThat(saved.getId()).isEqualTo(1);
+        assertThat(saved.getId()).isEqualTo("1");
         assertThat(saved.getReviewCount()).isEqualTo(reviewCount);
         assertThat(saved.getRating()).isEqualTo(reviewAverage);
     }
