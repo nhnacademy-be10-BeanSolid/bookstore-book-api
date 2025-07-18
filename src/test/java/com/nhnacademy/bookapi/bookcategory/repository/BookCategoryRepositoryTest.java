@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @ActiveProfiles("test")
 @Import(QuerydslConfig.class)
-class BookCategoryRepositoryImplTest {
+class BookCategoryRepositoryTest {
 
     @Autowired
     private BookCategoryRepository bookCategoryRepository;

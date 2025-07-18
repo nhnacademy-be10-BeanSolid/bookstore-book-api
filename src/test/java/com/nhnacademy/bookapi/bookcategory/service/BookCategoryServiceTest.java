@@ -29,7 +29,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BookCategoryServiceImplTest {
+class BookCategoryServiceTest {
 
     @Mock
     BookCategoryRepository bookCategoryRepository;

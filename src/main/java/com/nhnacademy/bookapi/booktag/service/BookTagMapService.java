@@ -2,10 +2,6 @@ package com.nhnacademy.bookapi.booktag.service;
 
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagMapCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
-import org.springframework.data.domain.Page;
-import org.springframework.web.bind.annotation.PathVariable;
-
-import java.util.List;
 
 public interface BookTagMapService {
 

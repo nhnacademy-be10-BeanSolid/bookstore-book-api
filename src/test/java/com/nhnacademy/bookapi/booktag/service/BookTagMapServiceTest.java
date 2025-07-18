@@ -11,7 +11,6 @@ import com.nhnacademy.bookapi.booktag.exception.BookTagMapAlreadyExistsException
 import com.nhnacademy.bookapi.booktag.exception.BookTagMapNotFoundException;
 import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
 import com.nhnacademy.bookapi.booktag.service.impl.BookTagMapServiceImpl;
-import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -32,7 +31,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BookTagMapServiceImplTest {
+class BookTagMapServiceTest {
 
     @Mock
     BookTagRepository bookTagRepository;

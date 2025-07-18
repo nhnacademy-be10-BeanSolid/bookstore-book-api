@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @ActiveProfiles("test")
 @Import(QuerydslConfig.class)
-class BookRepositoryImplTest {
+class BookRepositoryTest {
 
     @Autowired
     private BookRepository bookRepository;
@@ -77,7 +77,7 @@ class BookRepositoryImplTest {
         List<BookOrderResponse> result = bookRepository.findBookOrderResponsesById(ids);
 
         assertThat(result).isNotEmpty();
-        assertThat(result.size()).isEqualTo(2);
+        assertThat(result).hasSize(2);
         assertThat(result.get(0).id()).isEqualTo(1L);
         assertThat(result.get(1).id()).isEqualTo(2L);
     }
