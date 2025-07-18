@@ -42,7 +42,7 @@ public class BookServiceImpl implements BookService {
     private final BookCategoryRepository bookCategoryRepository;
     private final BookDocumentRepository bookDocumentRepository;
     private final UserService userService;
-
+    
     // 도서 추가
     @Override
     public BookResponse createBook(BookCreateRequest request) {
@@ -162,6 +162,7 @@ public class BookServiceImpl implements BookService {
     // 결제 후 재고 최신화
     // 동시성 문제
     @Override
+//    @Transactional(isolation = "")
     public void updateBookStock(List<BookStockReduceRequest> requests) {
         for (BookStockReduceRequest request : requests) {
             Long bookId = request.bookId();

@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.booktag.service.impl;
 
+import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
@@ -13,9 +14,9 @@ import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
 import com.nhnacademy.bookapi.booktag.service.BookTagMapService;
 import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Transactional
@@ -25,6 +26,8 @@ public class BookTagMapServiceImpl implements BookTagMapService {
     private final BookRepository bookRepository;
     private final BookTagRepository bookTagRepository;
     private final BookDocumentRepository bookDocumentRepository;
+    private final UserService userService;
+
 
     // 도서에 태그 추가
     @Override
@@ -42,7 +45,11 @@ public class BookTagMapServiceImpl implements BookTagMapService {
 
         book.getBookTags().add(bookTag);
         bookRepository.save(book);
-        bookDocumentRepository.save(BookDocument.from(book));
+
+        // 인덱스 최신화
+        Long reviewCount = userService.countReviewsByBookId(bookId);
+        Double rating = userService.getAverageEvaluationScoreByBookId(bookId);
+        bookDocumentRepository.save(BookDocument.from(book, reviewCount, rating));
 
         return getBookTagMapResponse(bookId);
     }
@@ -68,6 +75,7 @@ public class BookTagMapServiceImpl implements BookTagMapService {
 
     // 도서에 해당하는 태그 조회
     @Override
+    @Transactional(readOnly = true)
     public BookTagMapResponse getBookTagMapResponse(Long bookId) {
         return bookTagRepository.findBookTagMapResponse(bookId);
     }
