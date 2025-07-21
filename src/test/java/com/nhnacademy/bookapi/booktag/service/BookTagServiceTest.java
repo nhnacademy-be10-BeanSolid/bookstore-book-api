@@ -28,7 +28,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BookTagServiceImplTest {
+class BookTagServiceTest {
 
     @Mock
     BookTagRepository bookTagRepository;
@@ -123,9 +123,11 @@ class BookTagServiceImplTest {
     @Test
     @DisplayName("업데이트 - 존재하지 않는 태그 요청")
     void updateBookTag_notFound() {
+        BookTagUpdateRequest request = new BookTagUpdateRequest("tag1");
+
         when(bookTagRepository.findById(1L)).thenReturn(Optional.empty());
 
-        assertThatThrownBy(() -> bookTagService.updateBookTag(1L, new BookTagUpdateRequest("tag1")))
+        assertThatThrownBy(() -> bookTagService.updateBookTag(1L, request))
                 .isInstanceOf(BookTagNotFoundException.class);
     }
 

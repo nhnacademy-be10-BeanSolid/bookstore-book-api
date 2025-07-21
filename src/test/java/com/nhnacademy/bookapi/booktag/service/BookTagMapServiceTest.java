@@ -34,7 +34,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BookTagMapServiceImplTest {
+class BookTagMapServiceTest {
 
     @Mock
     BookTagRepository bookTagRepository;

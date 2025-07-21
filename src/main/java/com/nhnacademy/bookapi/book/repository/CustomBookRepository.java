@@ -1,14 +1,8 @@
 package com.nhnacademy.bookapi.book.repository;
 
-
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
-import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Page;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
-import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
-import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 
 import java.util.List;
 import java.util.Optional;

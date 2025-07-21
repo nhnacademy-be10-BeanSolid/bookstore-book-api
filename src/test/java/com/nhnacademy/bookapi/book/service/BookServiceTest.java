@@ -48,7 +48,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BookServiceImplTest {
+class BookServiceTest {
 
     @Mock
     private BookRepository bookRepository;
@@ -174,8 +174,9 @@ class BookServiceImplTest {
 
         Page<SimpleBookResponse> pageResult = bookService.getAllBooks(pageable);
 
-        assertThat(pageResult).isNotNull();
-        assertThat(pageResult).hasSize(2);
+        assertThat(pageResult).
+                isNotNull().
+                hasSize(2);
         assertThat(pageResult.getContent().get(0)).isEqualTo(response1);
         assertThat(pageResult.getContent().get(1)).isEqualTo(response2);
     }
@@ -196,8 +197,9 @@ class BookServiceImplTest {
 
         Page<SimpleBookResponse> pageResult = bookService.getAllBooks(categoryId, pageable);
 
-        assertThat(pageResult).isNotNull();
-        assertThat(pageResult).hasSize(3);
+        assertThat(pageResult)
+                .isNotNull()
+                .hasSize(3);
         assertThat(pageResult.getContent().get(0)).isEqualTo(response1);
         assertThat(pageResult.getContent().get(1)).isEqualTo(response2);
         assertThat(pageResult.getContent().get(2)).isEqualTo(response3);
@@ -309,10 +311,11 @@ class BookServiceImplTest {
     void getBookOrderResponseByBookIds_notSaleException() {
         Book book = new Book();
         ReflectionTestUtils.setField(book, "status", BookStatus.SALE_END);
+        List<Long> ids = List.of(1L);
 
         when(bookRepository.findBookOrderResponsesById(List.of(1L))).thenReturn(List.of());
 
-        assertThatThrownBy(() -> bookService.getBookOrderResponseByBookIds(List.of(1L)))
+        assertThatThrownBy(() -> bookService.getBookOrderResponseByBookIds(ids))
                 .isInstanceOf(BookNotSaleException.class);
     }
 
@@ -410,4 +413,3 @@ class BookServiceImplTest {
                 .isInstanceOf(BookNotFoundException.class);
     }
 }
-

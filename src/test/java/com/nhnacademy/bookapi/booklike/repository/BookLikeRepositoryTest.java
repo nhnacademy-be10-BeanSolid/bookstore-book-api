@@ -19,7 +19,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @DataJpaTest
 @ActiveProfiles("test")
 @Import(QuerydslConfig.class)
-class BookLikeRepositoryImplTest {
+class BookLikeRepositoryTest {
 
     @Autowired
     private BookLikeRepository bookLikeRepository;
