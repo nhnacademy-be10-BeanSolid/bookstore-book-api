@@ -12,7 +12,6 @@ import com.nhnacademy.bookapi.booktag.exception.BookTagMapNotFoundException;
 import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
 import com.nhnacademy.bookapi.booktag.service.impl.BookTagMapServiceImpl;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
-import com.nhnacademy.bookapi.event.BookDeleteEvent;
 import com.nhnacademy.bookapi.event.BookUpdateEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;

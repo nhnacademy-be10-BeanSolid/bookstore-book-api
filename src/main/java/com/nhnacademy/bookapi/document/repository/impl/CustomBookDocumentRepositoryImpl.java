@@ -30,6 +30,8 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
     private final ElasticsearchOperations elasticsearchOperations;
     private final BookRepository bookRepository;
 
+    private static final String BOOK_ID = "bookId";
+
     @Override
     public Page<SimpleBookResponse> searchByKeyword(String keyword, Pageable pageable) {
 
@@ -37,7 +39,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
 
         Sort currentSort = pageable.getSort();
         // 보조정렬
-        Sort newSort = currentSort.and(Sort.by(Sort.Order.desc("bookId")));
+        Sort newSort = currentSort.and(Sort.by(Sort.Order.desc(BOOK_ID)));
         Pageable newPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), newSort);
 
         log.info("page number: {}", pageable.getPageNumber());
@@ -112,7 +114,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
     public Page<SimpleBookResponse> findAllSimpleBookResponses(Pageable pageable) {
 
         Sort currentSort = pageable.getSort();
-        Sort newSort = currentSort.and(Sort.by(Sort.Order.desc("bookId")));
+        Sort newSort = currentSort.and(Sort.by(Sort.Order.desc(BOOK_ID)));
         Pageable newPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), newSort);
 
         NativeQuery query = NativeQuery.builder()
@@ -157,7 +159,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
     public Page<SimpleBookResponse> findAllSimpleBookResponses(Long categoryId, Pageable pageable) {
 
         Sort currentSort = pageable.getSort();
-        Sort newSort = currentSort.and(Sort.by(Sort.Order.desc("bookId")));
+        Sort newSort = currentSort.and(Sort.by(Sort.Order.desc(BOOK_ID)));
         Pageable newPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), newSort);
 
         NativeQuery query = NativeQuery.builder()
