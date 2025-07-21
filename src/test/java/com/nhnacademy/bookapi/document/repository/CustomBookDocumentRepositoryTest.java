@@ -2,7 +2,6 @@ package com.nhnacademy.bookapi.document.repository;
 
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
-import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.impl.CustomBookDocumentRepositoryImpl;
@@ -18,7 +17,6 @@ import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;

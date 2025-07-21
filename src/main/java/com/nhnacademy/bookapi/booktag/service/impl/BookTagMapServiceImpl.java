@@ -53,7 +53,7 @@ public class BookTagMapServiceImpl implements BookTagMapService {
         Double rating = userService.getAverageEvaluationScoreByBookId(bookId);
         applicationEventPublisher.publishEvent(new BookUpdateEvent(book, reviewCount, rating));
 
-        return getBookTagMapResponse(bookId);
+        return bookTagRepository.findBookTagMapResponse(bookId);
     }
 
     // 도서 태그 삭제

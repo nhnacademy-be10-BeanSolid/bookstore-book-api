@@ -29,7 +29,7 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
 
     // 도서에 카테고리 추가
     @Override
-    public BookCategoryMapResponse createBookCategoryMap(Long bookId , BookCategoryMapCreateRequest request) {
+    public BookCategoryMapResponse createBookCategoryMap(Long bookId, BookCategoryMapCreateRequest request) {
         Long categoryId = request.categoryId();
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
@@ -54,7 +54,7 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
         Double rating = userService.getAverageEvaluationScoreByBookId(bookId);
         applicationEventPublisher.publishEvent(new BookUpdateEvent(book, reviewCount, rating));
 
-        return getBookCategoryMapResponse(bookId);
+        return bookCategoryRepository.findBookCategoryMapResponse(bookId);
     }
 
     // 도서에서 카테고리 삭제
