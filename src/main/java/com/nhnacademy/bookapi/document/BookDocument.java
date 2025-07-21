@@ -20,7 +20,10 @@ public class BookDocument {
 
     @Id
     @Field(type = FieldType.Long)
-    private Long id;
+    private String id;
+
+    @Field(type = FieldType.Long)
+    private Long bookId;
 
     @MultiField(
             mainField = @Field(type = FieldType.Text, analyzer = "korean_analyzer"),
@@ -80,6 +83,7 @@ public class BookDocument {
                 .collect(Collectors.toSet());
 
         return new BookDocument(
+                String.valueOf(book.getId()),
                 book.getId(),
                 book.getTitle(),
                 book.getDescription(),

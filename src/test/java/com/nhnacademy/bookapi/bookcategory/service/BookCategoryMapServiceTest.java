@@ -14,6 +14,7 @@ import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapNotFoundExce
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.bookcategory.service.impl.BookCategoryMapServiceImpl;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
+import com.nhnacademy.bookapi.event.BookUpdateEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -21,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
@@ -38,15 +40,14 @@ class BookCategoryMapServiceTest {
 
     @Mock
     BookRepository bookRepository;
-
     @Mock
     BookCategoryRepository bookCategoryRepository;
-
     @Mock
     BookDocumentRepository bookDocumentRepository;
-
     @Mock
     UserService userService;
+    @Mock
+    ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     BookCategoryMapServiceImpl bookCategoryMapService;
@@ -74,26 +75,27 @@ class BookCategoryMapServiceTest {
         when(bookRepository.countBookCategoryByBookId(bookId)).thenReturn(1);
         when(bookCategoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
+        // 예상
         BookCategoryResponse categoryResponse = new BookCategoryResponse(categoryId, "카테고리",
                 null, null, LocalDateTime.now(), null);
         BookCategoryMapResponse response = new BookCategoryMapResponse(bookId, List.of(categoryResponse));
+
         when(userService.countReviewsByBookId(bookId)).thenReturn(1L);
         when(userService.getAverageEvaluationScoreByBookId(1L)).thenReturn(4.5);
         when(bookCategoryRepository.findBookCategoryMapResponse(bookId))
                 .thenReturn(response);
 
+        when(userService.countReviewsByBookId(bookId)).thenReturn(1L);
+        when(userService.getAverageEvaluationScoreByBookId(1L)).thenReturn(4.5);
+
         BookCategoryMapResponse result = bookCategoryMapService.createBookCategoryMap(bookId, request);
 
         assertThat(result.bookId()).isEqualTo(bookId);
         assertThat(result.categories()).hasSize(1);
-        assertThat(result.categories().getFirst().categoryId()).isEqualTo(categoryId);
-        assertThat(result.categories().getFirst().categoryName()).isEqualTo(category.getName());
+        assertThat(result.categories().getFirst().categoryId()).isEqualTo(response.categories().getFirst().categoryId());
+        assertThat(result.categories().getFirst().categoryName()).isEqualTo(response.categories().getFirst().categoryName());
 
-        verify(bookDocumentRepository).save(argThat(doc ->
-                doc.getId().equals(book.getId()) &&
-                        doc.getReviewCount() == 1L &&
-                        doc.getRating() == 4.5
-        ));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(BookUpdateEvent.class));
     }
 
     @Test
@@ -151,12 +153,7 @@ class BookCategoryMapServiceTest {
         bookCategoryMapService.deleteCategoryMap(bookId, categoryId);
 
         verify(bookRepository, times(1)).save(book);
-        verify(bookDocumentRepository).save(argThat(doc ->
-                doc.getId().equals(bookId) &&
-                        doc.getReviewCount() == 5L &&
-                        doc.getRating() == 4.5
-        ));
-
+        verify(applicationEventPublisher, times(1)).publishEvent(any(BookUpdateEvent.class));
     }
 
     @Test

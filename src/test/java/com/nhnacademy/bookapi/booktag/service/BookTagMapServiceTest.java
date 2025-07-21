@@ -12,6 +12,8 @@ import com.nhnacademy.bookapi.booktag.exception.BookTagMapNotFoundException;
 import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
 import com.nhnacademy.bookapi.booktag.service.impl.BookTagMapServiceImpl;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
+import com.nhnacademy.bookapi.event.BookDeleteEvent;
+import com.nhnacademy.bookapi.event.BookUpdateEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +21,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.HashSet;
@@ -35,15 +38,14 @@ class BookTagMapServiceTest {
 
     @Mock
     BookTagRepository bookTagRepository;
-
     @Mock
     BookRepository bookRepository;
-
     @Mock
     BookDocumentRepository bookDocumentRepository;
-
     @Mock
     UserService userService;
+    @Mock
+    ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     private BookTagMapServiceImpl bookTagMapService;
@@ -71,10 +73,11 @@ class BookTagMapServiceTest {
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookTagRepository.findById(tagId)).thenReturn(Optional.of(tag));
         when(bookRepository.save(any(Book.class))).thenReturn(book);
-        when(bookDocumentRepository.save(any())).thenReturn(null);
 
+        // 예상
         BookTagResponse tagResponse = new BookTagResponse(tagId, tag.getName());
         BookTagMapResponse mapResponse = new BookTagMapResponse(bookId, List.of(tagResponse));
+
         when(bookTagRepository.findBookTagMapResponse(bookId)).thenReturn(mapResponse);
         when(userService.countReviewsByBookId(bookId)).thenReturn(1L);
         when(userService.getAverageEvaluationScoreByBookId(1L)).thenReturn(4.5);
@@ -83,14 +86,10 @@ class BookTagMapServiceTest {
 
         assertThat(result.bookId()).isEqualTo(bookId);
         assertThat(result.tags()).hasSize(1);
-        assertThat(result.tags().getFirst().tagId()).isEqualTo(tagId);
-        assertThat(result.tags().getFirst().tagName()).isEqualTo(tag.getName());
+        assertThat(result.tags().getFirst().tagId()).isEqualTo(mapResponse.tags().getFirst().tagId());
+        assertThat(result.tags().getFirst().tagName()).isEqualTo(mapResponse.tags().getFirst().tagName());
 
-        verify(bookDocumentRepository).save(argThat(doc ->
-                doc.getId().equals(book.getId()) &&
-                        doc.getReviewCount() == 1L &&
-                        doc.getRating() == 4.5
-        ));
+        verify(applicationEventPublisher, times(1)).publishEvent(isA(BookUpdateEvent.class));
     }
 
     @Test
@@ -125,12 +124,11 @@ class BookTagMapServiceTest {
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookTagRepository.findById(tagId)).thenReturn(Optional.of(tag));
         when(bookRepository.save(any(Book.class))).thenReturn(book);
-        when(bookDocumentRepository.save(any())).thenReturn(null);
 
         bookTagMapService.deleteBookTag(bookId, tagId);
 
         verify(bookRepository, times(1)).save(book);
-        verify(bookDocumentRepository, times(1)).save(any());
+        verify(applicationEventPublisher, times(1)).publishEvent(isA(BookUpdateEvent.class));
     }
 
     @Test

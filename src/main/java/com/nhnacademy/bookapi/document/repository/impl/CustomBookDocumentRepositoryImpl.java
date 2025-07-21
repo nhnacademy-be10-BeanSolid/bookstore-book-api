@@ -37,7 +37,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
 
         Sort currentSort = pageable.getSort();
         // 보조정렬
-        Sort newSort = currentSort.and(Sort.by(Sort.Order.desc("id")));
+        Sort newSort = currentSort.and(Sort.by(Sort.Order.desc("bookId")));
         Pageable newPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), newSort);
 
         log.info("page number: {}", pageable.getPageNumber());
@@ -66,7 +66,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
 
         // 현재 페이지의 검색 결과 아이디
         List<Long> ids = hits.getSearchHits().stream()
-                .map(hit -> hit.getContent().getId())
+                .map(hit -> hit.getContent().getBookId())
                 .toList();
 
         Map<Long, Book> bookMap = bookRepository.findAllById(ids)
@@ -76,7 +76,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
         List<SimpleBookResponse> content = hits.getSearchHits().stream()
                 .map(hit -> {
                     BookDocument doc = hit.getContent();
-                    Book book = bookMap.get(doc.getId());
+                    Book book = bookMap.get(doc.getBookId());
                     return new SimpleBookResponse(
                             book.getId(),
                             book.getTitle(),
@@ -112,7 +112,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
     public Page<SimpleBookResponse> findAllSimpleBookResponses(Pageable pageable) {
 
         Sort currentSort = pageable.getSort();
-        Sort newSort = currentSort.and(Sort.by(Sort.Order.desc("id")));
+        Sort newSort = currentSort.and(Sort.by(Sort.Order.desc("bookId")));
         Pageable newPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), newSort);
 
         NativeQuery query = NativeQuery.builder()
@@ -123,7 +123,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
         SearchHits<BookDocument> hits = elasticsearchOperations.search(query, BookDocument.class);
 
         List<Long> ids = hits.getSearchHits().stream()
-                .map(hit -> hit.getContent().getId())
+                .map(hit -> hit.getContent().getBookId())
                 .toList();
 
         Map<Long, Book> bookMap = bookRepository.findAllById(ids)
@@ -133,7 +133,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
         List<SimpleBookResponse> content = hits.getSearchHits().stream()
                 .map(hit -> {
                     BookDocument doc = hit.getContent();
-                    Book book = bookMap.get(doc.getId());
+                    Book book = bookMap.get(doc.getBookId());
                     return new SimpleBookResponse(
                             book.getId(),
                             book.getTitle(),
@@ -157,7 +157,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
     public Page<SimpleBookResponse> findAllSimpleBookResponses(Long categoryId, Pageable pageable) {
 
         Sort currentSort = pageable.getSort();
-        Sort newSort = currentSort.and(Sort.by(Sort.Order.desc("id")));
+        Sort newSort = currentSort.and(Sort.by(Sort.Order.desc("bookId")));
         Pageable newPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), newSort);
 
         NativeQuery query = NativeQuery.builder()
@@ -173,7 +173,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
         SearchHits<BookDocument> hits = elasticsearchOperations.search(query, BookDocument.class);
 
         List<Long> ids = hits.getSearchHits().stream()
-                .map(hit -> hit.getContent().getId())
+                .map(hit -> hit.getContent().getBookId())
                 .toList();
 
         Map<Long, Book> bookMap = bookRepository.findAllById(ids)
@@ -183,7 +183,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
         List<SimpleBookResponse> content = hits.getSearchHits().stream()
                 .map(hit -> {
                     BookDocument doc = hit.getContent();
-                    Book book = bookMap.get(doc.getId());
+                    Book book = bookMap.get(doc.getBookId());
                     return new SimpleBookResponse(
                             book.getId(),
                             book.getTitle(),
