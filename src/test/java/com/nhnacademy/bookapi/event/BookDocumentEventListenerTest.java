@@ -10,10 +10,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-public class BookDocumentEventListenerTest {
+class BookDocumentEventListenerTest {
 
     @Mock
     private BookDocumentRepository bookDocumentRepository;
@@ -74,7 +75,7 @@ public class BookDocumentEventListenerTest {
         when(book.getId()).thenReturn(1L);
 
         BookCreateEvent event = new BookCreateEvent(book);
-        listener.whenBookCreateRollback(event);
+        assertDoesNotThrow(() -> listener.whenBookCreateRollback(event));
     }
 
     @Test
@@ -83,7 +84,7 @@ public class BookDocumentEventListenerTest {
         when(book.getId()).thenReturn(1L);
 
         BookDeleteEvent event = new BookDeleteEvent(book);
-        listener.whenBookDeleteRollback(event);
+        assertDoesNotThrow(() -> listener.whenBookDeleteRollback(event));
     }
 
     @Test
@@ -95,6 +96,6 @@ public class BookDocumentEventListenerTest {
         double rating = 4.7;
 
         BookUpdateEvent event = new BookUpdateEvent(book, reviewCount, rating);
-        listener.whenBookUpdateRollback(event);
+        assertDoesNotThrow(() -> listener.whenBookUpdateRollback(event));
     }
 }

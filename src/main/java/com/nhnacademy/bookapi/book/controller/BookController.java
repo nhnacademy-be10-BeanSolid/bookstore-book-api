@@ -2,7 +2,6 @@ package com.nhnacademy.bookapi.book.controller;
 
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.response.*;
-import com.nhnacademy.bookapi.adpater.service.NaverBookService;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
 
