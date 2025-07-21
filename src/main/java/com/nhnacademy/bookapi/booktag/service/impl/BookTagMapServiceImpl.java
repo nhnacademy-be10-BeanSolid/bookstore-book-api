@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.booktag.service.impl;
 
+import com.nhnacademy.bookapi.event.BookUpdateEvent;
 import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
@@ -12,9 +13,9 @@ import com.nhnacademy.bookapi.booktag.exception.BookTagMapNotFoundException;
 import com.nhnacademy.bookapi.booktag.exception.BookTagNotFoundException;
 import com.nhnacademy.bookapi.booktag.repository.BookTagRepository;
 import com.nhnacademy.bookapi.booktag.service.BookTagMapService;
-import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,6 +28,7 @@ public class BookTagMapServiceImpl implements BookTagMapService {
     private final BookTagRepository bookTagRepository;
     private final BookDocumentRepository bookDocumentRepository;
     private final UserService userService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
 
     // 도서에 태그 추가
@@ -49,7 +51,7 @@ public class BookTagMapServiceImpl implements BookTagMapService {
         // 인덱스 최신화
         Long reviewCount = userService.countReviewsByBookId(bookId);
         Double rating = userService.getAverageEvaluationScoreByBookId(bookId);
-        bookDocumentRepository.save(BookDocument.from(book, reviewCount, rating));
+        applicationEventPublisher.publishEvent(new BookUpdateEvent(book, reviewCount, rating));
 
         return getBookTagMapResponse(bookId);
     }
@@ -72,7 +74,7 @@ public class BookTagMapServiceImpl implements BookTagMapService {
         bookRepository.save(book);
         Long reviewCount = userService.countReviewsByBookId(bookId);
         Double rating = userService.getAverageEvaluationScoreByBookId(bookId);
-        bookDocumentRepository.save(BookDocument.from(book, reviewCount, rating));
+        applicationEventPublisher.publishEvent(new BookUpdateEvent(book, reviewCount, rating));
     }
 
     // 도서에 해당하는 태그 조회

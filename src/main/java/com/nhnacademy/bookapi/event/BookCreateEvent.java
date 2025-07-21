@@ -1,4 +1,4 @@
-package com.nhnacademy.bookapi;
+package com.nhnacademy.bookapi.event;
 
 import com.nhnacademy.bookapi.book.domain.Book;
 import lombok.Getter;
@@ -6,6 +6,6 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class BookCreatedEvent {
+public class BookCreateEvent {
     private final Book book;
 }

@@ -97,22 +97,4 @@ public class CustomBookRepositoryImpl implements CustomBookRepository {
                 .map(BookOrderResponse::from)
                 .toList();
     }
-
-    // 정렬 조건
-    private List<OrderSpecifier<?>> createOrderSpecifiers(Pageable pageable) {
-        PathBuilder<Book> pathBuilder = new PathBuilder<>(Book.class, "book");
-
-        // querydsl 에서 정렬에 사용하는 객체
-        List<OrderSpecifier<?>> orderSpecifiers = pageable.getSort().stream()
-                .map(order -> new OrderSpecifier<>(
-                        order.isAscending() ? Order.ASC : Order.DESC,
-                        pathBuilder.getComparable(order.getProperty(), Comparable.class)
-                ))
-                .collect(Collectors.toList());
-
-        // 보조 정렬 조건 추가 (id 내림차순)
-        orderSpecifiers.add(new OrderSpecifier<>(Order.DESC, pathBuilder.getComparable("id", Comparable.class)));
-
-        return orderSpecifiers;
-    }
 }

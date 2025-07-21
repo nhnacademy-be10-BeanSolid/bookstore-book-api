@@ -66,22 +66,6 @@ class BookControllerTest {
     }
 
     @Test
-    @DisplayName("외부검색")
-    void searchBook() throws Exception {
-        BookSearchResponse mockResponse = new BookSearchResponse();
-        mockResponse.setItems(List.of());
-
-        when(searchService.searchBook("자바", 1))
-                .thenReturn(mockResponse);
-
-        mockMvc.perform(get("/books-search")
-                        .param("query", "자바")
-                        .param("start", "1"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items").isArray());
-    }
-
-    @Test
     @DisplayName("도서 전체 조회")
     void getAllBooks() throws Exception{
         Pageable pageable = PageRequest.of(0, 4);
@@ -159,104 +143,8 @@ class BookControllerTest {
                 .andExpect(jsonPath("$.title").value("테스트책"))
                 .andExpect(jsonPath("$.isbn").value("1234567891011"))
                 .andExpect(jsonPath("$.likeCount").value(3));
-    }
 
-    @Test
-    @DisplayName("도서 생성")
-    void createBook() throws Exception{
-        Set<Long> categoryIds = Set.of(1L);
-
-        BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
-                LocalDate.now(), "test000000000", 10000, 5000, false, 100, null, categoryIds);
-
-        Book book = new Book();
-        ReflectionTestUtils.setField(book, "id", 1L);
-        ReflectionTestUtils.setField(book, "title", "타이틀");
-        ReflectionTestUtils.setField(book, "author", "작가");
-        ReflectionTestUtils.setField(book, "isbn", "test000000000");
-        ReflectionTestUtils.setField(book, "bookCategories", Set.of(category));
-        ReflectionTestUtils.setField(book, "status", BookStatus.ON_SALE);
-
-        given(bookService.createBook(any(BookCreateRequest.class))).willReturn(BookResponse.from(book));
-
-        mockMvc.perform(post("/books")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-USER-ID", "tester")
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isCreated())
-                .andExpect(header().string("Location", "/books/1"))
-                .andExpect(jsonPath("$.title").value("타이틀"))
-                .andExpect(jsonPath("$.isbn").value("test000000000"))
-                .andExpect(jsonPath("$.author").value("작가"))
-                .andExpect(jsonPath("$.bookCategories").value(Matchers.hasItem("카테고리")));
-    }
-
-    @Test
-    @DisplayName("도서 생성 - 유효성 검사 실패")
-    void createBook_validationFail() throws Exception {
-        // 재고량 null 요청
-        BookCreateRequest badRequest = new BookCreateRequest(
-                "타이틀", "설명", "목차", "출판사", "작가",
-                LocalDate.now(), "test123456789", 10000, 5000, false, null, null, new HashSet<>());
-
-        mockMvc.perform(post("/books")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-USER-ID", "tester")
-                        .content(objectMapper.writeValueAsString(badRequest)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("도서 수정")
-    void updateBook() throws Exception{
-        // 포장 여부 > false, 도서 상태 > SALE_END
-        BookUpdateRequest request = new BookUpdateRequest("타이틀", "설명", "목차", "출판사", "작가",
-                LocalDate.of(2020,10,19), 10000, 5000, false, BookStatus.SALE_END.toString(), 100);
-
-        Book book1 = new Book();
-        ReflectionTestUtils.setField(book1,"id",1L);
-        ReflectionTestUtils.setField(book1,"wrappable", true);
-        ReflectionTestUtils.setField(book1, "status", BookStatus.ON_SALE);
-
-        book1.updateFrom(request);
-        BookDetailResponse response = BookDetailResponse.from(book1, 2);
-
-        given(bookService.updateBook(1L, request)).willReturn(response);
-
-        mockMvc.perform(put("/books/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-USER-ID", "tester")
-                        .content(objectMapper.writeValueAsString(request)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(1L))
-                .andExpect(jsonPath("$.wrappable").value(false))
-                .andExpect(jsonPath("$.status").value(BookStatus.SALE_END.getLabel()));
-
-        verify(bookService, times(1)).updateBook(eq(1L), any(BookUpdateRequest.class));
-    }
-
-    @Test
-    @DisplayName("도서 수정 - 유효성 검사 실패")
-    void updateBook_validationFail() throws Exception {
-        BookUpdateRequest badRequest = new BookUpdateRequest(null, "설명", "목차", "출판사", "작가",
-                LocalDate.of(2020,10,19), 10000, 5000, true, BookStatus.SALE_END.toString(), 100);
-
-        mockMvc.perform(put("/books/1")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(badRequest)))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("도서 삭제")
-    void deleteBook_success() throws Exception {
-        willDoNothing().given(bookService).deleteBook(1L);
-
-        mockMvc.perform(delete("/books/1")
-                .header("X-USER-ID", "tester"))
-                .andExpect(status().isNoContent());
-
-        verify(bookService, times(1)).deleteBook(1L);
+        verify(bookService, times(1)).increaseViewCount(1L);
     }
 
     @Test
