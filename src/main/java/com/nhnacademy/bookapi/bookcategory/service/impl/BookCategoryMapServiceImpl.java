@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.bookcategory.service.impl;
 
+import com.nhnacademy.bookapi.event.BookUpdateEvent;
 import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
@@ -10,9 +11,9 @@ import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapRespon
 import com.nhnacademy.bookapi.bookcategory.exception.*;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryMapService;
-import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,12 +24,12 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
 
     private final BookRepository bookRepository;
     private final BookCategoryRepository bookCategoryRepository;
-    private final BookDocumentRepository bookDocumentRepository;
     private final UserService userService;
+    private final ApplicationEventPublisher applicationEventPublisher;
 
     // 도서에 카테고리 추가
     @Override
-    public BookCategoryMapResponse createBookCategoryMap(Long bookId , BookCategoryMapCreateRequest request) {
+    public BookCategoryMapResponse createBookCategoryMap(Long bookId, BookCategoryMapCreateRequest request) {
         Long categoryId = request.categoryId();
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
@@ -51,9 +52,9 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
         // 인덱스 최신화
         Long reviewCount = userService.countReviewsByBookId(bookId);
         Double rating = userService.getAverageEvaluationScoreByBookId(bookId);
-        bookDocumentRepository.save(BookDocument.from(book, reviewCount, rating));
+        applicationEventPublisher.publishEvent(new BookUpdateEvent(book, reviewCount, rating));
 
-        return getBookCategoryMapResponse(bookId);
+        return bookCategoryRepository.findBookCategoryMapResponse(bookId);
     }
 
     // 도서에서 카테고리 삭제
@@ -80,7 +81,7 @@ public class BookCategoryMapServiceImpl implements BookCategoryMapService {
         // 인덱스 최신화
         Long reviewCount = userService.countReviewsByBookId(bookId);
         Double rating = userService.getAverageEvaluationScoreByBookId(bookId);
-        bookDocumentRepository.save(BookDocument.from(book, reviewCount, rating));
+        applicationEventPublisher.publishEvent(new BookUpdateEvent(book, reviewCount, rating));
     }
 
     // 도서의 카테고리 조회

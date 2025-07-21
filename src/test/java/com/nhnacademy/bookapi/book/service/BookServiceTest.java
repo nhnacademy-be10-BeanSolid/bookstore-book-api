@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.book.service;
 
+import com.nhnacademy.bookapi.event.BookCreateEvent;
 import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
@@ -19,16 +20,17 @@ import com.nhnacademy.bookapi.book.service.impl.BookServiceImpl;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
-import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
+import com.nhnacademy.bookapi.event.BookDeleteEvent;
+import com.nhnacademy.bookapi.event.BookUpdateEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -56,6 +58,8 @@ class BookServiceTest {
     private BookDocumentRepository bookDocumentRepository;
     @Mock
     private UserService userService;
+    @Mock
+    private ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     private BookServiceImpl bookService;
@@ -78,19 +82,20 @@ class BookServiceTest {
         when(bookRepository.existsByIsbn("test000000000")).thenReturn(false);
         when(bookCategoryRepository.findById(1L)).thenReturn(Optional.of(bookCategory));
 
-        BookResponse bookResponse = BookResponse.from(book);
+        BookResponse expectedResponse = BookResponse.from(book);
 
         when(bookRepository.save(any(Book.class))).thenReturn(book);
-        when(bookRepository.findBookResponseById(1L)).thenReturn(Optional.of(bookResponse));
-        when(bookDocumentRepository.save(any(BookDocument.class))).thenReturn(BookDocument.from(book));
+        when(bookRepository.findBookResponseById(1L)).thenReturn(Optional.of(expectedResponse));
 
-        BookResponse response = bookService.createBook(request);
+        BookResponse result = bookService.createBook(request);
 
-        assertThat(response).isNotNull();
-        assertThat(response.title()).isEqualTo("타이틀");
-        assertThat(response.isbn()).isEqualTo("test000000000");
-        assertThat(response.bookCategories()).contains("소설");
-        assertThat(response.publishAt()).isEqualTo(LocalDate.of(2020,10,19));
+        assertThat(result).isNotNull();
+        assertThat(result.title()).isEqualTo("타이틀");
+        assertThat(result.isbn()).isEqualTo("test000000000");
+        assertThat(result.bookCategories()).contains("소설");
+        assertThat(result.publishAt()).isEqualTo(LocalDate.of(2020,10,19));
+
+        verify(applicationEventPublisher, times(1)).publishEvent(isA(BookCreateEvent.class));
     }
 
     @Test
@@ -205,12 +210,13 @@ class BookServiceTest {
     void updateBook_success() {
         Book book = new Book();
         ReflectionTestUtils.setField(book, "id", 1L);
-        ReflectionTestUtils.setField(book, "status", BookStatus.ON_SALE);
 
         BookUpdateRequest request = new BookUpdateRequest("타이틀", "설명", "목차", "출판사", "작가",
                 LocalDate.of(2020,10,19), 10000, 5000, true, BookStatus.SALE_END.toString(), 100);
 
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
+        when(userService.countReviewsByBookId(1L)).thenReturn(1L);
+        when(userService.getAverageEvaluationScoreByBookId(1L)).thenReturn(4.5);
 
         book.updateFrom(request);
         when(bookRepository.findBookDetailResponseByBookId(1L)).thenReturn(Optional.of(BookDetailResponse.from(book, 2)));
@@ -221,7 +227,7 @@ class BookServiceTest {
         assertThat(result.wrappable()).isTrue();
         assertThat(result.status()).isEqualTo(BookStatus.SALE_END.getLabel());
 
-        verify(bookDocumentRepository).save(any(BookDocument.class));
+        verify(applicationEventPublisher, times(1)).publishEvent(any(BookUpdateEvent.class));
     }
 
     @Test
@@ -244,12 +250,11 @@ class BookServiceTest {
         when(bookRepository.findById(1L)).thenReturn(Optional.of(book));
 
         doNothing().when(bookRepository).delete(book);
-        doNothing().when(bookDocumentRepository).deleteById(String.valueOf(1L));
 
         bookService.deleteBook(1L);
 
-        verify(bookDocumentRepository, times(1)).deleteById(String.valueOf(1L));
         verify(bookRepository, times(1)).delete(book);
+        verify(applicationEventPublisher, times(1)).publishEvent(any(BookDeleteEvent.class));
     }
 
     @Test
@@ -385,28 +390,6 @@ class BookServiceTest {
     }
 
     @Test
-    @DisplayName("인덱스 최신화")
-    void updateBookDocument() {
-        Book book = new Book();
-        ReflectionTestUtils.setField(book, "id", 1L);
-        Long reviewCount = 1L;
-        Double reviewAverage = 4.5;
-
-        when(userService.countReviewsByBookId(1L)).thenReturn(reviewCount);
-        when(userService.getAverageEvaluationScoreByBookId(1L)).thenReturn(reviewAverage);
-
-        bookService.updateBookDocument(book);
-
-        ArgumentCaptor<BookDocument> captor = ArgumentCaptor.forClass(BookDocument.class);
-        verify(bookDocumentRepository).save(captor.capture());
-
-        BookDocument saved = captor.getValue();
-        assertThat(saved.getId()).isEqualTo(1);
-        assertThat(saved.getReviewCount()).isEqualTo(reviewCount);
-        assertThat(saved.getRating()).isEqualTo(reviewAverage);
-    }
-
-    @Test
     @DisplayName("유저 서비스에서 리뷰 작성시 인덱스 최신화")
     void updateBookDocument_success() {
         Book book = new Book();
@@ -418,13 +401,7 @@ class BookServiceTest {
 
         bookService.updateBookDocument(1L, reviewCount, reviewAverage);
 
-        ArgumentCaptor<BookDocument> captor = ArgumentCaptor.forClass(BookDocument.class);
-        verify(bookDocumentRepository).save(captor.capture());
-
-        BookDocument saved = captor.getValue();
-        assertThat(saved.getId()).isEqualTo(1);
-        assertThat(saved.getReviewCount()).isEqualTo(reviewCount);
-        assertThat(saved.getRating()).isEqualTo(reviewAverage);
+        verify(applicationEventPublisher, times(1)).publishEvent(any(BookUpdateEvent.class));
     }
 
     @Test

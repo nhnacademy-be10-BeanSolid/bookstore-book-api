@@ -24,6 +24,7 @@ import java.util.List;
 @Transactional
 @RequiredArgsConstructor
 public class BookCategoryServiceImpl implements BookCategoryService {
+
     private final BookCategoryRepository bookCategoryRepository;
 
     @Override

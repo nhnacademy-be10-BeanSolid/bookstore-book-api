@@ -2,7 +2,6 @@ package com.nhnacademy.bookapi.document.repository;
 
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
-import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.impl.CustomBookDocumentRepositoryImpl;
@@ -18,7 +17,6 @@ import org.springframework.data.elasticsearch.core.query.Query;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -44,12 +42,12 @@ class CustomBookDocumentRepositoryTest {
         SearchHit<BookDocument> hit1 = mock(SearchHit.class);
         BookDocument bookDocument1 = mock(BookDocument.class);
         when(hit1.getContent()).thenReturn(bookDocument1);
-        when(bookDocument1.getId()).thenReturn(1L);
+        when(bookDocument1.getBookId()).thenReturn(1L);
 
         SearchHit<BookDocument> hit2 = mock(SearchHit.class);
         BookDocument bookDocument2 = mock(BookDocument.class);
         when(hit2.getContent()).thenReturn(bookDocument2);
-        when(bookDocument2.getId()).thenReturn(2L);
+        when(bookDocument2.getBookId()).thenReturn(2L);
 
         // 검색 결과를 담고 있는 컨테이너
         SearchHits<BookDocument> searchHits = mock(SearchHits.class);

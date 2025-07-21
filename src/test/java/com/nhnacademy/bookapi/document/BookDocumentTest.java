@@ -33,7 +33,7 @@ class BookDocumentTest {
         BookDocument doc = BookDocument.from(book);
 
         assertThat(doc).isNotNull();
-        assertThat(doc.getId()).isEqualTo(1);
+        assertThat(doc.getId()).isEqualTo("1");
         assertThat(doc.getTitle()).isEqualTo("제목");
         assertThat(doc.getDescription()).isEqualTo("설명");
         assertThat(doc.getAuthor()).isEqualTo("작가");

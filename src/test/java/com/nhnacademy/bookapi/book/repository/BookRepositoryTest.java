@@ -76,8 +76,9 @@ class BookRepositoryTest {
         List<Long> ids = Arrays.asList(1L, 2L);
         List<BookOrderResponse> result = bookRepository.findBookOrderResponsesById(ids);
 
-        assertThat(result).isNotEmpty();
-        assertThat(result).hasSize(2);
+        assertThat(result)
+                .isNotEmpty()
+                .hasSize(2);
         assertThat(result.get(0).id()).isEqualTo(1L);
         assertThat(result.get(1).id()).isEqualTo(2L);
     }
