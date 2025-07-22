@@ -11,6 +11,8 @@ import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
     private final BookCategoryRepository bookCategoryRepository;
 
     @Override
+    @CacheEvict(value = "categories", allEntries = true)
     public BookCategoryResponse createCategory(BookCategoryCreateRequest request) {
         if (existsCategory(request.categoryName())) {
             throw new BookCategoryAlreadyExistsException(request.categoryName());
@@ -57,6 +60,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
     }
 
     @Override
+    @CacheEvict(value = "categories", allEntries = true)
     public BookCategoryResponse updateCategory(Long categoryId, BookCategoryUpdateRequest request) {
         BookCategory category = bookCategoryRepository.findById(categoryId)
                 .orElseThrow(() -> new BookCategoryNotFoundException(categoryId));
@@ -76,6 +80,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
     }
 
     @Override
+    @CacheEvict(value = "categories", allEntries = true)
     public void deleteCategory(Long categoryId) {
         if(!existsCategory(categoryId)) {
             throw new BookCategoryNotFoundException(categoryId);
@@ -101,6 +106,7 @@ public class BookCategoryServiceImpl implements BookCategoryService {
     }
 
     @Override
+    @Cacheable(value = "categories", key = "'categoryTree'")
     public List<BookCategoryNodeResponse> getCategoryTree() {
         return bookCategoryRepository.buildCategoryTree();
     }
