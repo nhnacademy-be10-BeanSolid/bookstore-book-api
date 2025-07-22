@@ -13,10 +13,14 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.document.Document;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -84,5 +88,18 @@ class CustomBookDocumentRepositoryTest {
 
         verify(elasticsearchOperations, times(1)).search((Query) any(), eq(BookDocument.class));
         verify(bookRepository, times(1)).findAllById(List.of(1L, 2L));
+    }
+
+    @Test
+    void increaseViewCount_shouldCallUpdate() {
+        String id = "book123";
+        Long viewCount = 42L;
+
+        when(elasticsearchOperations.update(any(UpdateQuery.class), any(IndexCoordinates.class)))
+                .thenReturn(null);
+
+        repository.increaseViewCount(id, viewCount);
+
+        verify(elasticsearchOperations, times(1)).update(any(UpdateQuery.class), any(IndexCoordinates.class));
     }
 }
