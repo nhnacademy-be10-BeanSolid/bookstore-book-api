@@ -1,7 +1,7 @@
 package com.nhnacademy.bookapi.event.listener;
 
 import com.nhnacademy.bookapi.book.domain.Book;
-import com.nhnacademy.bookapi.common.util.MinioUploader;
+import com.nhnacademy.bookapi.common.service.MinioUploader;
 import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
 import com.nhnacademy.bookapi.event.BookCreateEvent;

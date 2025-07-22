@@ -1,7 +1,6 @@
-package com.nhnacademy.bookapi.common.util;
+package com.nhnacademy.bookapi.common.service;
 
 import io.minio.*;
-import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,7 +40,7 @@ public class MinioUploader {
                     PutObjectArgs.builder()
                             .bucket(bucket)
                             .object(objectName)
-                            .stream(in, -1, 10 * 1024 * 1024)
+                            .stream(in, -1, 10L * 1024 * 1024)
                             .contentType(contentType)
                             .build()
             );

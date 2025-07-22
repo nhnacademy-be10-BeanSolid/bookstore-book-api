@@ -10,7 +10,6 @@ import com.nhnacademy.bookapi.book.repository.CustomBookRepository;
 import com.nhnacademy.bookapi.bookcategory.domain.QBookCategory;
 import com.nhnacademy.bookapi.booklike.domain.QBookLike;
 import com.nhnacademy.bookapi.booktag.domain.QBookTag;
-import com.nhnacademy.bookapi.common.util.MinioUploader;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
