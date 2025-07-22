@@ -24,7 +24,6 @@ import java.util.Set;
 public class CustomBookRepositoryImpl implements CustomBookRepository {
 
     private final JPAQueryFactory queryFactory;
-    private final MinioUploader minioUploader;
 
     public Optional<BookResponse> findBookResponseById(Long id) {
         QBook book = QBook.book;

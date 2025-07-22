@@ -105,7 +105,7 @@ class BookLikeControllerTest {
         Book newBook = new Book();
         ReflectionTestUtils.setField(newBook, "id", 2L);
 
-        BookLikeResponse response = new BookLikeResponse(2L, LocalDateTime.now(), "user1", newBook.getId());
+        BookLikeResponse response = new BookLikeResponse(2L, LocalDateTime.now(), "user1", newBook.getId(), newBook.getTitle());
 
         given(bookLikeService.createBookLike(newBook.getId(), "user1")).willReturn(response);
 
@@ -122,7 +122,7 @@ class BookLikeControllerTest {
         Book newBook = new Book();
         ReflectionTestUtils.setField(newBook, "id", 2L);
 
-        BookLikeResponse response = new BookLikeResponse(2L, LocalDateTime.now(), "user1", newBook.getId());
+        BookLikeResponse response = new BookLikeResponse(2L, LocalDateTime.now(), "user1", newBook.getId(), newBook.getTitle());
 
         given(bookLikeService.createBookLike(newBook.getId(), "user1")).willReturn(response);
 

@@ -132,11 +132,6 @@
             <artifactId>minio</artifactId>
             <version>8.5.3</version>
         </dependency>
-        <dependency>
-            <groupId>io.minio</groupId>
-            <artifactId>minio</artifactId>
-            <version>8.5.17</version>
-            <scope>compile</scope>
         <!-- Spring Cache -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
