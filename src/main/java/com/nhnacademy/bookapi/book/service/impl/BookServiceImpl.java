@@ -99,6 +99,23 @@ public class BookServiceImpl implements BookService {
         return bookRepository.findAllSimpleBookResponses(pageable);
     }
 
+    // 전체 리스트
+    @Override
+    @Transactional(readOnly = true)
+    public List<SimpleBookResponse> getAllSimpleBookResponses() {
+        return bookRepository.findAll().stream()
+                .map(book -> new SimpleBookResponse(
+                        book.getId(),
+                        book.getTitle(),
+                        book.getAuthor(),
+                        book.getSalePrice(),
+                        book.getStock(),
+                        book.getImage(),
+                        book.getViewCount()
+                ))
+                .collect(Collectors.toList());
+    }
+
     // 카테고리를 가지고 있는 도서 리스트
     @Override
     @Transactional(readOnly = true)

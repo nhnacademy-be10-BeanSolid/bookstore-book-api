@@ -24,6 +24,8 @@ public interface BookService {
 
     Page<SimpleBookResponse> getAllBooks(Long categoryId, Pageable pageable);
 
+    List<SimpleBookResponse> getAllSimpleBookResponses();
+
     BookDetailResponse updateBook(Long id, BookUpdateRequest request);
 
     void deleteBook(Long id);
