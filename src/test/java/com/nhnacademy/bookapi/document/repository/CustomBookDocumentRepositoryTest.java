@@ -85,4 +85,6 @@ class CustomBookDocumentRepositoryTest {
         verify(elasticsearchOperations, times(1)).search((Query) any(), eq(BookDocument.class));
         verify(bookRepository, times(1)).findAllById(List.of(1L, 2L));
     }
+
+
 }

@@ -20,19 +20,8 @@ public class MinioUploader {
     @Value("${minio.bucket.name}")
     private String bucket;
 
-    public String uploadFromUrl(Long bookId, String imageUrl) {
-        try (InputStream in = new URL(imageUrl).openStream()) {
-            // 확장자
-            String extension = "";
-
-            int lastDotIndex = imageUrl.lastIndexOf('.');
-            if (lastDotIndex != -1 && lastDotIndex < imageUrl.length() - 1) {
-                extension = imageUrl.substring(lastDotIndex);
-            } else {
-                extension = ".jpg"; // 기본 확장자
-            }
-
-            // 파일 이름
+    public String upload(InputStream in, Long bookId, String extension) {
+        try {
             String objectName = bookId + "-" + UUID.randomUUID() + extension;
             String contentType = getContentTypeByExtension(extension);
 
@@ -47,6 +36,23 @@ public class MinioUploader {
 
             return "/images/book/" + objectName;
 
+        } catch (Exception e) {
+            throw new RuntimeException("이미지 업로드 실패", e);
+        }
+    }
+
+    public String uploadFromUrl(Long bookId, String imageUrl) {
+        // 확장자 추출
+        String extension = "";
+        int lastDotIndex = imageUrl.lastIndexOf('.');
+        if (lastDotIndex != -1 && lastDotIndex < imageUrl.length() - 1) {
+            extension = imageUrl.substring(lastDotIndex);
+        } else {
+            extension = ".jpg"; // 기본 확장자
+        }
+
+        try (InputStream in = new URL(imageUrl).openStream()) {
+            return upload(in, bookId, extension);
         } catch (Exception e) {
             throw new RuntimeException("이미지 업로드 실패", e);
         }
