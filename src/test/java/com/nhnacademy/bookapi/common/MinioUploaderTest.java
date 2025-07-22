@@ -48,6 +48,20 @@ class MinioUploaderTest {
     }
 
     @Test
+    void testUpload_fail() throws Exception {
+        Long bookId = 1L;
+        String extension = ".jpg";
+        InputStream dummyStream = new ByteArrayInputStream("dummy data".getBytes());
+
+        when(minioClient.putObject(any(PutObjectArgs.class))).thenReturn(mock(ObjectWriteResponse.class));
+
+        String result = minioUploader.upload(dummyStream, bookId, extension);
+
+        Assertions.assertTrue(result.startsWith("/images/book/"));
+        Assertions.assertTrue(result.endsWith(extension));
+    }
+
+    @Test
     void deleteImage_success() throws Exception {
         String objectName = "test.jpg";
 

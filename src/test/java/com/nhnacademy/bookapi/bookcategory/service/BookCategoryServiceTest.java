@@ -3,6 +3,7 @@ package com.nhnacademy.bookapi.bookcategory.service;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
+import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryNodeResponse;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryAlreadyExistsException;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -196,6 +198,26 @@ class BookCategoryServiceTest {
         when(bookCategoryRepository.findBookCategoryResponseById(1L)).thenReturn(Optional.of(response));
         BookCategoryResponse result = bookCategoryService.updateCategory(1L, request);
 
+        assertThat(result.categoryName()).isEqualTo("Updated");
+        assertThat(result.updatedAt()).isNotNull();
+    }
+
+    @Test
+    @DisplayName("업데이트 - 존재하는 부모 카테고리")
+    void updateCategory_existsParent() {
+        BookCategory category = new BookCategory("test", null);
+        ReflectionTestUtils.setField(category, "categoryId", 3L);
+
+        BookCategoryUpdateRequest request = new BookCategoryUpdateRequest("Updated", parentCategory.getCategoryId()); // 아이디 1
+        BookCategoryResponse response = new BookCategoryResponse(3L, "Updated", parentCategory.getCategoryId(), parentCategory.getName(),
+                category.getCreatedAt(), LocalDateTime.now());
+
+        when(bookCategoryRepository.findById(3L)).thenReturn(Optional.of(category));
+        when(bookCategoryRepository.findById(parentCategory.getCategoryId())).thenReturn(Optional.of(parentCategory));
+        when(bookCategoryRepository.findBookCategoryResponseById(3L)).thenReturn(Optional.of(response));
+        BookCategoryResponse result = bookCategoryService.updateCategory(3L, request);
+
+        assertThat(result.categoryId()).isEqualTo(3L);
         assertThat(result.categoryName()).isEqualTo("Updated");
         assertThat(result.updatedAt()).isNotNull();
     }

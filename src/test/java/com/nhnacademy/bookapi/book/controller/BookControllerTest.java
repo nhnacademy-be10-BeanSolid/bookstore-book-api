@@ -46,8 +46,6 @@ class BookControllerTest {
 
     @MockBean
     BookService bookService;
-    @MockBean
-    NaverBookService searchService;
 
     BookTag tag;
     BookCategory category;
@@ -217,6 +215,19 @@ class BookControllerTest {
                 .andExpect(status().isOk());
 
         verify(bookService, times(1)).updateBookStock(requests);
+    }
+
+    @Test
+    @DisplayName("재고 최신화 - 유효성 검사 실패")
+    void getBookOrderResponse_vaildationFail() throws Exception {
+        List<BookStockReduceRequest> requests = List.of(new BookStockReduceRequest(null, 10));
+
+        willDoNothing().given(bookService).updateBookStock(requests);
+
+        mockMvc.perform(put("/book-reduce")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requests)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
