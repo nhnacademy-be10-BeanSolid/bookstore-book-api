@@ -18,12 +18,14 @@ import java.util.*;
 @RequiredArgsConstructor
 public class CustomBookCategoryRepositoryImpl implements CustomBookCategoryRepository {
 
+    private static final String PARENT = "parent";
+
     private final JPAQueryFactory queryFactory;
 
     @Override
     public Optional<BookCategoryResponse> findBookCategoryResponseById(Long id) {
         QBookCategory bookCategory = QBookCategory.bookCategory;
-        QBookCategory parent = new QBookCategory("parent");
+        QBookCategory parent = new QBookCategory(PARENT);
 
         BookCategoryResponse result = queryFactory
                 .select(Projections.constructor(BookCategoryResponse.class,
@@ -45,7 +47,7 @@ public class CustomBookCategoryRepositoryImpl implements CustomBookCategoryRepos
     @Override
     public Page<BookCategoryResponse> findAllBookCategoryResponse(Pageable pageable) {
         QBookCategory bookCategory = QBookCategory.bookCategory;
-        QBookCategory parent = new QBookCategory("parent");
+        QBookCategory parent = new QBookCategory(PARENT);
 
         List<BookCategoryResponse> result = queryFactory
                 .select(Projections.constructor(BookCategoryResponse.class,
@@ -74,7 +76,7 @@ public class CustomBookCategoryRepositoryImpl implements CustomBookCategoryRepos
     public BookCategoryMapResponse findBookCategoryMapResponse(Long bookId) {
         QBook book = QBook.book;
         QBookCategory category = QBookCategory.bookCategory;
-        QBookCategory parent = new QBookCategory("parent");
+        QBookCategory parent = new QBookCategory(PARENT);
 
         List<BookCategoryResponse> categories = queryFactory
                 .select(Projections.constructor(BookCategoryResponse.class,
@@ -97,7 +99,7 @@ public class CustomBookCategoryRepositoryImpl implements CustomBookCategoryRepos
     @Override
     public List<BookCategoryNodeResponse> buildCategoryTree(){
         QBookCategory bookCategory = QBookCategory.bookCategory;
-        QBookCategory parent = new QBookCategory("parent");
+        QBookCategory parent = new QBookCategory(PARENT);
 
         List<BookCategoryResponse> result = queryFactory
                 .select(Projections.constructor(BookCategoryResponse.class,

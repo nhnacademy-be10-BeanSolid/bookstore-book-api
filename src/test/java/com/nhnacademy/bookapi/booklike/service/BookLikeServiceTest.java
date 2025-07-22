@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BookLikeServiceImplTest {
+class BookLikeServiceTest {
 
     @Mock
     private BookLikeRepository bookLikeRepository;
@@ -148,10 +148,11 @@ class BookLikeServiceImplTest {
     @DisplayName("도서아이디에 해당하는 책이 없는 경우 조회")
     void getBookLikeByBookIdFailTest() {
         Long bookId = book.getId();
+        Pageable pageable = PageRequest.of(0, 10);
 
         when(bookLikeRepository.existsByBookId(book.getId())).thenReturn(false);
 
-        assertThatThrownBy(() -> bookLikeService.getBookLikesByBookId(bookId, PageRequest.of(0, 10)))
+        assertThatThrownBy(() -> bookLikeService.getBookLikesByBookId(bookId, pageable))
                 .isInstanceOf(BookNotFoundException.class);
     }
 

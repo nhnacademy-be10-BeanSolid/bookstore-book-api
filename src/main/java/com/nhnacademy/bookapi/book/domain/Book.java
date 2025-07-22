@@ -127,9 +127,7 @@ public class Book {
 
     @PrePersist
     public void prePersist() {
-        LocalDateTime now = LocalDateTime.now();
-        this.createAt = now;
-        this.updateAt = now;
+        this.createAt = LocalDateTime.now();
         this.status = BookStatus.ON_SALE;
     }
 

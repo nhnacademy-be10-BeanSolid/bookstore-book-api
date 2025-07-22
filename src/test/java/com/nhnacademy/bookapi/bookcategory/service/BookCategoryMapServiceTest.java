@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.bookcategory.service;
 
+import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
@@ -12,6 +13,8 @@ import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapDeleteFailEx
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryMapNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.bookcategory.service.impl.BookCategoryMapServiceImpl;
+import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
+import com.nhnacademy.bookapi.event.BookUpdateEvent;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -19,6 +22,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
@@ -32,13 +36,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class BookCategoryMapServiceImplTest {
+class BookCategoryMapServiceTest {
 
     @Mock
     BookRepository bookRepository;
-
     @Mock
     BookCategoryRepository bookCategoryRepository;
+    @Mock
+    BookDocumentRepository bookDocumentRepository;
+    @Mock
+    UserService userService;
+    @Mock
+    ApplicationEventPublisher applicationEventPublisher;
 
     @InjectMocks
     BookCategoryMapServiceImpl bookCategoryMapService;
@@ -66,18 +75,27 @@ class BookCategoryMapServiceImplTest {
         when(bookRepository.countBookCategoryByBookId(bookId)).thenReturn(1);
         when(bookCategoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
+        // 예상
         BookCategoryResponse categoryResponse = new BookCategoryResponse(categoryId, "카테고리",
                 null, null, LocalDateTime.now(), null);
         BookCategoryMapResponse response = new BookCategoryMapResponse(bookId, List.of(categoryResponse));
+
+        when(userService.countReviewsByBookId(bookId)).thenReturn(1L);
+        when(userService.getAverageEvaluationScoreByBookId(1L)).thenReturn(4.5);
         when(bookCategoryRepository.findBookCategoryMapResponse(bookId))
                 .thenReturn(response);
+
+        when(userService.countReviewsByBookId(bookId)).thenReturn(1L);
+        when(userService.getAverageEvaluationScoreByBookId(1L)).thenReturn(4.5);
 
         BookCategoryMapResponse result = bookCategoryMapService.createBookCategoryMap(bookId, request);
 
         assertThat(result.bookId()).isEqualTo(bookId);
         assertThat(result.categories()).hasSize(1);
-        assertThat(result.categories().getFirst().categoryId()).isEqualTo(categoryId);
-        assertThat(result.categories().getFirst().categoryName()).isEqualTo(category.getName());
+        assertThat(result.categories().getFirst().categoryId()).isEqualTo(response.categories().getFirst().categoryId());
+        assertThat(result.categories().getFirst().categoryName()).isEqualTo(response.categories().getFirst().categoryName());
+
+        verify(applicationEventPublisher, times(1)).publishEvent(any(BookUpdateEvent.class));
     }
 
     @Test
@@ -129,10 +147,13 @@ class BookCategoryMapServiceImplTest {
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(book));
         when(bookCategoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
         when(bookRepository.countBookCategoryByBookId(bookId)).thenReturn(bookCategorySet.size());
+        when(userService.countReviewsByBookId(bookId)).thenReturn(5L);
+        when(userService.getAverageEvaluationScoreByBookId(bookId)).thenReturn(4.5);
 
         bookCategoryMapService.deleteCategoryMap(bookId, categoryId);
 
         verify(bookRepository, times(1)).save(book);
+        verify(applicationEventPublisher, times(1)).publishEvent(any(BookUpdateEvent.class));
     }
 
     @Test

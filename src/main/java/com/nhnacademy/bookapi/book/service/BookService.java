@@ -1,6 +1,5 @@
 package com.nhnacademy.bookapi.book.service;
 
-import com.nhnacademy.bookapi.book.domain.QBook;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
@@ -8,7 +7,6 @@ import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
-import com.nhnacademy.bookapi.document.BookDocument;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -40,4 +38,11 @@ public interface BookService {
     void updateBookStock(List<BookStockReduceRequest> requests);
 
     void increaseViewCount(Long id);
+
+    // 리뷰 작성 후 인덱스 최신화
+    void updateBookDocument(Long bookId, Long reviewCount, Double reviewAverage);
+
+    // 유저 서비스에서 필요한 정보 - 도서 아이디로 이름 반환
+    String getTitleByBookId(Long bookId);
+
 }

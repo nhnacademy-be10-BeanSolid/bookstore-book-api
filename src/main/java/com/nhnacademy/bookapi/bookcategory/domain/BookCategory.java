@@ -20,7 +20,8 @@ public class BookCategory {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long categoryId;
 
-    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+    // 자식에서 부모 관계
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private BookCategory parentCategory;
 
