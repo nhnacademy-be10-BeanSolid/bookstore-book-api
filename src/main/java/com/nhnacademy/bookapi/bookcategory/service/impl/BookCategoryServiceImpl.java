@@ -60,6 +60,11 @@ public class BookCategoryServiceImpl implements BookCategoryService {
     }
 
     @Override
+    public List<BookCategoryResponse> getAllCategories() {
+        return List.of();
+    }
+
+    @Override
     @CacheEvict(value = "categories", allEntries = true)
     public BookCategoryResponse updateCategory(Long categoryId, BookCategoryUpdateRequest request) {
         BookCategory category = bookCategoryRepository.findById(categoryId)
