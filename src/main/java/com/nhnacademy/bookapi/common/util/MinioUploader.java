@@ -1,11 +1,11 @@
 package com.nhnacademy.bookapi.common.util;
 
 import io.minio.*;
+import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import io.minio.http.Method;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -23,8 +23,6 @@ public class MinioUploader {
 
     public String uploadFromUrl(Long bookId, String imageUrl) {
         try (InputStream in = new URL(imageUrl).openStream()) {
-
-            log.info(imageUrl);
             // 확장자
             String extension = "";
 
@@ -48,7 +46,7 @@ public class MinioUploader {
                             .build()
             );
 
-            return objectName;
+            return "/images/book/" + objectName;
 
         } catch (Exception e) {
             throw new RuntimeException("이미지 업로드 실패", e);
