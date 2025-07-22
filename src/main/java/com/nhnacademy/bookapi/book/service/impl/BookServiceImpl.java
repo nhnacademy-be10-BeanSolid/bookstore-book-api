@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.book.service.impl;
 
+import com.nhnacademy.bookapi.common.util.MinioUploader;
 import com.nhnacademy.bookapi.event.BookCreateEvent;
 import com.nhnacademy.bookapi.event.BookDeleteEvent;
 import com.nhnacademy.bookapi.event.BookUpdateEvent;
@@ -49,6 +50,8 @@ public class BookServiceImpl implements BookService {
 
     // 이벤트 발행용 인터페이스
     private final ApplicationEventPublisher applicationEventPublisher;
+    // 이미지 업로더
+    private final MinioUploader minioUploader;
 
     // 도서 추가
     @Override
@@ -71,6 +74,10 @@ public class BookServiceImpl implements BookService {
         Book book = Book.from(request, categories);
         book.setImage(image);
         Book savedBook = bookRepository.save(book);
+
+        // 이미지 업로드
+        String uploadedImageUrl = minioUploader.uploadFromUrl(savedBook.getId(), image);
+        savedBook.setImage(uploadedImageUrl);
 
         applicationEventPublisher.publishEvent(new BookCreateEvent(savedBook));
 
@@ -134,6 +141,7 @@ public class BookServiceImpl implements BookService {
                 .orElseThrow(() -> new BookNotFoundException(id));
 
         bookRepository.delete(book);
+        minioUploader.deleteImage(book.getImage());
         applicationEventPublisher.publishEvent(new BookDeleteEvent(book));
     }
 
