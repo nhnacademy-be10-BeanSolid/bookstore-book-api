@@ -121,7 +121,6 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
-    // 관리자용 모든 도서 목록 (프론트엔드에서 사용)
     @GetMapping("/admin/books/all")
     public ResponseEntity<List<AdminBookSearchResponse>> getAllBooksForAdmin() {
         List<SimpleBookResponse> simpleBooks = bookService.getAllSimpleBookResponses();
