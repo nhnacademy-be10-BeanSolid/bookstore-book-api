@@ -1,11 +1,14 @@
 package com.nhnacademy.bookapi.book.controller;
 
+import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
+import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.*;
+import com.nhnacademy.bookapi.book.service.BookSearchService;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
 
-
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -14,8 +17,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -23,6 +26,15 @@ import java.util.stream.Collectors;
 public class BookController {
 
     private final BookService bookService;
+    private final BookSearchService naverBookSearchService;
+
+    @GetMapping("/books-search")
+    public ResponseEntity<BookSearchResponse> searchBook(
+            @RequestParam String query,
+            @RequestParam(defaultValue = "1") int start) {
+        BookSearchResponse response = naverBookSearchService.searchBook(query, start);
+        return ResponseEntity.ok(response);
+    }
 
     // 메인페이지 도서 리스트
     @GetMapping("/books")
@@ -41,24 +53,45 @@ public class BookController {
     }
 
     // 상세 정보, 조회수 증가
-    @GetMapping("/books/{book-id}")
-    public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable(name = "book-id") Long id){
+    @GetMapping("/books/{id}")
+    public ResponseEntity<BookDetailResponse> getBookDetailById(@PathVariable Long id){
         BookDetailResponse response = bookService.getBookDetailResponseByBookId(id);
         bookService.increaseViewCount(id);
         return ResponseEntity.ok(response);
     }
 
-    // 엘라스틱 서치
-    @GetMapping("/books/search")
-    public ResponseEntity<Page<SimpleBookResponse>> getSimpleBookResponseByKeyword(@RequestParam String keyword,
-                                                                                   Pageable pageable) {
-        Page<SimpleBookResponse> response = bookService.getSimpleBookResponseByKeyword(keyword, pageable);
+    @PostMapping("/books")
+    public ResponseEntity<BookResponse> createBook(@RequestHeader("X-USER-ID") String userId,
+                                                   @Valid @RequestBody BookCreateRequest request,
+                                                   BindingResult bindingResult)
+    {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationFailedException(bindingResult);
+        }
 
+        log.info("userId = {}", userId);
+
+        BookResponse response = bookService.createBook(request);
+        URI location = URI.create("/books/" + response.id());
+        return ResponseEntity.created(location).body(response);
+    }
+
+    @PutMapping("/books/{bookId}")
+    public ResponseEntity<BookDetailResponse> updateBook(@PathVariable Long bookId,
+                                                         @Valid @RequestBody BookUpdateRequest request,
+                                                         BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            throw new ValidationFailedException(bindingResult);
+        }
+        BookDetailResponse response = bookService.updateBook(bookId, request);
         return ResponseEntity.ok(response);
     }
 
-
-    // 외부 api 에서 호출
+    @DeleteMapping("/books/{bookId}")
+    public ResponseEntity<Void> deleteBook(@PathVariable Long bookId) {
+        bookService.deleteBook(bookId);
+        return ResponseEntity.noContent().build();
+    }
 
     // 주문 api 전달
     @GetMapping("/books/ids")
@@ -79,30 +112,12 @@ public class BookController {
         return ResponseEntity.ok().build();
     }
 
-    // 유저 api 에서 리뷰 작성시 인덱스 최신화
-    @PostMapping("/books/{bookId}/document")
-    public ResponseEntity<Void> updateBookDocument(
-            @PathVariable Long bookId,
-            @RequestParam Long reviewCount,
-            @RequestParam Double reviewAverage) {
+    // 엘라스틱 서치
+    @GetMapping("/search")
+    public ResponseEntity<Page<SimpleBookResponse>> getSimpleBookResponseByKeyword(@RequestParam String keyword,
+                                                                                   Pageable pageable) {
+        Page<SimpleBookResponse> response = bookService.getSimpleBookResponseByKeyword(keyword, pageable);
 
-        bookService.updateBookDocument(bookId, reviewCount, reviewAverage);
-        return ResponseEntity.noContent().build();
-    }
-
-    // 유저 api 에서 첵 제목 받기
-    @GetMapping("/books/{bookId}/title")
-    public ResponseEntity<String> getTitleByBookId(@PathVariable Long bookId) {
-        String title = bookService.getTitleByBookId(bookId);
-        return ResponseEntity.ok(title);
-    }
-
-    @GetMapping("/admin/books/all")
-    public ResponseEntity<List<AdminBookSearchResponse>> getAllBooksForAdmin() {
-        List<SimpleBookResponse> simpleBooks = bookService.getAllSimpleBookResponses();
-        List<AdminBookSearchResponse> bookResponses = simpleBooks.stream()
-                .map(book -> new AdminBookSearchResponse(book.id(), book.title(), book.author()))
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(bookResponses);
+        return ResponseEntity.ok(response);
     }
 }
