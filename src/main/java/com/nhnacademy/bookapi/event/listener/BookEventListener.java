@@ -18,7 +18,7 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class BookDocumentEventListener {
+public class BookEventListener {
 
     private final BookDocumentRepository bookDocumentRepository;
     private final MinioUploader minioUploader;
