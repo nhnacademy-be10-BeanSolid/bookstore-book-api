@@ -5,7 +5,6 @@ import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.response.*;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
-import com.nhnacademy.bookapi.adpater.service.NaverBookService;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
