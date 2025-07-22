@@ -5,9 +5,8 @@ import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.*;
 import com.nhnacademy.bookapi.book.service.BookSearchService;
-import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
-
+import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -19,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -119,5 +119,15 @@ public class BookController {
         Page<SimpleBookResponse> response = bookService.getSimpleBookResponseByKeyword(keyword, pageable);
 
         return ResponseEntity.ok(response);
+    }
+
+    // 관리자용 모든 도서 목록 (프론트엔드에서 사용)
+    @GetMapping("/admin/books/all")
+    public ResponseEntity<List<AdminBookSearchResponse>> getAllBooksForAdmin() {
+        List<SimpleBookResponse> simpleBooks = bookService.getAllSimpleBookResponses();
+        List<AdminBookSearchResponse> bookResponses = simpleBooks.stream()
+                .map(book -> new AdminBookSearchResponse(book.id(), book.title(), book.author()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(bookResponses);
     }
 }
