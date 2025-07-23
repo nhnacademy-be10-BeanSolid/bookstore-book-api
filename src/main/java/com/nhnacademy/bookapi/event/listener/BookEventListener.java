@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.event.listener;
 
 import com.nhnacademy.bookapi.book.domain.Book;
+import com.nhnacademy.bookapi.common.service.MinioUploader;
 import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
 import com.nhnacademy.bookapi.event.BookCreateEvent;
@@ -17,12 +18,13 @@ import org.springframework.transaction.event.TransactionalEventListener;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class BookDocumentEventListener {
+public class BookEventListener {
 
     private final BookDocumentRepository bookDocumentRepository;
+    private final MinioUploader minioUploader;
 
     // 생성 이벤트
-    // 동기
+    // 동기(한 트랜잭션 경계에 묶인다)
     @EventListener
     public void handleBookCreatedEvent(BookCreateEvent event) {
         // 처리 로직
@@ -52,8 +54,18 @@ public class BookDocumentEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleBookDeleteEvent(BookDeleteEvent event) {
         Book book = event.getBook();
-        bookDocumentRepository.deleteById(String.valueOf(book.getId()));
-        log.info("Deleted BookDocument from Elasticsearch: {}", book.getId());
+        try {
+            bookDocumentRepository.deleteById(String.valueOf(book.getId()));
+            log.info("Deleted BookDocument: {}", book.getId());
+        } catch (Exception e) {
+            log.error("BookDocument 삭제 실패! bookId={}", book.getId(), e);
+        }
+        try {
+            minioUploader.deleteImage(book.getImage());
+            log.info("Deleted Minio Image: {}", book.getId());
+        } catch (Exception e) {
+            log.error("Minio image deletion failed - bookId: {}", book.getId());
+        }
     }
 
     // 삭제 롤백 이후 보상

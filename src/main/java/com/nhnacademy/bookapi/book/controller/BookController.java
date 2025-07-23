@@ -5,6 +5,7 @@ import com.nhnacademy.bookapi.book.domain.response.*;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.book.service.BookService;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -55,7 +56,6 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
-
     // 외부 api 에서 호출
 
     // 주문 api 전달
@@ -68,7 +68,7 @@ public class BookController {
 
     // 재고 최신화
     @PutMapping("/book-reduce")
-    public ResponseEntity<Void> stockUpdate(@RequestBody List<BookStockReduceRequest> request,
+    public ResponseEntity<Void> stockUpdate(@Valid @RequestBody List<BookStockReduceRequest> request,
                                             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException(bindingResult);

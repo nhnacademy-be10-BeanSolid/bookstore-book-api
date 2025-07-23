@@ -39,7 +39,7 @@ public class BookLikeServiceImpl implements BookLikeService {
         BookLike savedBookLike = bookLikeRepository.save(new BookLike(userId, book));
 
         return bookLikeRepository.findBookLikeResponseById(savedBookLike.getId())
-                .orElseThrow(() -> new BookLikeNotFoundException(savedBookLike.getId()));
+                .orElseThrow(() -> new BookLikeNotFoundException(userId, bookId));
     }
 
     // 유저별 좋아요 조회

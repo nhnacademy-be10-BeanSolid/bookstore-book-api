@@ -10,18 +10,13 @@ import com.nhnacademy.bookapi.book.repository.CustomBookRepository;
 import com.nhnacademy.bookapi.bookcategory.domain.QBookCategory;
 import com.nhnacademy.bookapi.booklike.domain.QBookLike;
 import com.nhnacademy.bookapi.booktag.domain.QBookTag;
-import com.querydsl.core.types.Order;
-import com.querydsl.core.types.OrderSpecifier;
-import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RequiredArgsConstructor

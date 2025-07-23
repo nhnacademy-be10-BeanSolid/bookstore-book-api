@@ -3,7 +3,7 @@ package com.nhnacademy.bookapi.event;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
-import com.nhnacademy.bookapi.event.listener.BookDocumentEventListener;
+import com.nhnacademy.bookapi.event.listener.BookEventListener;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,7 +20,7 @@ class BookDocumentEventListenerTest {
     private BookDocumentRepository bookDocumentRepository;
 
     @InjectMocks
-    private BookDocumentEventListener listener;
+    private BookEventListener listener;
 
     @Test
     void handleBookCreatedEvent_shouldSaveDocument() {

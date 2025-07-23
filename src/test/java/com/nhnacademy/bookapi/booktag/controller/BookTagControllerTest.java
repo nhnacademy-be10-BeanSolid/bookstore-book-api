@@ -121,7 +121,8 @@ class BookTagControllerTest {
 
         mockMvc.perform(post("/book-tags")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(request))
+                        .header("X-USER-ID", "test"))
                 .andExpect(status().isBadRequest());
     }
 

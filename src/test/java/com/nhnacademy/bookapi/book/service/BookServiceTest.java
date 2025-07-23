@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.book.service;
 
+import com.nhnacademy.bookapi.common.service.MinioUploader;
 import com.nhnacademy.bookapi.event.BookCreateEvent;
 import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
@@ -60,6 +61,8 @@ class BookServiceTest {
     private UserService userService;
     @Mock
     private ApplicationEventPublisher applicationEventPublisher;
+    @Mock
+    private MinioUploader minioUploader;
 
     @InjectMocks
     private BookServiceImpl bookService;

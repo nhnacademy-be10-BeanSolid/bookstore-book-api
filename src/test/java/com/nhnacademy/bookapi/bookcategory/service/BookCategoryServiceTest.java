@@ -3,6 +3,7 @@ package com.nhnacademy.bookapi.bookcategory.service;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
+import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryNodeResponse;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryAlreadyExistsException;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
@@ -19,13 +20,16 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -201,6 +205,26 @@ class BookCategoryServiceTest {
     }
 
     @Test
+    @DisplayName("업데이트 - 존재하는 부모 카테고리")
+    void updateCategory_existsParent() {
+        BookCategory category = new BookCategory("test", null);
+        ReflectionTestUtils.setField(category, "categoryId", 3L);
+
+        BookCategoryUpdateRequest request = new BookCategoryUpdateRequest("Updated", parentCategory.getCategoryId()); // 아이디 1
+        BookCategoryResponse response = new BookCategoryResponse(3L, "Updated", parentCategory.getCategoryId(), parentCategory.getName(),
+                category.getCreatedAt(), LocalDateTime.now());
+
+        when(bookCategoryRepository.findById(3L)).thenReturn(Optional.of(category));
+        when(bookCategoryRepository.findById(parentCategory.getCategoryId())).thenReturn(Optional.of(parentCategory));
+        when(bookCategoryRepository.findBookCategoryResponseById(3L)).thenReturn(Optional.of(response));
+        BookCategoryResponse result = bookCategoryService.updateCategory(3L, request);
+
+        assertThat(result.categoryId()).isEqualTo(3L);
+        assertThat(result.categoryName()).isEqualTo("Updated");
+        assertThat(result.updatedAt()).isNotNull();
+    }
+
+    @Test
     @DisplayName("업데이트 - 존재하지 않는 카테고리")
     void updateCategory_notFound() {
         BookCategoryUpdateRequest request = new BookCategoryUpdateRequest("Updated", null);
@@ -226,10 +250,15 @@ class BookCategoryServiceTest {
     @DisplayName("삭제")
     void deleteCategory_success() {
         when(bookCategoryRepository.existsById(1L)).thenReturn(true);
+        when(bookCategoryRepository.existsById(2L)).thenReturn(true);
+        when(bookCategoryRepository.findByParentCategory_CategoryId(1L)).thenReturn(List.of(childCategory));
+        when(bookCategoryRepository.findByParentCategory_CategoryId(2L)).thenReturn(List.of());
+
         doNothing().when(bookCategoryRepository).deleteById(1L);
+        doNothing().when(bookCategoryRepository).deleteById(2L);
 
         bookCategoryService.deleteCategory(1L);
-
+        verify(bookCategoryRepository).deleteById(2L);
         verify(bookCategoryRepository).deleteById(1L);
     }
 
@@ -256,5 +285,26 @@ class BookCategoryServiceTest {
         when(bookCategoryRepository.existsById(1L)).thenReturn(true);
 
         assertThat(bookCategoryService.existsCategory(1L)).isTrue();
+    }
+
+    @Test
+    @DisplayName("카테고리 트리")
+    void getCategoryTree_success() {
+        BookCategoryNodeResponse child1 = new BookCategoryNodeResponse(2L, "추리소설", new ArrayList<>());
+        BookCategoryNodeResponse child2 = new BookCategoryNodeResponse(3L, "공포소설", new ArrayList<>());
+        BookCategoryNodeResponse root = new BookCategoryNodeResponse(1L, "소설", List.of(child1, child2));
+
+        BookCategoryNodeResponse root1 = new BookCategoryNodeResponse(4L, "만화", new ArrayList<>());
+
+        given(bookCategoryRepository.buildCategoryTree()).willReturn(List.of(root, root1));
+
+        List<BookCategoryNodeResponse> actual = bookCategoryService.getCategoryTree();
+
+        assertThat(actual).hasSize(2);
+        assertThat(actual).extracting(BookCategoryNodeResponse::categoryId).containsExactly(1L, 4L);
+        assertThat(actual.getFirst().children()).hasSize(2);
+        assertThat(actual.getFirst().children()).extracting(BookCategoryNodeResponse::categoryName)
+                .containsExactlyInAnyOrder("추리소설", "공포소설");
+
     }
 }
