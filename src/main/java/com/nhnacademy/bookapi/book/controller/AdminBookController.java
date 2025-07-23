@@ -6,12 +6,15 @@ import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
+import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.common.annotation.AuthenticatedUserId;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -72,5 +75,11 @@ public class AdminBookController {
                                            @PathVariable("book-id") Long bookId) {
         bookService.deleteBook(bookId);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<Page<SimpleBookResponse>> getAllBooks(Pageable pageable) {
+        Page<SimpleBookResponse> response = bookService.getAllBooks(pageable);
+        return ResponseEntity.ok(response);
     }
 }

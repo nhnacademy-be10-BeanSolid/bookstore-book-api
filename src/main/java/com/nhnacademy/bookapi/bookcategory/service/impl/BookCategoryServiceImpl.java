@@ -59,6 +59,12 @@ public class BookCategoryServiceImpl implements BookCategoryService {
     public Page<BookCategoryResponse> getAllCategories(Pageable pageable) {
         return bookCategoryRepository.findAllBookCategoryResponse(pageable);
     }
+    //카테고리 정보 목록을 가져와 반환
+    @Override
+    @Transactional(readOnly = true)
+    public List<BookCategoryResponse> getAllCategories() {
+        return bookCategoryRepository.findAllBookCategoryResponse(PageRequest.of(0, Integer.MAX_VALUE)).getContent();
+    }
 
     @Override
     @Transactional(readOnly = true)

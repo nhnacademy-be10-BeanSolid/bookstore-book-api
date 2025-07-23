@@ -1,10 +1,7 @@
 package com.nhnacademy.bookapi.book.service.impl;
 
-import com.nhnacademy.bookapi.event.BookCreateEvent;
 import com.nhnacademy.bookapi.event.BookDeleteEvent;
 import com.nhnacademy.bookapi.event.BookUpdateEvent;
-import com.nhnacademy.bookapi.event.BookViewEvent;
-import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
@@ -22,10 +19,10 @@ import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
+import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -45,10 +42,6 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookCategoryRepository bookCategoryRepository;
     private final BookDocumentRepository bookDocumentRepository;
-    private final UserService userService;
-
-    // 이벤트 발행용 인터페이스
-    private final ApplicationEventPublisher applicationEventPublisher;
 
     // 도서 추가
     @Override
@@ -72,7 +65,9 @@ public class BookServiceImpl implements BookService {
         book.setImage(image);
         Book savedBook = bookRepository.save(book);
 
-        applicationEventPublisher.publishEvent(new BookCreateEvent(savedBook));
+        // Document 저장
+        BookDocument document = BookDocument.from(savedBook);
+        bookDocumentRepository.save(document);
 
         return bookRepository.findBookResponseById(savedBook.getId())
                 .orElseThrow(() -> new BookNotFoundException(savedBook.getId()));
@@ -94,7 +89,9 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
 
-        applicationEventPublisher.publishEvent(new BookViewEvent(book));
+        BookDocument document = BookDocument.from(book);
+
+        bookDocumentRepository.save(document);
     }
 
     // 전체 리스트
@@ -142,9 +139,8 @@ public class BookServiceImpl implements BookService {
 
         book.updateFrom(request);
 
-        Long reviewCount = userService.countReviewsByBookId(book.getId());
-        Double reviewAverage = userService.getAverageEvaluationScoreByBookId(book.getId());
-        applicationEventPublisher.publishEvent(new BookUpdateEvent(book, reviewCount, reviewAverage));
+        BookDocument updateDocument = BookDocument.from(book);
+        bookDocumentRepository.save(updateDocument);
 
         return bookRepository.findBookDetailResponseByBookId(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
@@ -155,7 +151,7 @@ public class BookServiceImpl implements BookService {
     public void deleteBook(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
-
+        bookDocumentRepository.deleteById(String.valueOf(book.getId())); // 인덱스 다시 저장
         bookRepository.delete(book);
         applicationEventPublisher.publishEvent(new BookDeleteEvent(book));
     }
