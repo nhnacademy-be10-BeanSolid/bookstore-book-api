@@ -109,15 +109,21 @@ public class BookServiceImpl implements BookService {
     @Transactional(readOnly = true)
     public List<SimpleBookResponse> getAllSimpleBookResponses() {
         return bookRepository.findAll().stream()
-                .map(book -> new SimpleBookResponse(
-                        book.getId(),
-                        book.getTitle(),
-                        book.getAuthor(),
-                        book.getSalePrice(),
-                        book.getStock(),
-                        book.getImage(),
-                        book.getViewCount()
-                ))
+                .map(book -> {
+                    Long reviewCount = userService.countReviewsByBookId(book.getId());
+                    Double rating = userService.getAverageEvaluationScoreByBookId(book.getId());
+                    return new SimpleBookResponse(
+                            book.getId(),
+                            book.getTitle(),
+                            book.getAuthor(),
+                            book.getSalePrice(),
+                            book.getStock(),
+                            book.getImage(),
+                            book.getViewCount(),
+                            reviewCount,
+                            rating
+                    );
+                })
                 .collect(Collectors.toList());
     }
 
