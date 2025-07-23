@@ -61,7 +61,7 @@ class CustomBookDocumentRepositoryTest {
         Book book1 = new Book();
         ReflectionTestUtils.setField(book1, "id", 1L);
         ReflectionTestUtils.setField(book1, "title", "Title1");
-        ReflectionTestUtils.setField(book1, "test", "Author1");
+        ReflectionTestUtils.setField(book1, "author", "test");
         ReflectionTestUtils.setField(book1, "salePrice", 1000);
         ReflectionTestUtils.setField(book1, "stock", 5);
         ReflectionTestUtils.setField(book1, "image", "img1");
@@ -70,7 +70,7 @@ class CustomBookDocumentRepositoryTest {
         Book book2 = new Book();
         ReflectionTestUtils.setField(book2, "id", 2L);
         ReflectionTestUtils.setField(book2, "title", "Title2");
-        ReflectionTestUtils.setField(book2, "test", "Author2");
+        ReflectionTestUtils.setField(book2, "author", "test");
         ReflectionTestUtils.setField(book2, "salePrice", 2000);
         ReflectionTestUtils.setField(book2, "stock", 3);
         ReflectionTestUtils.setField(book2, "image", "img2");
