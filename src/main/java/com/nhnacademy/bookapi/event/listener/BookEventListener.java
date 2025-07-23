@@ -45,9 +45,8 @@ public class BookEventListener {
     @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
     public void handleBookViewEvent(BookViewEvent event) {
         Book book = event.getBook();
-        BookDocument document = BookDocument.from(book);
-        bookDocumentRepository.save(document);
-        log.info("Updated BookDocument in Elasticsearch: {}, viewCount -{}", document.getId(), document.getViewCount());
+        bookDocumentRepository.increaseViewCount(String.valueOf(book.getId()), book.getViewCount());
+        log.info("Updated BookDocument in Elasticsearch: {}, viewCount -{}", book.getId(), book.getViewCount());
     }
 
     // 삭제 이벤트

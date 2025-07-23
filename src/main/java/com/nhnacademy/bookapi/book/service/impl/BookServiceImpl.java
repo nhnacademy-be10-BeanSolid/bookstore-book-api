@@ -211,8 +211,12 @@ public class BookServiceImpl implements BookService {
     @Override
     @Transactional(readOnly = true)
     public void updateBookDocument(Long bookId, Long reviewCount, Double reviewAverage) {
+        log.info("인덱스 최신화");
+
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(() -> new BookNotFoundException(bookId));
+
+        log.info("이벤트 발행");
 
         applicationEventPublisher.publishEvent(new BookUpdateEvent(book, reviewCount, reviewAverage));
     }
