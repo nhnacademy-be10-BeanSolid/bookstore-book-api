@@ -3,6 +3,7 @@ package com.nhnacademy.bookapi.bookcategory.service;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
+import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryNodeResponse;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryAlreadyExistsException;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
@@ -22,11 +23,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -277,5 +280,26 @@ class BookCategoryServiceTest {
         when(bookCategoryRepository.existsById(1L)).thenReturn(true);
 
         assertThat(bookCategoryService.existsCategory(1L)).isTrue();
+    }
+
+    @Test
+    @DisplayName("카테고리 트리")
+    void getCategoryTree_success() {
+        BookCategoryNodeResponse child1 = new BookCategoryNodeResponse(2L, "추리소설", new ArrayList<>());
+        BookCategoryNodeResponse child2 = new BookCategoryNodeResponse(3L, "공포소설", new ArrayList<>());
+        BookCategoryNodeResponse root = new BookCategoryNodeResponse(1L, "소설", List.of(child1, child2));
+
+        BookCategoryNodeResponse root1 = new BookCategoryNodeResponse(4L, "만화", new ArrayList<>());
+
+        given(bookCategoryRepository.buildCategoryTree()).willReturn(List.of(root, root1));
+
+        List<BookCategoryNodeResponse> actual = bookCategoryService.getCategoryTree();
+
+        assertThat(actual).hasSize(2);
+        assertThat(actual).extracting(BookCategoryNodeResponse::categoryId).containsExactly(1L, 4L);
+        assertThat(actual.getFirst().children()).hasSize(2);
+        assertThat(actual.getFirst().children()).extracting(BookCategoryNodeResponse::categoryName)
+                .containsExactlyInAnyOrder("추리소설", "공포소설");
+
     }
 }
