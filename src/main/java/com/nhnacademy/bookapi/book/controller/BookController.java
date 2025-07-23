@@ -1,11 +1,12 @@
 package com.nhnacademy.bookapi.book.controller;
 
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
-import com.nhnacademy.bookapi.book.domain.response.*;
-import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
+import com.nhnacademy.bookapi.book.domain.response.AdminBookSearchResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
+import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.service.BookService;
-
-
+import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -15,7 +16,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -102,7 +102,7 @@ public class BookController {
         List<SimpleBookResponse> simpleBooks = bookService.getAllSimpleBookResponses();
         List<AdminBookSearchResponse> bookResponses = simpleBooks.stream()
                 .map(book -> new AdminBookSearchResponse(book.id(), book.title(), book.author()))
-                .collect(Collectors.toList());
+                .toList();
         return ResponseEntity.ok(bookResponses);
     }
 }

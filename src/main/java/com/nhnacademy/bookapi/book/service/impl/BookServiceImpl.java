@@ -124,7 +124,7 @@ public class BookServiceImpl implements BookService {
                             rating
                     );
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     // 카테고리를 가지고 있는 도서 리스트
