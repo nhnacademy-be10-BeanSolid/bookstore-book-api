@@ -37,6 +37,7 @@ class BookSearchServiceTest {
     @DisplayName("네이버 검색 테스트")
     void searchBook() {
         BookItemResponse item1 = new BookItemResponse();
+        item1.setTitle("제목");
         item1.setPubdate("20250711");
         item1.setAuthor("김^이");
 
@@ -52,6 +53,7 @@ class BookSearchServiceTest {
         assertThat(result.getItems()).hasSize(1);
 
         BookItemResponse formattedItem = result.getItems().getFirst();
+        assertThat(formattedItem.getTitle()).isEqualTo("제목");
         assertThat(formattedItem.getPubdate()).isEqualTo("2025-07-11");
         assertThat(formattedItem.getAuthor()).isEqualTo("김, 이");
 

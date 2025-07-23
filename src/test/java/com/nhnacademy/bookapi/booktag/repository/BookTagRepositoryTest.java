@@ -34,6 +34,13 @@ class BookTagRepositoryTest {
     }
 
     @Test
+    void findBookTagResponseByIdNullTest() {
+        Optional<BookTagResponse> result = bookTagRepository.findBookTagResponseById(null);
+
+        assertThat(result).isNotPresent();
+    }
+
+    @Test
     void findBookTagResponseByIdNotFoundTest() {
         Optional<BookTagResponse> result = bookTagRepository.findBookTagResponseById(99L);
 

@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 
 @Getter
-@Setter
 @Entity
 @Table(
         name = "book_like",

@@ -250,10 +250,16 @@ class BookCategoryServiceTest {
     @DisplayName("삭제")
     void deleteCategory_success() {
         when(bookCategoryRepository.existsById(1L)).thenReturn(true);
+        when(bookCategoryRepository.existsById(2L)).thenReturn(true);
+        when(bookCategoryRepository.findByParentCategory_CategoryId(1L)).thenReturn(List.of(childCategory));
+        when(bookCategoryRepository.findByParentCategory_CategoryId(2L)).thenReturn(List.of());
+
         doNothing().when(bookCategoryRepository).deleteById(1L);
+        doNothing().when(bookCategoryRepository).deleteById(2L);
 
         bookCategoryService.deleteCategory(1L);
 
+        verify(bookCategoryRepository).deleteById(2L);
         verify(bookCategoryRepository).deleteById(1L);
     }
 
