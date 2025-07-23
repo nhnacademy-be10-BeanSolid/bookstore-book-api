@@ -1,11 +1,13 @@
 package com.nhnacademy.bookapi.book.controller;
 
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
+import com.nhnacademy.bookapi.book.domain.response.AdminBookSearchResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
