@@ -5,7 +5,6 @@ import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.response.*;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
-import com.nhnacademy.bookapi.adpater.service.NaverBookService;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
@@ -46,8 +45,6 @@ class BookControllerTest {
 
     @MockBean
     BookService bookService;
-    @MockBean
-    NaverBookService searchService;
 
     BookTag tag;
     BookCategory category;
@@ -217,6 +214,19 @@ class BookControllerTest {
                 .andExpect(status().isOk());
 
         verify(bookService, times(1)).updateBookStock(requests);
+    }
+
+    @Test
+    @DisplayName("재고 최신화 - 유효성 검사 실패")
+    void getBookOrderResponse_vaildationFail() throws Exception {
+        List<BookStockReduceRequest> requests = List.of(new BookStockReduceRequest(null, 10));
+
+        willDoNothing().given(bookService).updateBookStock(requests);
+
+        mockMvc.perform(put("/book-reduce")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(requests)))
+                .andExpect(status().isBadRequest());
     }
 
     @Test

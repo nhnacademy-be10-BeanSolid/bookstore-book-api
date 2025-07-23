@@ -1,7 +1,6 @@
 package com.nhnacademy.bookapi.book.controller;
 
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
-import com.nhnacademy.bookapi.book.domain.response.AdminBookSearchResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
@@ -57,7 +56,6 @@ public class BookController {
         return ResponseEntity.ok(response);
     }
 
-
     // 외부 api 에서 호출
 
     // 주문 api 전달
@@ -70,7 +68,7 @@ public class BookController {
 
     // 재고 최신화
     @PutMapping("/book-reduce")
-    public ResponseEntity<Void> stockUpdate(@RequestBody List<BookStockReduceRequest> request,
+    public ResponseEntity<Void> stockUpdate(@Valid @RequestBody List<BookStockReduceRequest> request,
                                             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException(bindingResult);

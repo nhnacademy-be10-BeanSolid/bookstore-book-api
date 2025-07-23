@@ -8,14 +8,16 @@ public record BookLikeResponse(
         Long bookLikeId,
         LocalDateTime likedAt,
         String userId,
-        Long bookId
+        Long bookId,
+        String bookTitle
 ) {
     public static BookLikeResponse from(BookLike bookLike) {
         return new BookLikeResponse(
                 bookLike.getId(),
                 bookLike.getLikedAt(),
                 bookLike.getUserId(),
-                bookLike.getBook().getId()
+                bookLike.getBook().getId(),
+                bookLike.getBook().getTitle()
         );
     }
 }

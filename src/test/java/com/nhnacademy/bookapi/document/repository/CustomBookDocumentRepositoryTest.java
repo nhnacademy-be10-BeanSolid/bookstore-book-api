@@ -13,7 +13,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
+import org.springframework.data.elasticsearch.core.mapping.IndexCoordinates;
 import org.springframework.data.elasticsearch.core.query.Query;
+import org.springframework.data.elasticsearch.core.query.UpdateQuery;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -59,7 +61,7 @@ class CustomBookDocumentRepositoryTest {
         Book book1 = new Book();
         ReflectionTestUtils.setField(book1, "id", 1L);
         ReflectionTestUtils.setField(book1, "title", "Title1");
-        ReflectionTestUtils.setField(book1, "author", "Author1");
+        ReflectionTestUtils.setField(book1, "author", "test");
         ReflectionTestUtils.setField(book1, "salePrice", 1000);
         ReflectionTestUtils.setField(book1, "stock", 5);
         ReflectionTestUtils.setField(book1, "image", "img1");
@@ -68,7 +70,7 @@ class CustomBookDocumentRepositoryTest {
         Book book2 = new Book();
         ReflectionTestUtils.setField(book2, "id", 2L);
         ReflectionTestUtils.setField(book2, "title", "Title2");
-        ReflectionTestUtils.setField(book2, "author", "Author2");
+        ReflectionTestUtils.setField(book2, "author", "test");
         ReflectionTestUtils.setField(book2, "salePrice", 2000);
         ReflectionTestUtils.setField(book2, "stock", 3);
         ReflectionTestUtils.setField(book2, "image", "img2");
@@ -84,5 +86,18 @@ class CustomBookDocumentRepositoryTest {
 
         verify(elasticsearchOperations, times(1)).search((Query) any(), eq(BookDocument.class));
         verify(bookRepository, times(1)).findAllById(List.of(1L, 2L));
+    }
+
+    @Test
+    void increaseViewCount_shouldCallUpdate() {
+        String id = "book123";
+        Long viewCount = 42L;
+
+        when(elasticsearchOperations.update(any(UpdateQuery.class), any(IndexCoordinates.class)))
+                .thenReturn(null);
+
+        repository.increaseViewCount(id, viewCount);
+
+        verify(elasticsearchOperations, times(1)).update(any(UpdateQuery.class), any(IndexCoordinates.class));
     }
 }

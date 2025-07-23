@@ -112,7 +112,6 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
 
     @Override
     public Page<SimpleBookResponse> findAllSimpleBookResponses(Pageable pageable) {
-
         Sort currentSort = pageable.getSort();
         Sort newSort = currentSort.and(Sort.by(Sort.Order.desc(BOOK_ID)));
         Pageable newPageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), newSort);

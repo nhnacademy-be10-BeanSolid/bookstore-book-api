@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
 
-// setter 사용 x
 @Setter
 @Getter
 @Entity

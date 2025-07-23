@@ -27,7 +27,8 @@ public class CustomBookLikeRepositoryImpl implements CustomBookLikeRepository {
                         bookLike.id,
                         bookLike.likedAt,
                         bookLike.userId,
-                        bookLike.book.id
+                        bookLike.book.id,
+                        bookLike.book.title
                 ))
                 .from(bookLike)
                 .where(bookLike.id.eq(id))
@@ -46,7 +47,8 @@ public class CustomBookLikeRepositoryImpl implements CustomBookLikeRepository {
                         bookLike.id,
                         bookLike.likedAt,
                         bookLike.userId,
-                        bookLike.book.id
+                        bookLike.book.id,
+                        bookLike.book.title
                 ))
                 .from(bookLike)
                 .where(bookLike.book.id.eq(bookId))
@@ -73,7 +75,8 @@ public class CustomBookLikeRepositoryImpl implements CustomBookLikeRepository {
                         bookLike.id,
                         bookLike.likedAt,
                         bookLike.userId,
-                        bookLike.book.id
+                        bookLike.book.id,
+                        bookLike.book.title
                 ))
                 .from(bookLike)
                 .where(bookLike.userId.eq(userId))
