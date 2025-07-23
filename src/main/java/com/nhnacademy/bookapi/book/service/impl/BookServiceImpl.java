@@ -24,10 +24,7 @@ import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
-import com.nhnacademy.bookapi.event.BookCreateEvent;
-import com.nhnacademy.bookapi.event.BookDeleteEvent;
-import com.nhnacademy.bookapi.event.BookUpdateEvent;
-import com.nhnacademy.bookapi.event.BookViewEvent;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -35,7 +32,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
