@@ -51,7 +51,6 @@ public class BookServiceImpl implements BookService {
     private final MinioUploader minioUploader;
     private final UserService userService;
 
-
     // 도서 추가
     @Override
     public BookResponse createBook(BookCreateRequest request) {
