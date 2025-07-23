@@ -258,7 +258,6 @@ class BookCategoryServiceTest {
         doNothing().when(bookCategoryRepository).deleteById(2L);
 
         bookCategoryService.deleteCategory(1L);
-
         verify(bookCategoryRepository).deleteById(2L);
         verify(bookCategoryRepository).deleteById(1L);
     }
