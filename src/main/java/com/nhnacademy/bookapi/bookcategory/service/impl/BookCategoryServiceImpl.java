@@ -67,12 +67,6 @@ public class BookCategoryServiceImpl implements BookCategoryService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<BookCategoryResponse> getAllCategories() {
-        return bookCategoryRepository.findAllBookCategoryResponse(PageRequest.of(0, Integer.MAX_VALUE)).getContent();
-    }
-
-    @Override
     @CacheEvict(value = "categories", allEntries = true)
     public BookCategoryResponse updateCategory(Long categoryId, BookCategoryUpdateRequest request) {
         BookCategory category = bookCategoryRepository.findById(categoryId)

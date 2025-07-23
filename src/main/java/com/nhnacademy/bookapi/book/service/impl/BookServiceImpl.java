@@ -1,14 +1,13 @@
 package com.nhnacademy.bookapi.book.service.impl;
 
-import com.nhnacademy.bookapi.event.BookDeleteEvent;
-import com.nhnacademy.bookapi.event.BookUpdateEvent;
+import com.nhnacademy.bookapi.adpater.service.UserService;
+import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
-import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
@@ -19,10 +18,14 @@ import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
-import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
+import com.nhnacademy.bookapi.event.BookCreateEvent;
+import com.nhnacademy.bookapi.event.BookDeleteEvent;
+import com.nhnacademy.bookapi.event.BookUpdateEvent;
+import com.nhnacademy.bookapi.event.BookViewEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,6 +45,9 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookCategoryRepository bookCategoryRepository;
     private final BookDocumentRepository bookDocumentRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
+    private final UserService userService;
+
 
     // 도서 추가
     @Override
@@ -65,9 +71,7 @@ public class BookServiceImpl implements BookService {
         book.setImage(image);
         Book savedBook = bookRepository.save(book);
 
-        // Document 저장
-        BookDocument document = BookDocument.from(savedBook);
-        bookDocumentRepository.save(document);
+        applicationEventPublisher.publishEvent(new BookCreateEvent(savedBook));
 
         return bookRepository.findBookResponseById(savedBook.getId())
                 .orElseThrow(() -> new BookNotFoundException(savedBook.getId()));
@@ -89,9 +93,7 @@ public class BookServiceImpl implements BookService {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
 
-        BookDocument document = BookDocument.from(book);
-
-        bookDocumentRepository.save(document);
+        applicationEventPublisher.publishEvent(new BookViewEvent(book));
     }
 
     // 전체 리스트
@@ -139,8 +141,9 @@ public class BookServiceImpl implements BookService {
 
         book.updateFrom(request);
 
-        BookDocument updateDocument = BookDocument.from(book);
-        bookDocumentRepository.save(updateDocument);
+        Long reviewCount = userService.countReviewsByBookId(book.getId());
+        Double reviewAverage = userService.getAverageEvaluationScoreByBookId(book.getId());
+        applicationEventPublisher.publishEvent(new BookUpdateEvent(book, reviewCount, reviewAverage));
 
         return bookRepository.findBookDetailResponseByBookId(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
@@ -151,7 +154,6 @@ public class BookServiceImpl implements BookService {
     public void deleteBook(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
-        bookDocumentRepository.deleteById(String.valueOf(book.getId())); // 인덱스 다시 저장
         bookRepository.delete(book);
         applicationEventPublisher.publishEvent(new BookDeleteEvent(book));
     }
