@@ -37,10 +37,12 @@ public interface BookService {
 
     void increaseViewCount(Long id);
 
-    // 리뷰 작성 후 인덱스 최신화
-    void updateBookDocument(Long bookId, Long reviewCount, Double reviewAverage);
-
-    // 유저 서비스에서 필요한 정보 - 도서 아이디로 이름 반환
+    // 유저 서비스에서 필요한 정보 - 아이디로 책이름 반환
     String getTitleByBookId(Long bookId);
 
+    // 유저 서비스에서 최신화
+    void updateBookDocument(Long bookId, Long reviewCount, Double reviewAverage);
+
+    // 전체 리스트 (SimpleBookResponse)
+    List<SimpleBookResponse> getAllSimpleBookResponses();
 }

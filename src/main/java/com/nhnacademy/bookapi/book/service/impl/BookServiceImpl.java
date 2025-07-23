@@ -6,13 +6,13 @@ import com.nhnacademy.bookapi.event.BookDeleteEvent;
 import com.nhnacademy.bookapi.event.BookUpdateEvent;
 import com.nhnacademy.bookapi.event.BookViewEvent;
 import com.nhnacademy.bookapi.adpater.service.UserService;
+import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
-import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.exception.BookAlreadyExistsException;
 import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
@@ -24,6 +24,7 @@ import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.exception.BookCategoryNotFoundException;
 import com.nhnacademy.bookapi.bookcategory.repository.BookCategoryRepository;
 import com.nhnacademy.bookapi.document.repository.BookDocumentRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -31,7 +32,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -46,12 +46,10 @@ public class BookServiceImpl implements BookService {
     private final BookRepository bookRepository;
     private final BookCategoryRepository bookCategoryRepository;
     private final BookDocumentRepository bookDocumentRepository;
-    private final UserService userService;
-
-    // 이벤트 발행용 인터페이스
     private final ApplicationEventPublisher applicationEventPublisher;
     // 이미지 업로더
     private final MinioUploader minioUploader;
+    private final UserService userService;
 
     // 도서 추가
     @Override
@@ -111,6 +109,29 @@ public class BookServiceImpl implements BookService {
         return bookDocumentRepository.findAllSimpleBookResponses(pageable);
     }
 
+    // 전체 리스트
+    @Override
+    @Transactional(readOnly = true)
+    public List<SimpleBookResponse> getAllSimpleBookResponses() {
+        return bookRepository.findAll().stream()
+                .map(book -> {
+                    Long reviewCount = userService.countReviewsByBookId(book.getId());
+                    Double rating = userService.getAverageEvaluationScoreByBookId(book.getId());
+                    return new SimpleBookResponse(
+                            book.getId(),
+                            book.getTitle(),
+                            book.getAuthor(),
+                            book.getSalePrice(),
+                            book.getStock(),
+                            book.getImage(),
+                            book.getViewCount(),
+                            reviewCount,
+                            rating
+                    );
+                })
+                .toList();
+    }
+
     // 카테고리를 가지고 있는 도서 리스트
     @Override
     @Transactional(readOnly = true)
@@ -139,7 +160,6 @@ public class BookServiceImpl implements BookService {
     public void deleteBook(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException(id));
-
         bookRepository.delete(book);
         minioUploader.deleteImage(book.getImage());
         applicationEventPublisher.publishEvent(new BookDeleteEvent(book));

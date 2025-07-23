@@ -77,4 +77,10 @@ public class BookCategoryController {
         List<BookCategoryNodeResponse> response = bookCategoryService.getCategoryTree();
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/all")
+    public ResponseEntity<List<BookCategoryResponse>> getAllCategoriesList() {
+        List<BookCategoryResponse> response = bookCategoryService.getAllCategories();
+        return ResponseEntity.ok(response);
+    }
 }
