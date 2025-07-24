@@ -88,6 +88,7 @@ class BookServiceTest {
         BookResponse expectedResponse = BookResponse.from(book);
 
         when(bookRepository.save(any(Book.class))).thenReturn(book);
+        when(minioUploader.uploadFromUrl(anyLong(), anyString())).thenReturn("uploaded_image_url");
         when(bookRepository.findBookResponseById(1L)).thenReturn(Optional.of(expectedResponse));
 
         BookResponse result = bookService.createBook(request);
@@ -99,6 +100,7 @@ class BookServiceTest {
         assertThat(result.publishAt()).isEqualTo(LocalDate.of(2020,10,19));
 
         verify(applicationEventPublisher, times(1)).publishEvent(isA(BookCreateEvent.class));
+        verify(minioUploader, times(1)).uploadFromUrl(anyLong(), anyString());
     }
 
     @Test
@@ -124,6 +126,58 @@ class BookServiceTest {
 
         assertThatThrownBy(() -> bookService.createBook(request))
                 .isInstanceOf(BookCategoryNotFoundException.class);
+    }
+
+    @Test
+    @DisplayName("도서 생성 - 이미지 URL이 null일 경우 기본 이미지 설정 및 Minio 업로드 호출")
+    void createBook_nullImageUrl_defaultsToDefaultImageAndUploads() {
+        BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
+                LocalDate.of(2020,10,19) , "test000000001", 10000, 5000, false, 100, null, Set.of(1L));
+        Book book = Book.from(request, Set.of(bookCategory));
+        ReflectionTestUtils.setField(book, "id", 1L);
+
+        when(bookRepository.existsByIsbn("test000000001")).thenReturn(false);
+        when(bookCategoryRepository.findById(1L)).thenReturn(Optional.of(bookCategory));
+        when(bookRepository.save(any(Book.class))).thenReturn(book);
+        when(minioUploader.uploadFromUrl(anyLong(), eq("/images/default.png"))).thenReturn("/images/default.png");
+
+        // BookServiceImpl에서 book.setImage(uploadedImageUrl)이 호출되므로, 테스트에서도 이를 반영해야 합니다.
+        book.setImage("/images/default.png");
+        BookResponse expectedResponse = BookResponse.from(book);
+        when(bookRepository.findBookResponseById(1L)).thenReturn(Optional.of(expectedResponse));
+
+        BookResponse result = bookService.createBook(request);
+
+        assertThat(result).isNotNull();
+        assertThat(result.image()).isEqualTo("/images/default.png");
+        verify(minioUploader, times(1)).uploadFromUrl(anyLong(), eq("/images/default.png"));
+        verify(applicationEventPublisher, times(1)).publishEvent(isA(BookCreateEvent.class));
+    }
+
+    @Test
+    @DisplayName("도서 생성 - 이미지 URL이 비어있을 경우 기본 이미지 설정 및 Minio 업로드 호출")
+    void createBook_emptyImageUrl_defaultsToDefaultImageAndUploads() {
+        BookCreateRequest request = new BookCreateRequest("타이틀", "설명", "목차", "출판사", "작가",
+                LocalDate.of(2020,10,19) , "test000000002", 10000, 5000, false, 100, "", Set.of(1L));
+        Book book = Book.from(request, Set.of(bookCategory));
+        ReflectionTestUtils.setField(book, "id", 1L);
+
+        when(bookRepository.existsByIsbn("test000000002")).thenReturn(false);
+        when(bookCategoryRepository.findById(1L)).thenReturn(Optional.of(bookCategory));
+        when(bookRepository.save(any(Book.class))).thenReturn(book);
+        when(minioUploader.uploadFromUrl(anyLong(), eq("/images/default.png"))).thenReturn("/images/default.png");
+
+        // BookServiceImpl에서 book.setImage(uploadedImageUrl)이 호출되므로, 테스트에서도 이를 반영해야 합니다.
+        book.setImage("/images/default.png");
+        BookResponse expectedResponse = BookResponse.from(book);
+        when(bookRepository.findBookResponseById(1L)).thenReturn(Optional.of(expectedResponse));
+
+        BookResponse result = bookService.createBook(request);
+
+        assertThat(result).isNotNull();
+        assertThat(result.image()).isEqualTo("/images/default.png");
+        verify(minioUploader, times(1)).uploadFromUrl(anyLong(), eq("/images/default.png"));
+        verify(applicationEventPublisher, times(1)).publishEvent(isA(BookCreateEvent.class));
     }
 
     @Test

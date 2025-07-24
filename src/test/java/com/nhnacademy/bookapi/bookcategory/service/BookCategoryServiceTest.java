@@ -307,4 +307,40 @@ class BookCategoryServiceTest {
                 .containsExactlyInAnyOrder("추리소설", "공포소설");
 
     }
+
+    @Test
+    @DisplayName("모든 카테고리 조회 (인자 없는 버전)")
+    void getAllCategories_noArgs() {
+        BookCategoryResponse parentResponse = new BookCategoryResponse(
+                parentCategory.getCategoryId(),
+                parentCategory.getName(),
+                null,
+                null,
+                parentCategory.getCreatedAt(),
+                parentCategory.getUpdatedAt()
+        );
+
+        BookCategoryResponse childResponse = new BookCategoryResponse(
+                childCategory.getCategoryId(),
+                childCategory.getName(),
+                childCategory.getParentCategory().getCategoryId(),
+                childCategory.getParentCategory().getName(),
+                childCategory.getCreatedAt(),
+                childCategory.getUpdatedAt()
+        );
+
+        Page<BookCategoryResponse> mockPage = new PageImpl<>(List.of(parentResponse, childResponse));
+        when(bookCategoryRepository.findAllBookCategoryResponse(any(Pageable.class))).thenReturn(mockPage);
+
+        List<BookCategoryResponse> categories = bookCategoryService.getAllCategories();
+
+        assertThat(categories)
+                .hasSize(2)
+                .extracting(BookCategoryResponse::categoryName)
+                .containsExactlyInAnyOrder("Parent", "Child");
+
+        verify(bookCategoryRepository, times(1)).findAllBookCategoryResponse(argThat(pageable ->
+                pageable.getPageNumber() == 0 && pageable.getPageSize() == Integer.MAX_VALUE
+        ));
+    }
 }

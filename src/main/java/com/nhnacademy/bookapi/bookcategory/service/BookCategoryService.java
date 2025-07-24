@@ -19,6 +19,8 @@ public interface BookCategoryService {
     // 전체 조회
     Page<BookCategoryResponse> getAllCategories(Pageable pageable);
 
+    List<BookCategoryResponse> getAllCategories();
+
     // 수정(Update)
     BookCategoryResponse updateCategory(Long categoryId, BookCategoryUpdateRequest request);
 

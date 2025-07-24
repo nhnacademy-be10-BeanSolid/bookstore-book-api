@@ -2,10 +2,12 @@ package com.nhnacademy.bookapi.book.controller;
 
 import com.nhnacademy.bookapi.book.controller.swagger.BookControllerDocs;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
-import com.nhnacademy.bookapi.book.domain.response.*;
-import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
+import com.nhnacademy.bookapi.book.domain.response.AdminBookSearchResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
+import com.nhnacademy.bookapi.book.domain.response.BookOrderResponse;
+import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.service.BookService;
-
+import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -94,5 +96,14 @@ public class BookController implements BookControllerDocs {
     public ResponseEntity<String> getTitleByBookId(@PathVariable Long bookId) {
         String title = bookService.getTitleByBookId(bookId);
         return ResponseEntity.ok(title);
+    }
+
+    @GetMapping("/admin/books/all")
+    public ResponseEntity<List<AdminBookSearchResponse>> getAllBooksForAdmin() {
+        List<SimpleBookResponse> simpleBooks = bookService.getAllSimpleBookResponses();
+        List<AdminBookSearchResponse> bookResponses = simpleBooks.stream()
+                .map(book -> new AdminBookSearchResponse(book.id(), book.title(), book.author()))
+                .toList();
+        return ResponseEntity.ok(bookResponses);
     }
 }

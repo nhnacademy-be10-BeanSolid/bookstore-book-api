@@ -100,4 +100,92 @@ class CustomBookDocumentRepositoryTest {
 
         verify(elasticsearchOperations, times(1)).update(any(UpdateQuery.class), any(IndexCoordinates.class));
     }
+
+    @Test
+    void findAllSimpleBookResponses_returnsPageOfSimpleBookResponse() {
+        Pageable pageable = PageRequest.of(0, 4);
+
+        SearchHit<BookDocument> hit1 = mock(SearchHit.class);
+        BookDocument bookDocument1 = mock(BookDocument.class);
+        when(hit1.getContent()).thenReturn(bookDocument1);
+        when(bookDocument1.getBookId()).thenReturn(1L);
+
+        SearchHit<BookDocument> hit2 = mock(SearchHit.class);
+        BookDocument bookDocument2 = mock(BookDocument.class);
+        when(hit2.getContent()).thenReturn(bookDocument2);
+        when(bookDocument2.getBookId()).thenReturn(2L);
+
+        SearchHits<BookDocument> searchHits = mock(SearchHits.class);
+        when(searchHits.getSearchHits()).thenReturn(List.of(hit1, hit2));
+        when(searchHits.getTotalHits()).thenReturn(2L);
+
+        when(elasticsearchOperations.search((Query) any(), eq(BookDocument.class))).thenReturn(searchHits);
+
+        Book book1 = new Book();
+        ReflectionTestUtils.setField(book1, "id", 1L);
+        ReflectionTestUtils.setField(book1, "title", "Title1");
+        ReflectionTestUtils.setField(book1, "author", "Author1");
+        ReflectionTestUtils.setField(book1, "salePrice", 1000);
+        ReflectionTestUtils.setField(book1, "stock", 5);
+        ReflectionTestUtils.setField(book1, "image", "img1");
+        ReflectionTestUtils.setField(book1, "viewCount", 10L);
+
+        Book book2 = new Book();
+        ReflectionTestUtils.setField(book2, "id", 2L);
+        ReflectionTestUtils.setField(book2, "title", "Title2");
+        ReflectionTestUtils.setField(book2, "author", "Author2");
+        ReflectionTestUtils.setField(book2, "salePrice", 2000);
+        ReflectionTestUtils.setField(book2, "stock", 3);
+        ReflectionTestUtils.setField(book2, "image", "img2");
+        ReflectionTestUtils.setField(book2, "viewCount", 20L);
+
+        when(bookRepository.findAllById(List.of(1L, 2L))).thenReturn(List.of(book1, book2));
+
+        Page<SimpleBookResponse> result = repository.findAllSimpleBookResponses(pageable);
+
+        assertThat(result.getTotalElements()).isEqualTo(2);
+        assertThat(result.getContent()).hasSize(2);
+        assertThat(result.getContent().get(0).title()).isEqualTo("Title1");
+        assertThat(result.getContent().get(1).title()).isEqualTo("Title2");
+
+        verify(elasticsearchOperations, times(1)).search((Query) any(), eq(BookDocument.class));
+        verify(bookRepository, times(1)).findAllById(List.of(1L, 2L));
+    }
+
+    @Test
+    void findAllSimpleBookResponsesByCategoryId_returnsPageOfSimpleBookResponse() {
+        Long categoryId = 1L;
+        Pageable pageable = PageRequest.of(0, 4);
+
+        SearchHit<BookDocument> hit1 = mock(SearchHit.class);
+        BookDocument bookDocument1 = mock(BookDocument.class);
+        when(hit1.getContent()).thenReturn(bookDocument1);
+        when(bookDocument1.getBookId()).thenReturn(1L);
+
+        SearchHits<BookDocument> searchHits = mock(SearchHits.class);
+        when(searchHits.getSearchHits()).thenReturn(List.of(hit1));
+        when(searchHits.getTotalHits()).thenReturn(1L);
+
+        when(elasticsearchOperations.search((Query) any(), eq(BookDocument.class))).thenReturn(searchHits);
+
+        Book book1 = new Book();
+        ReflectionTestUtils.setField(book1, "id", 1L);
+        ReflectionTestUtils.setField(book1, "title", "Title1");
+        ReflectionTestUtils.setField(book1, "author", "Author1");
+        ReflectionTestUtils.setField(book1, "salePrice", 1000);
+        ReflectionTestUtils.setField(book1, "stock", 5);
+        ReflectionTestUtils.setField(book1, "image", "img1");
+        ReflectionTestUtils.setField(book1, "viewCount", 10L);
+
+        when(bookRepository.findAllById(List.of(1L))).thenReturn(List.of(book1));
+
+        Page<SimpleBookResponse> result = repository.findAllSimpleBookResponses(categoryId, pageable);
+
+        assertThat(result.getTotalElements()).isEqualTo(1);
+        assertThat(result.getContent()).hasSize(1);
+        assertThat(result.getContent().get(0).title()).isEqualTo("Title1");
+
+        verify(elasticsearchOperations, times(1)).search((Query) any(), eq(BookDocument.class));
+        verify(bookRepository, times(1)).findAllById(List.of(1L));
+    }
 }
