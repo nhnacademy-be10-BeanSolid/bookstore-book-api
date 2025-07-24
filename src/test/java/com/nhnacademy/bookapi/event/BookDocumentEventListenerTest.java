@@ -40,6 +40,8 @@ class BookDocumentEventListenerTest {
 
         BookViewEvent event = new BookViewEvent(book);
         listener.handleBookViewEvent(event);
+
+        verify(bookDocumentRepository, times(1)).increaseViewCount(String.valueOf(book.getId()), book.getViewCount());
     }
 
     @Test

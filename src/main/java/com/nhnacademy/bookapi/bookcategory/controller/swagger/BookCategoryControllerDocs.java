@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.parameters.RequestBody;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Page;
@@ -43,15 +42,15 @@ public interface BookCategoryControllerDocs {
     );
 
     @Operation(summary = "카테고리 단건 조회", description = "카테고리 ID를 이용해 해당 카테고리 정보를 조회합니다.")
-    @ApiResponses(value = {
-            @ApiResponse(
-                    responseCode = "200", description = "카테고리 조회 성공",
-                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookCategoryResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "404", description = "카테고리를 찾을 수 없음"
-            )
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = "카테고리 조회 성공",
+            content = @Content(mediaType = "application/json", schema = @Schema(implementation = BookCategoryResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "카테고리를 찾을 수 없음"
+    )
     ResponseEntity<BookCategoryResponse> getCategoryById(
             @Parameter(description = "인증된 사용자 ID", required = true)
             @RequestHeader("X-USER-ID") String xUserId,
@@ -63,18 +62,19 @@ public interface BookCategoryControllerDocs {
             summary = "도서 카테고리 생성",
             description = "새로운 도서 카테고리를 생성합니다."
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "201", description = "카테고리 생성 성공",
-                    content = @Content(schema = @Schema(implementation = BookCategoryResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "400", description = "검증 실패"
-            ),
-            @ApiResponse(
-                    responseCode = "403", description = "권한 없음"
-            )
-    })
+    @ApiResponse(
+            responseCode = "201",
+            description = "카테고리 생성 성공",
+            content = @Content(schema = @Schema(implementation = BookCategoryResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "검증 실패"
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "권한 없음"
+    )
     ResponseEntity<BookCategoryResponse> createCategory(
             @Parameter(description = "인증된 사용자 ID", required = true)
             @RequestHeader("X-USER-ID") String xUserId,
@@ -88,21 +88,23 @@ public interface BookCategoryControllerDocs {
             summary = "도서 카테고리 수정",
             description = "지정한 ID의 도서 카테고리를 수정합니다."
     )
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "200", description = "수정 성공",
-                    content = @Content(schema = @Schema(implementation = BookCategoryResponse.class))
-            ),
-            @ApiResponse(
-                    responseCode = "400", description = "검증 실패"
-            ),
-            @ApiResponse(
-                    responseCode = "403", description = "권한 없음"
-            ),
-            @ApiResponse(
-                    responseCode = "404", description = "카테고리 없음"
-            )
-    })
+    @ApiResponse(
+            responseCode = "200",
+            description = "수정 성공",
+            content = @Content(schema = @Schema(implementation = BookCategoryResponse.class))
+    )
+    @ApiResponse(
+            responseCode = "400",
+            description = "검증 실패"
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "권한 없음"
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "카테고리 없음"
+    )
     ResponseEntity<BookCategoryResponse> updateCategory(
             @Parameter(description = "인증된 사용자 ID", required = true)
             @RequestHeader("X-USER-ID") String xUserId,
@@ -117,17 +119,18 @@ public interface BookCategoryControllerDocs {
     );
 
     @Operation(summary = "카테고리 삭제", description = "특정 카테고리를 삭제합니다.")
-    @ApiResponses({
-            @ApiResponse(
-                    responseCode = "204", description = "삭제 성공 - 내용 없음"
-            ),
-            @ApiResponse(
-                    responseCode = "403", description = "권한 없음"
-            ),
-            @ApiResponse(
-                    responseCode = "404", description = "카테고리를 찾을 수 없음"
-            )
-    })
+    @ApiResponse(
+            responseCode = "204",
+            description = "삭제 성공 - 내용 없음"
+    )
+    @ApiResponse(
+            responseCode = "403",
+            description = "권한 없음"
+    )
+    @ApiResponse(
+            responseCode = "404",
+            description = "카테고리를 찾을 수 없음"
+    )
     ResponseEntity<Void> deleteCategory(
             @Parameter(description = "인증된 사용자 ID", required = true) @RequestHeader("X-USER-ID") String xUserId,
             @Parameter(description = "삭제할 카테고리 ID", required = true) @PathVariable("categoryId") Long categoryId

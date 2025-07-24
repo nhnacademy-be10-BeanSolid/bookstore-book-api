@@ -4,7 +4,6 @@ import com.nhnacademy.bookapi.adpater.UserAdapter;
 import com.nhnacademy.bookapi.adpater.exception.MemberNotFoundException;
 import com.nhnacademy.bookapi.adpater.response.UserResponse;
 import com.nhnacademy.bookapi.adpater.service.UserService;
-import com.nhnacademy.bookapi.book.exception.BookNotFoundException;
 import com.nhnacademy.bookapi.common.exception.ForbiddenException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
