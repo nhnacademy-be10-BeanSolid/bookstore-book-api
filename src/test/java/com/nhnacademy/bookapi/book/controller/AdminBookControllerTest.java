@@ -2,6 +2,7 @@ package com.nhnacademy.bookapi.book.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nhnacademy.bookapi.adpater.service.NaverBookService;
+import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
@@ -13,6 +14,7 @@ import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.booktag.domain.BookTag;
+import com.nhnacademy.bookapi.common.exception.ForbiddenException;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -30,9 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
-import static org.mockito.Mockito.*;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -46,9 +46,11 @@ class AdminBookControllerTest {
     private ObjectMapper objectMapper;
 
     @MockBean
-    BookService bookService;
+    private BookService bookService;
     @MockBean
     private NaverBookService searchService;
+    @MockBean
+    private UserService userService;
 
     BookTag tag;
     BookCategory category;
@@ -68,10 +70,12 @@ class AdminBookControllerTest {
         BookSearchResponse mockResponse = new BookSearchResponse();
         mockResponse.setItems(List.of());
 
-        when(searchService.searchBook("자바", 1))
-                .thenReturn(mockResponse);
+        given(searchService.searchBook("자바", 1))
+                .willReturn(mockResponse);
+        willDoNothing().given(userService).getUserAuthorize("admin");
 
         mockMvc.perform(get("/admin/books/search")
+                        .header("X-USER-ID", "admin")
                         .param("query", "자바")
                         .param("start", "1"))
                 .andExpect(status().isOk())
@@ -105,8 +109,10 @@ class AdminBookControllerTest {
         );
 
         given(bookService.getBookDetailResponseByBookId(1L)).willReturn(mockResponse);
+        willDoNothing().given(userService).getUserAuthorize("admin");
 
-        mockMvc.perform(get("/admin/books/1"))
+        mockMvc.perform(get("/admin/books/1")
+                        .header("X-USER-ID", "admin"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
                 .andExpect(jsonPath("$.title").value("테스트책"))
@@ -133,11 +139,12 @@ class AdminBookControllerTest {
         ReflectionTestUtils.setField(book, "bookCategories", Set.of(category));
         ReflectionTestUtils.setField(book, "status", BookStatus.ON_SALE);
 
+        willDoNothing().given(userService).getUserAuthorize("admin");
         given(bookService.createBook(any(BookCreateRequest.class))).willReturn(BookResponse.from(book));
 
         mockMvc.perform(post("/admin/books")
+                        .header("X-USER-ID", "admin")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-USER-ID", "tester")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/books/1"))
@@ -155,13 +162,14 @@ class AdminBookControllerTest {
                 "타이틀", "설명", "목차", "출판사", "작가",
                 LocalDate.now(), "test123456789", 10000, 5000, false, null, null, new HashSet<>());
 
+        willDoNothing().given(userService).getUserAuthorize("admin");
+
         mockMvc.perform(post("/admin/books")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-USER-ID", "tester")
+                        .header("X-USER-ID", "admin")
                         .content(objectMapper.writeValueAsString(badRequest)))
                 .andExpect(status().isBadRequest());
     }
-
 
     @Test
     @DisplayName("도서 수정")
@@ -179,10 +187,11 @@ class AdminBookControllerTest {
         BookDetailResponse response = BookDetailResponse.from(book1, 2);
 
         given(bookService.updateBook(1L, request)).willReturn(response);
+        willDoNothing().given(userService).getUserAuthorize("admin");
 
         mockMvc.perform(put("/admin/books/1")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .header("X-USER-ID", "tester")
+                        .header("X-USER-ID", "admin")
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1L))
@@ -199,6 +208,7 @@ class AdminBookControllerTest {
                 LocalDate.of(2020,10,19), 10000, 5000, true, BookStatus.SALE_END.toString(), 100);
 
         mockMvc.perform(put("/admin/books/1")
+                        .header("X-USER-ID", "admin")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(badRequest)))
                 .andExpect(status().isBadRequest());
@@ -207,12 +217,26 @@ class AdminBookControllerTest {
     @Test
     @DisplayName("도서 삭제")
     void deleteBook_success() throws Exception {
+        willDoNothing().given(userService).getUserAuthorize("admin");
         willDoNothing().given(bookService).deleteBook(1L);
 
         mockMvc.perform(delete("/admin/books/1")
-                        .header("X-USER-ID", "tester"))
+                        .header("X-USER-ID", "admin"))
                 .andExpect(status().isNoContent());
 
         verify(bookService, times(1)).deleteBook(1L);
+    }
+
+    @Test
+    @DisplayName("도서 삭제 - 권한 부족")
+    void deleteBook_Forbidden() throws Exception {
+        willDoNothing().given(bookService).deleteBook(1L);
+
+        willThrow(new ForbiddenException("관리자 권한이 필요합니다."))
+                .given(userService).getUserAuthorize("test");
+
+        mockMvc.perform(delete("/admin/books/1")
+                        .header("X-USER-ID", "test"))
+                .andExpect(status().isForbidden());
     }
 }

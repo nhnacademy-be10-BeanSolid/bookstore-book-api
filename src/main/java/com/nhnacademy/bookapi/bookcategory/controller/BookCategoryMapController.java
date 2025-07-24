@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.bookcategory.controller;
 
-import com.nhnacademy.bookapi.common.annotation.AuthenticatedUserId;
+import com.nhnacademy.bookapi.adpater.service.UserService;
+import com.nhnacademy.bookapi.bookcategory.controller.swagger.BookCategoryMapControllerDocs;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryMapCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryMapResponse;
@@ -14,8 +15,9 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/books/{bookId}/categories")
-public class BookCategoryMapController {
+public class BookCategoryMapController implements BookCategoryMapControllerDocs {
 
+    private final UserService userService;
     private final BookCategoryMapService bookCategoryMapService;
 
     @GetMapping
@@ -25,10 +27,11 @@ public class BookCategoryMapController {
     }
 
     @PostMapping
-    public ResponseEntity<BookCategoryMapResponse> createBookCategoryMap(@AuthenticatedUserId String userId,
+    public ResponseEntity<BookCategoryMapResponse> createBookCategoryMap(@RequestHeader("X-USER-ID") String xUserId,
                                                                          @PathVariable Long bookId,
                                                                          @Valid @RequestBody BookCategoryMapCreateRequest request,
                                                                          BindingResult bindingResult) {
+        userService.getUserAuthorize(xUserId);
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException(bindingResult);
         }
@@ -37,9 +40,10 @@ public class BookCategoryMapController {
     }
 
     @DeleteMapping("/{categoryId}")
-    public ResponseEntity<Void> deleteCategoryMap(@AuthenticatedUserId String userId,
+    public ResponseEntity<Void> deleteCategoryMap(@RequestHeader("X-USER-ID") String xUserId,
                                                   @PathVariable Long bookId,
                                                   @PathVariable Long categoryId) {
+        userService.getUserAuthorize(xUserId);
         bookCategoryMapService.deleteCategoryMap(bookId, categoryId);
         return ResponseEntity.noContent().build();
     }

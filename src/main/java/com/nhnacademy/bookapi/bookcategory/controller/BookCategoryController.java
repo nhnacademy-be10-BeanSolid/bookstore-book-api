@@ -1,7 +1,8 @@
 package com.nhnacademy.bookapi.bookcategory.controller;
 
+import com.nhnacademy.bookapi.adpater.service.UserService;
+import com.nhnacademy.bookapi.bookcategory.controller.swagger.BookCategoryControllerDocs;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryNodeResponse;
-import com.nhnacademy.bookapi.common.annotation.AuthenticatedUserId;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
@@ -23,26 +24,32 @@ import java.util.List;
 @RestController
 @RequestMapping("/categories")
 @RequiredArgsConstructor
-public class BookCategoryController {
+public class BookCategoryController implements BookCategoryControllerDocs {
 
+    private final UserService userService;
     private final BookCategoryService bookCategoryService;
 
     @GetMapping
-    public ResponseEntity<Page<BookCategoryResponse>> getAllCategories(Pageable pageable) {
+    public ResponseEntity<Page<BookCategoryResponse>> getAllCategories(@RequestHeader("X-USER-ID") String xUserId,
+                                                                       Pageable pageable) {
+        userService.getUserAuthorize(xUserId);
         Page<BookCategoryResponse> bookCategoryList = bookCategoryService.getAllCategories(pageable);
         return ResponseEntity.ok(bookCategoryList);
     }
 
     @GetMapping("/{categoryId}")
-    public ResponseEntity<BookCategoryResponse> getCategoryById(@PathVariable("categoryId") Long categoryId) {
+    public ResponseEntity<BookCategoryResponse> getCategoryById(@RequestHeader("X-USER-ID") String xUserId,
+                                                                @PathVariable("categoryId") Long categoryId) {
+        userService.getUserAuthorize(xUserId);
         BookCategoryResponse response = bookCategoryService.getCategoryById(categoryId);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping
-    public ResponseEntity<BookCategoryResponse> createCategory(@AuthenticatedUserId String userId,
+    public ResponseEntity<BookCategoryResponse> createCategory(@RequestHeader("X-USER-ID") String xUserId,
                                                                @Valid @RequestBody BookCategoryCreateRequest request,
                                                                BindingResult bindingResult) {
+        userService.getUserAuthorize(xUserId);
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException(bindingResult);
         }
@@ -53,10 +60,11 @@ public class BookCategoryController {
     }
 
     @PutMapping("/{categoryId}")
-    public ResponseEntity<BookCategoryResponse> updateCategory(@AuthenticatedUserId String userId,
+    public ResponseEntity<BookCategoryResponse> updateCategory(@RequestHeader("X-USER-ID") String xUserId,
                                                                @PathVariable("categoryId") Long categoryId,
                                                                @Valid @RequestBody BookCategoryUpdateRequest request,
                                                                BindingResult bindingResult) {
+        userService.getUserAuthorize(xUserId);
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException(bindingResult);
         }
@@ -66,8 +74,9 @@ public class BookCategoryController {
     }
 
     @DeleteMapping("/{categoryId}")
-    public ResponseEntity<Void> deleteCategory(@AuthenticatedUserId String userId,
+    public ResponseEntity<Void> deleteCategory(@RequestHeader("X-USER-ID") String xUserId,
                                                @PathVariable("categoryId") Long categoryId) {
+        userService.getUserAuthorize(xUserId);
         bookCategoryService.deleteCategory(categoryId);
         return ResponseEntity.noContent().build();
     }

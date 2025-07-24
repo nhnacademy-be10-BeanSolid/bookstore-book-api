@@ -1,12 +1,14 @@
 package com.nhnacademy.bookapi.bookcategory.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryNodeResponse;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
+import com.nhnacademy.bookapi.common.exception.ForbiddenException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,8 +28,7 @@ import java.util.List;
 import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.BDDMockito.willDoNothing;
+import static org.mockito.BDDMockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -38,6 +39,8 @@ class BookCategoryControllerTest {
 
     @MockBean
     BookCategoryService bookCategoryService;
+    @MockBean
+    UserService userService;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -53,9 +56,11 @@ class BookCategoryControllerTest {
                 "Child",1L,"Parent", LocalDateTime.now(), LocalDateTime.now());
         Page<BookCategoryResponse> page = new PageImpl<>(List.of(parentResponse, childResponse), pageable, 2);
 
+        willDoNothing().given(userService).getUserAuthorize("admin");
         given(bookCategoryService.getAllCategories(any(Pageable.class))).willReturn(page);
 
-        mockMvc.perform(get("/categories"))
+        mockMvc.perform(get("/categories")
+                        .header("X-USER-ID", "admin"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content", hasSize(2)))
                 .andExpect(jsonPath("$.content[0].categoryId").value(1L))
@@ -72,9 +77,11 @@ class BookCategoryControllerTest {
         BookCategoryResponse response = new BookCategoryResponse(1L,
                 "Parent", null, null, LocalDateTime.now(), LocalDateTime.now());
 
+        willDoNothing().given(userService).getUserAuthorize("admin");
         given(bookCategoryService.getCategoryById(1L)).willReturn(response);
 
-        mockMvc.perform(get("/categories/{categoryId}", 1L))
+        mockMvc.perform(get("/categories/{categoryId}", 1L)
+                        .header("X-USER-ID", "admin"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.categoryId").value(1L))
                 .andExpect(jsonPath("$.categoryName").value("Parent"))
@@ -87,12 +94,13 @@ class BookCategoryControllerTest {
         BookCategoryCreateRequest request = new BookCategoryCreateRequest("NewCategory", null);
         BookCategoryResponse response = new BookCategoryResponse(10L,
                 "NewCategory", null, null, LocalDateTime.now(), LocalDateTime.now());
+        willDoNothing().given(userService).getUserAuthorize("admin");
         given(bookCategoryService.createCategory(request)).willReturn(response);
 
         mockMvc.perform(post("/categories")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content(objectMapper.writeValueAsString(request))
-                    .header("X-USER-ID", "test"))
+                    .header("X-USER-ID", "admin"))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/categories/10"))
                 .andExpect(jsonPath("$.categoryId").value(10L))
@@ -104,10 +112,12 @@ class BookCategoryControllerTest {
     void createCategory_validFail() throws Exception {
         BookCategoryCreateRequest request = new BookCategoryCreateRequest(null, null);
 
+        willDoNothing().given(userService).getUserAuthorize("admin");
+
         mockMvc.perform(post("/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-USER-ID", "test"))
+                        .header("X-USER-ID", "admin"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -128,13 +138,14 @@ class BookCategoryControllerTest {
 
         BookCategoryResponse response = new BookCategoryResponse(2L, "ChildCategory", 1L,"ParentCategory", LocalDateTime.now(), LocalDateTime.now());
 
+        willDoNothing().given(userService).getUserAuthorize("admin");
         given(bookCategoryService.createCategory(any(BookCategoryCreateRequest.class)))
                 .willReturn(response);
 
         mockMvc.perform(post("/categories")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-USER-ID", "test"))
+                        .header("X-USER-ID", "admin"))
                 .andExpect(status().isCreated())
                 .andExpect(header().string("Location", "/categories/2"))
                 .andExpect(jsonPath("$.categoryId").value(2L))
@@ -148,13 +159,14 @@ class BookCategoryControllerTest {
         BookCategoryUpdateRequest request = new BookCategoryUpdateRequest("Updated", null);
         BookCategoryResponse updated = new BookCategoryResponse(1L, "Updated", null, null, LocalDateTime.now(), LocalDateTime.now());
 
+        willDoNothing().given(userService).getUserAuthorize("admin");
         given(bookCategoryService.updateCategory(eq(1L),
                 any(BookCategoryUpdateRequest.class))).willReturn(updated);
 
         mockMvc.perform(put("/categories/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-USER-ID", "test"))
+                        .header("X-USER-ID", "admin"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.categoryId").value(1L))
                 .andExpect(jsonPath("$.categoryName").value("Updated"));
@@ -165,31 +177,36 @@ class BookCategoryControllerTest {
     void updateCategory_validFail() throws Exception {
         BookCategoryUpdateRequest request = new BookCategoryUpdateRequest(null, null);
 
+        willDoNothing().given(userService).getUserAuthorize("admin");
+
         mockMvc.perform(put("/categories/1")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-USER-ID", "test"))
+                        .header("X-USER-ID", "admin"))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
     @DisplayName("카테고리 삭제")
     void deleteCategory() throws Exception {
+        willDoNothing().given(userService).getUserAuthorize("admin");
         willDoNothing().given(bookCategoryService).deleteCategory(1L);
 
         mockMvc.perform(delete("/categories/1")
-                        .header("X-USER-ID", "test"))
+                        .header("X-USER-ID", "admin"))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    @DisplayName("카테고리 삭제 - 헤더 검증 실패")
+    @DisplayName("카테고리 삭제 - 권한 부족")
     void deleteCategory_headerException() throws Exception {
+        willThrow(new ForbiddenException("관리자 권한이 필요합니다."))
+                .given(userService).getUserAuthorize("test");
         willDoNothing().given(bookCategoryService).deleteCategory(1L);
 
         mockMvc.perform(delete("/categories/1")
-                        .header("X-USER-ID", ""))
-                .andExpect(status().isBadRequest());
+                        .header("X-USER-ID", "test"))
+                .andExpect(status().isForbidden());
     }
 
     @Test
