@@ -104,7 +104,7 @@ public class BookCategoryController implements BookCategoryControllerDocs {
         File convFile = File.createTempFile("tmp", ".csv");
         file.transferTo(convFile);
 
-        categoryCsvFileReadService.importCategoriesFromCsv(convFile);
+        categoryCsvFileReadService.importCategories(convFile);
 
         return ResponseEntity.ok("Import completed");
     }

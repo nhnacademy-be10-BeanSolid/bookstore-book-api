@@ -22,13 +22,11 @@ public class CategoryCsvFileReadService {
 
     private final BookCategoryRepository bookCategoryRepository;
 
-    // internalId → 이름
-    private final Map<Long, String> internalIdToName = new HashMap<>();
-    // 이름 → BookCategory
-    private final Map<String, BookCategory> nameToCategory = new HashMap<>();
+    // 아이디 → BookCategory
+    private final Map<Long, BookCategory> nameToCategory = new HashMap<>();
 
     @Transactional
-    public void importCategoriesFromCsv(File csvFile) throws IOException {
+    public void importCategories(File csvFile) throws IOException {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(csvFile), StandardCharsets.UTF_8))) {
             br.mark(1);
             if (br.read() != 0xFEFF) {
@@ -43,16 +41,16 @@ public class CategoryCsvFileReadService {
 
             CSVParser parser = new CSVParser(br, csvFormat);
 
-            for (CSVRecord record : parser) {
+            for (CSVRecord csvRecord : parser) {
                 List<String> depths = new ArrayList<>();
                 for (int i = 1; i <= 5; i++) {
-                    String depthName = record.get(i + "Depth");
+                    String depthName = csvRecord.get(i + "Depth");
                     if (depthName != null && !depthName.isBlank()) {
                         depths.add(depthName.trim());
                     }
                 }
 
-                Long cid = Long.parseLong(record.get("CID")); // ★ 변경: cid 읽기
+                Long cid = Long.parseLong(csvRecord.get("CID")); // CID 읽기
 
                 BookCategory parent = null;
                 for (int i = 0; i < depths.size(); i++) {
@@ -65,15 +63,12 @@ public class CategoryCsvFileReadService {
                     if (category == null) {
                         category = bookCategoryRepository.findByNameAndParentCategory(currentName, parent).orElse(null);
                         if (category == null) {
-                            // BookCategory에 cid 생성자/필드 있다고 가정
                             category = new BookCategory(cid, currentName, parent);
                             bookCategoryRepository.save(category);
 
-                            internalIdToName.put(cid, currentName); // ★ 변경: cid로 key 지정
-                            nameToCategory.put(key, category);
+                            nameToCategory.put(cid, category);
                         } else {
-                            internalIdToName.put(cid, currentName);
-                            nameToCategory.put(key, category);
+                            nameToCategory.put(cid, category);
                         }
                     }
                     parent = category;
