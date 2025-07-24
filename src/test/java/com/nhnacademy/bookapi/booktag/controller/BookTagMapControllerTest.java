@@ -1,10 +1,12 @@
 package com.nhnacademy.bookapi.booktag.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagMapCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagResponse;
 import com.nhnacademy.bookapi.booktag.service.BookTagMapService;
+import com.nhnacademy.bookapi.common.exception.ForbiddenException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +17,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
@@ -30,6 +32,8 @@ class BookTagMapControllerTest {
 
     @MockBean
     BookTagMapService bookTagMapService;
+    @MockBean
+    UserService userService;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -40,12 +44,13 @@ class BookTagMapControllerTest {
         BookTagMapCreateRequest request = new BookTagMapCreateRequest(1L);
         BookTagMapResponse response = new BookTagMapResponse(1L, List.of(new BookTagResponse(1L, "test")));
 
+        willDoNothing().given(userService).getUserAuthorize("admin");
         given(bookTagMapService.createBookTag(1L, request)).willReturn(response);
 
         mockMvc.perform(post("/books/1/tags")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-USER-ID", "test"))
+                        .header("X-USER-ID", "admin"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.bookId").value(1))
                 .andExpect(jsonPath("$.tags[0].tagId").value(1))
@@ -57,10 +62,12 @@ class BookTagMapControllerTest {
     void createBookTagMap_validationFail() throws Exception {
         BookTagMapCreateRequest request = new BookTagMapCreateRequest(null);
 
+        willDoNothing().given(userService).getUserAuthorize("admin");
+
         mockMvc.perform(post("/books/1/tags")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-USER-ID", "test"))
+                        .header("X-USER-ID", "admin"))
                 .andExpect(status().isBadRequest());
     }
 
@@ -69,11 +76,14 @@ class BookTagMapControllerTest {
     void createBookTag_headerException() throws Exception {
         BookTagMapCreateRequest request = new BookTagMapCreateRequest(1L);
 
+        willThrow(new ForbiddenException("관리자 권한이 필요합니다."))
+                .given(userService).getUserAuthorize("test");
+
         mockMvc.perform(post("/books/1/tags")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request))
-                        .header("X-USER-ID", ""))
-                .andExpect(status().isBadRequest());
+                        .header("X-USER-ID", "test"))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -81,21 +91,25 @@ class BookTagMapControllerTest {
     void deleteBookTagMap() throws Exception {
         doNothing().when(bookTagMapService).deleteBookTag(1L, 1L);
 
+        willDoNothing().given(userService).getUserAuthorize("admin");
+
         mockMvc.perform(delete("/books/1/tags/1")
-                        .header("X-USER-ID", "test"))
+                        .header("X-USER-ID", "admin"))
                 .andExpect(status().isNoContent());
 
         verify(bookTagMapService).deleteBookTag(1L, 1L);
     }
 
     @Test
-    @DisplayName("도서에서 태그 삭제 - 헤더 검증 실패")
+    @DisplayName("도서에서 태그 삭제 - 일반 권한")
     void deleteBookTagMap_headerException() throws Exception {
         doNothing().when(bookTagMapService).deleteBookTag(1L, 1L);
+        willThrow(new ForbiddenException("관리자 권한이 필요합니다."))
+                .given(userService).getUserAuthorize("test");
 
         mockMvc.perform(delete("/books/1/tags/1")
-                        .header("X-USER-ID", ""))
-                .andExpect(status().isBadRequest());
+                        .header("X-USER-ID", "test"))
+                .andExpect(status().isForbidden());
     }
 
     @Test

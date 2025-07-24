@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.booktag.controller;
 
-import com.nhnacademy.bookapi.common.annotation.AuthenticatedUserId;
+import com.nhnacademy.bookapi.adpater.service.UserService;
+import com.nhnacademy.bookapi.booktag.controller.swagger.BookTagMapControllerDocs;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.booktag.domain.request.BookTagMapCreateRequest;
 import com.nhnacademy.bookapi.booktag.domain.response.BookTagMapResponse;
@@ -14,9 +15,10 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/books/{bookId}/tags")
-public class BookTagMapController {
+public class BookTagMapController implements BookTagMapControllerDocs {
 
     private final BookTagMapService bookTagMapService;
+    private final UserService userService;
 
     @GetMapping
     public ResponseEntity<BookTagMapResponse> getBookTagMapResponse(@PathVariable Long bookId) {
@@ -25,10 +27,11 @@ public class BookTagMapController {
     }
 
     @PostMapping
-    public ResponseEntity<BookTagMapResponse> createBookTagMap(@AuthenticatedUserId String userId,
+    public ResponseEntity<BookTagMapResponse> createBookTagMap(@RequestHeader("X-USER-ID") String xUserId,
                                                                @PathVariable Long bookId,
                                                                @Valid @RequestBody BookTagMapCreateRequest request,
                                                                BindingResult bindingResult) {
+        userService.getUserAuthorize(xUserId);
         if (bindingResult.hasErrors()) {
             throw new ValidationFailedException(bindingResult);
         }
@@ -37,9 +40,10 @@ public class BookTagMapController {
     }
 
     @DeleteMapping("/{tagId}")
-    public ResponseEntity<Void> deleteBookTagMap(@AuthenticatedUserId String userId,
+    public ResponseEntity<Void> deleteBookTagMap(@RequestHeader("X-USER-ID") String xUserId,
                                                  @PathVariable Long bookId,
                                                  @PathVariable Long tagId) {
+        userService.getUserAuthorize(xUserId);
         bookTagMapService.deleteBookTag(bookId, tagId);
         return ResponseEntity.noContent().build();
     }

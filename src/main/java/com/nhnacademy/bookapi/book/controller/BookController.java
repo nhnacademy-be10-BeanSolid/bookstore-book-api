@@ -1,5 +1,6 @@
 package com.nhnacademy.bookapi.book.controller;
 
+import com.nhnacademy.bookapi.book.controller.swagger.BookControllerDocs;
 import com.nhnacademy.bookapi.book.domain.request.BookStockReduceRequest;
 import com.nhnacademy.bookapi.book.domain.response.*;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
@@ -19,7 +20,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-public class BookController {
+public class BookController implements BookControllerDocs {
 
     private final BookService bookService;
 

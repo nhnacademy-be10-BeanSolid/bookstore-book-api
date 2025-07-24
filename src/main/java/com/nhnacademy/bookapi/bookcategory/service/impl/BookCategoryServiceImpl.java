@@ -91,7 +91,6 @@ public class BookCategoryServiceImpl implements BookCategoryService {
             log.info("Deleting child category: {}", child.getCategoryId());
             deleteCategory(child.getCategoryId());
         }
-
         bookCategoryRepository.deleteById(categoryId);
     }
 

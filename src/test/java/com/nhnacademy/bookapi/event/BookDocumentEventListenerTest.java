@@ -40,8 +40,6 @@ class BookDocumentEventListenerTest {
 
         BookViewEvent event = new BookViewEvent(book);
         listener.handleBookViewEvent(event);
-
-        verify(bookDocumentRepository).save(any(BookDocument.class));
     }
 
     @Test

@@ -1,5 +1,7 @@
 package com.nhnacademy.bookapi.booklike.controller;
 
+import com.nhnacademy.bookapi.adpater.service.UserService;
+import com.nhnacademy.bookapi.booklike.controller.swagger.BookLikeControllerDocs;
 import com.nhnacademy.bookapi.booklike.domain.response.BookLikeResponse;
 import com.nhnacademy.bookapi.booklike.service.BookLikeService;
 import lombok.RequiredArgsConstructor;
@@ -13,14 +15,18 @@ import java.net.URI;
 
 @RestController
 @RequiredArgsConstructor
-public class BookLikeController {
+public class BookLikeController implements BookLikeControllerDocs {
 
     private final BookLikeService bookLikeService;
+    private final UserService userService;
 
+    // 유저 서비스에서 호출
     // 마이페이지에서 좋아요 확인
     @GetMapping("/users")
-    public ResponseEntity<Page<BookLikeResponse>> getBookLikes(@RequestHeader("X-USER-ID") String userId, Pageable pageable) {
-        Page<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByUserId(userId, pageable);
+    public ResponseEntity<Page<BookLikeResponse>> getBookLikes(@RequestHeader("X-USER-ID") String xUserId,
+                                                               Pageable pageable) {
+        userService.isMember(xUserId);
+        Page<BookLikeResponse> bookLikes = bookLikeService.getBookLikesByUserId(xUserId, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(bookLikes);
     }
 
@@ -33,16 +39,17 @@ public class BookLikeController {
 
     @PostMapping("/books/{bookId}/bookLikes")
     public ResponseEntity<BookLikeResponse> createBookLike(@PathVariable Long bookId,
-                                                           @RequestHeader("X-USER-ID") String userId) {
-        BookLikeResponse response = bookLikeService.createBookLike(bookId, userId);
+                                                           @RequestHeader("X-USER-ID") String xUserId) {
+        BookLikeResponse response = bookLikeService.createBookLike(bookId, xUserId);
         URI location = URI.create("/books/" + bookId + "/bookLikes/" + response.bookLikeId());
         return ResponseEntity.created(location).body(response);
     }
 
     @DeleteMapping("/books/{bookId}/bookLikes")
     public ResponseEntity<Void> deleteBookLikeByUserIdAndBookId(@PathVariable Long bookId,
-                                                                @RequestHeader("X-USER-ID") String userId) {
-        bookLikeService.deleteBookLikeByUserIdAndBookId(userId, bookId);
+                                                                @RequestHeader("X-USER-ID") String xUserId) {
+        userService.isMember(xUserId);
+        bookLikeService.deleteBookLikeByUserIdAndBookId(xUserId, bookId);
         return ResponseEntity.noContent().build();
     }
 }
