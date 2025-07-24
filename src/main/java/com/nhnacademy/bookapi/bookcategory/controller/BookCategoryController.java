@@ -3,6 +3,7 @@ package com.nhnacademy.bookapi.bookcategory.controller;
 import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.bookcategory.controller.swagger.BookCategoryControllerDocs;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryNodeResponse;
+import com.nhnacademy.bookapi.bookcategory.service.CategoryCsvFileReadService;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
 import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryCreateRequest;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
@@ -16,7 +17,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 
@@ -28,6 +32,8 @@ public class BookCategoryController implements BookCategoryControllerDocs {
 
     private final UserService userService;
     private final BookCategoryService bookCategoryService;
+
+    private final CategoryCsvFileReadService categoryCsvFileReadService;
 
     @GetMapping
     public ResponseEntity<Page<BookCategoryResponse>> getAllCategories(@RequestHeader("X-USER-ID") String xUserId,
@@ -91,5 +97,15 @@ public class BookCategoryController implements BookCategoryControllerDocs {
     public ResponseEntity<List<BookCategoryResponse>> getAllCategoriesList() {
         List<BookCategoryResponse> response = bookCategoryService.getAllCategories();
         return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/import-categories")
+    public ResponseEntity<String> importCategories(@RequestParam("file") MultipartFile file) throws IOException {
+        File convFile = File.createTempFile("tmp", ".csv");
+        file.transferTo(convFile);
+
+        categoryCsvFileReadService.importCategoriesFromCsv(convFile);
+
+        return ResponseEntity.ok("Import completed");
     }
 }

@@ -17,7 +17,6 @@ public class BookCategory {
 
     @Id
     @Column(name = "category_id")
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long categoryId;
 
     // 자식에서 부모 관계
@@ -43,4 +42,10 @@ public class BookCategory {
         this.createdAt = LocalDateTime.now();
     }
 
+    public BookCategory(long categoryId, String name, BookCategory parentCategory) {
+        this.categoryId = categoryId;
+        this.name = name;
+        this.parentCategory = parentCategory;
+        this.createdAt = LocalDateTime.now();
+    }
 }
