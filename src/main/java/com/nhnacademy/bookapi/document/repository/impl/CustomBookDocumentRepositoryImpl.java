@@ -212,6 +212,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                             doc.getRating()
                     );
                 })
+
                 .toList();
 
         long total = hits.getTotalHits();
