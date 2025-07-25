@@ -17,6 +17,7 @@ public class BookCategory {
 
     @Id
     @Column(name = "category_id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long categoryId;
 
     // 자식에서 부모 관계

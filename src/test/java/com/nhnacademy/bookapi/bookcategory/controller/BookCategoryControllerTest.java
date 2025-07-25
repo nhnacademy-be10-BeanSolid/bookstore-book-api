@@ -8,7 +8,6 @@ import com.nhnacademy.bookapi.bookcategory.domain.request.BookCategoryUpdateRequ
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryNodeResponse;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
 import com.nhnacademy.bookapi.bookcategory.service.BookCategoryService;
-import com.nhnacademy.bookapi.bookcategory.service.CategoryCsvFileReadService;
 import com.nhnacademy.bookapi.common.exception.ForbiddenException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -42,8 +41,6 @@ class BookCategoryControllerTest {
     BookCategoryService bookCategoryService;
     @MockBean
     UserService userService;
-    @MockBean
-    CategoryCsvFileReadService categoryCsvFileReadService;
 
     @Autowired
     ObjectMapper objectMapper;
