@@ -1,7 +1,9 @@
 package com.nhnacademy.bookapi.book.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nhnacademy.bookapi.adpater.service.NaverBookService;
+import com.nhnacademy.bookapi.adpater.domain.AladinSearchRequest;
+import com.nhnacademy.bookapi.adpater.domain.AladinSearchResponse;
+import com.nhnacademy.bookapi.adpater.service.AladinService;
 import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.BookStatus;
@@ -9,7 +11,6 @@ import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
-import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.bookcategory.domain.BookCategory;
 import com.nhnacademy.bookapi.bookcategory.domain.response.BookCategoryResponse;
@@ -48,7 +49,7 @@ class AdminBookControllerTest {
     @MockBean
     private BookService bookService;
     @MockBean
-    private NaverBookService searchService;
+    private AladinService searchService;
     @MockBean
     private UserService userService;
 
@@ -67,10 +68,9 @@ class AdminBookControllerTest {
     @Test
     @DisplayName("외부검색")
     void searchBook() throws Exception {
-        BookSearchResponse mockResponse = new BookSearchResponse();
-        mockResponse.setItems(List.of());
+        AladinSearchResponse mockResponse = mock(AladinSearchResponse.class);
 
-        given(searchService.searchBook("자바", 1))
+        given(searchService.search(any(AladinSearchRequest.class)))
                 .willReturn(mockResponse);
         willDoNothing().given(userService).getUserAuthorize("admin");
 
@@ -79,7 +79,7 @@ class AdminBookControllerTest {
                         .param("query", "자바")
                         .param("start", "1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.items").isArray());
+                .andExpect(jsonPath("$.item").isArray());
     }
 
     @Test

@@ -116,4 +116,5 @@ public class BookCategoryServiceImpl implements BookCategoryService {
     public List<BookCategoryNodeResponse> getCategoryTree() {
         return bookCategoryRepository.buildCategoryTree();
     }
+
 }

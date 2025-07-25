@@ -1,13 +1,15 @@
 package com.nhnacademy.bookapi.book.controller;
 
-import com.nhnacademy.bookapi.adpater.service.NaverBookService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.nhnacademy.bookapi.adpater.domain.AladinSearchRequest;
+import com.nhnacademy.bookapi.adpater.domain.AladinSearchResponse;
+import com.nhnacademy.bookapi.adpater.service.AladinService;
 import com.nhnacademy.bookapi.adpater.service.UserService;
 import com.nhnacademy.bookapi.book.controller.swagger.AdminBookControllerDocs;
 import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
-import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.service.BookService;
 import com.nhnacademy.bookapi.common.exception.ValidationFailedException;
@@ -30,18 +32,16 @@ public class AdminBookController implements AdminBookControllerDocs {
 
     private final UserService userService;
     private final BookService bookService;
-    private final NaverBookService naverBookSearchService;
+    private final AladinService aladinService;
 
     @GetMapping("/search")
-    public ResponseEntity<BookSearchResponse> searchBook(
-            @RequestHeader("X-USER-ID") String xUserId,
+    public ResponseEntity<AladinSearchResponse> searchBooks(
             @RequestParam String query,
-            @RequestParam(defaultValue = "1") int start) {
-
-        userService.getUserAuthorize(xUserId);
-
-        BookSearchResponse response = naverBookSearchService.searchBook(query, start);
-        return ResponseEntity.ok(response);
+            @RequestParam(defaultValue = "1") Integer start,
+            @RequestParam(name = "MaxResults", defaultValue = "10") Integer maxResults
+    ) throws JsonProcessingException {
+        AladinSearchRequest request = new AladinSearchRequest(query, start, maxResults);
+        return ResponseEntity.ok(aladinService.search(request));
     }
 
     @GetMapping("/{book-id}")

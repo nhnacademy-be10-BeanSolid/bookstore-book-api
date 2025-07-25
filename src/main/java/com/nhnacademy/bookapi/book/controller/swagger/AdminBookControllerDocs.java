@@ -4,7 +4,6 @@ import com.nhnacademy.bookapi.book.domain.request.BookCreateRequest;
 import com.nhnacademy.bookapi.book.domain.request.BookUpdateRequest;
 import com.nhnacademy.bookapi.book.domain.response.BookDetailResponse;
 import com.nhnacademy.bookapi.book.domain.response.BookResponse;
-import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -14,26 +13,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @Tag(name = "관리자 도서 API", description = "관리자용 도서 관련 API 명세")
 public interface AdminBookControllerDocs {
 
-    @Operation(summary = "도서 검색", description = "네이버 API를 이용하여 도서를 검색합니다.")
-    @ApiResponse(
-            responseCode = "200",
-            description = "검색 성공",
-            content = @Content(mediaType = "application/json")
-    )
-    @ApiResponse(
-            responseCode = "403",
-            description = "권한 없음"
-    )
-    ResponseEntity<BookSearchResponse> searchBook(
-            @Parameter(description = "인증된 사용자 ID", required = true) @RequestHeader("X-USER-ID") String xUserId,
-            @Parameter(description = "검색어", required = true) @RequestParam String query,
-            @Parameter(description = "검색 시작 위치", required = false) @RequestParam(defaultValue = "1") int start
-    );
 
     @Operation(summary = "도서 상세 조회", description = "도서 ID로 상세 정보를 조회합니다.")
     @ApiResponse(

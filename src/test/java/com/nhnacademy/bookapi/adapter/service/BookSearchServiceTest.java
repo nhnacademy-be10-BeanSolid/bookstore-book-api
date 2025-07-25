@@ -1,9 +1,13 @@
 package com.nhnacademy.bookapi.adapter.service;
 
-import com.nhnacademy.bookapi.adpater.NaverBookAdapter;
-import com.nhnacademy.bookapi.adpater.service.NaverBookService;
-import com.nhnacademy.bookapi.book.domain.response.BookItemResponse;
-import com.nhnacademy.bookapi.book.domain.response.BookSearchResponse;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.nhnacademy.bookapi.adpater.AladinAdapter;
+import com.nhnacademy.bookapi.adpater.domain.AladinItem;
+import com.nhnacademy.bookapi.adpater.domain.AladinSearchRequest;
+import com.nhnacademy.bookapi.adpater.domain.AladinSearchResponse;
+import com.nhnacademy.bookapi.adpater.service.AladinService;
+import com.nhnacademy.bookapi.common.service.IsbnConverter;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,43 +26,54 @@ import static org.mockito.Mockito.*;
 class BookSearchServiceTest {
 
     @Mock
-    private NaverBookAdapter naverBookClient;
+    private AladinAdapter aladinClient;
+    @Mock
+    private ObjectMapper objectMapper;
+    @Mock
+    private IsbnConverter isbnConverter;
 
     @InjectMocks
-    private NaverBookService bookSearchService;
+    private AladinService bookSearchService;
 
     @BeforeEach
     void setup() {
-        ReflectionTestUtils.setField(bookSearchService, "clientId", "dummy-client-id");
-        ReflectionTestUtils.setField(bookSearchService, "clientSecret", "dummy-client-secret");
+        ReflectionTestUtils.setField(bookSearchService, "ttbKey", "dummy-ttb");
     }
 
     @Test
-    @DisplayName("네이버 검색 테스트")
-    void searchBook() {
-        BookItemResponse item1 = new BookItemResponse();
-        item1.setTitle("제목");
-        item1.setPubdate("20250711");
-        item1.setAuthor("김^이");
+    @DisplayName("알라딘 검색 테스트 - isbn13 없음, 변환 수행")
+    void searchBook_withIsbn13Conversion() throws JsonProcessingException {
+        // given
+        AladinItem item = new AladinItem(
+                "제목",
+                "링크",
+                "작가",
+                "출판일",
+                "설명",
+                "1234567890",
+                "",
+                27000,
+                30000, "이미지",
+                "출판사",
+                51320
+        );
 
-        BookSearchResponse mockResponse = new BookSearchResponse();
-        mockResponse.setItems(List.of(item1));
+        AladinSearchResponse original = new AladinSearchResponse(
+                "제목", 100, 1, 10, "소설", List.of(item)
+        );
 
-        when(naverBookClient.searchBook("dummy-client-id", "dummy-client-secret", "자바", 1))
-                .thenReturn(mockResponse);
+        String json = new ObjectMapper().writeValueAsString(original);
 
-        BookSearchResponse result = bookSearchService.searchBook("자바", 1);
+        when(aladinClient.searchItem("dummy-ttb", "자바", 1, 100, "js"))
+                .thenReturn(json);
+        when(objectMapper.readValue(anyString(), eq(AladinSearchResponse.class)))
+                .thenReturn(original);
+        when(isbnConverter.convertIsbn10ToIsbn13("1234567890"))
+                .thenReturn("9781234567890");
 
-        assertThat(result).isNotNull();
-        assertThat(result.getItems()).hasSize(1);
+        AladinSearchResponse result = bookSearchService.search(new AladinSearchRequest("자바", 1, 100));
 
-        BookItemResponse formattedItem = result.getItems().getFirst();
-        assertThat(formattedItem.getTitle()).isEqualTo("제목");
-        assertThat(formattedItem.getPubdate()).isEqualTo("2025-07-11");
-        assertThat(formattedItem.getAuthor()).isEqualTo("김, 이");
-
-        verify(naverBookClient, times(1))
-                .searchBook("dummy-client-id", "dummy-client-secret", "자바", 1);
+        assertThat(result.item().getFirst().isbn13()).isEqualTo("9781234567890");
     }
 }
 
