@@ -202,6 +202,8 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                     String image = minioUploader.extractObjectName(imagePath);
                     String presignedUrl = minioUploader.getPresignedUrl(image);
 
+                    log.info("presignedUrl: {}", presignedUrl);
+
                     return new SimpleBookResponse(
                             book.getId(),
                             book.getTitle(),

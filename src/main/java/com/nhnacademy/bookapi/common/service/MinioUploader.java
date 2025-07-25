@@ -89,11 +89,28 @@ public class MinioUploader {
     }
 
     public String extractObjectName(String imageUrl) {
-        String prefix = "/images/book/";
-        if (imageUrl != null && imageUrl.startsWith(prefix)) {
-            return imageUrl.substring(prefix.length());
+        if (imageUrl == null) {
+            return null;
         }
-        return imageUrl;
+
+        String prefix = "/images/book/";
+        String pathPart = imageUrl;
+
+        if (imageUrl.startsWith(prefix)) {
+            pathPart = imageUrl.substring(prefix.length());
+        }
+
+        // 쿼리 파라미터 시작 위치 찾기 ('?' 또는 '&')
+        int queryIndex = pathPart.indexOf('?');
+        if (queryIndex == -1) {
+            queryIndex = pathPart.indexOf('&');
+        }
+
+        if (queryIndex != -1) {
+            pathPart = pathPart.substring(0, queryIndex);
+        }
+
+        return pathPart;
     }
 
     private String getContentTypeByExtension(String extension) {
