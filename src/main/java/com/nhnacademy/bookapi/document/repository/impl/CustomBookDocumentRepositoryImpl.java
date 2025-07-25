@@ -82,17 +82,13 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                     BookDocument doc = hit.getContent();
                     Book book = bookMap.get(doc.getBookId());
 
-                    String imagePath = book.getImage();
-                    String image = minioUploader.extractObjectName(imagePath);
-                    String presignedUrl = minioUploader.getPresignedUrl(image);
-
                     return new SimpleBookResponse(
                             book.getId(),
                             book.getTitle(),
                             book.getAuthor(),
                             book.getSalePrice(),
                             book.getStock(),
-                            presignedUrl,
+                            book.getImage(),
                             book.getViewCount(),
                             doc.getReviewCount(),
                             doc.getRating()
@@ -153,7 +149,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                             book.getAuthor(),
                             book.getSalePrice(),
                             book.getStock(),
-                            presignedUrl,
+                            book.getImage(),
                             book.getViewCount(),
                             doc.getReviewCount(),
                             doc.getRating()
@@ -210,7 +206,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                             book.getAuthor(),
                             book.getSalePrice(),
                             book.getStock(),
-                            presignedUrl,
+                            book.getImage(),
                             book.getViewCount(),
                             doc.getReviewCount(),
                             doc.getRating()
