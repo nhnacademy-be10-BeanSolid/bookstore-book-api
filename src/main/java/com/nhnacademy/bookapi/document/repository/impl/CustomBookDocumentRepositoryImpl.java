@@ -83,7 +83,8 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                     Book book = bookMap.get(doc.getBookId());
 
                     String imagePath = book.getImage();
-                    String presignedUrl = minioUploader.getPresignedUrl(imagePath);
+                    String image = minioUploader.extractObjectName(imagePath);
+                    String presignedUrl = minioUploader.getPresignedUrl(image);
 
                     return new SimpleBookResponse(
                             book.getId(),
@@ -143,7 +144,8 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                     Book book = bookMap.get(doc.getBookId());
 
                     String imagePath = book.getImage();
-                    String presignedUrl = minioUploader.getPresignedUrl(imagePath);
+                    String image = minioUploader.extractObjectName(imagePath);
+                    String presignedUrl = minioUploader.getPresignedUrl(image);
 
                     return new SimpleBookResponse(
                             book.getId(),
@@ -197,7 +199,8 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                     Book book = bookMap.get(doc.getBookId());
 
                     String imagePath = book.getImage();
-                    String presignedUrl = minioUploader.getPresignedUrl(imagePath);
+                    String image = minioUploader.extractObjectName(imagePath);
+                    String presignedUrl = minioUploader.getPresignedUrl(image);
 
                     return new SimpleBookResponse(
                             book.getId(),
