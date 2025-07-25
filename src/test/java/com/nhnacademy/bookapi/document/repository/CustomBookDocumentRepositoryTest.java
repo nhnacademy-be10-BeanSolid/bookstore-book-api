@@ -35,6 +35,7 @@ class CustomBookDocumentRepositoryTest {
     void setUp() {
         elasticsearchOperations = mock(ElasticsearchOperations.class);
         bookRepository = mock(BookRepository.class);
+        minioUploader = mock(MinioUploader.class);
         repository = new CustomBookDocumentRepositoryImpl(elasticsearchOperations, bookRepository, minioUploader);
     }
 
