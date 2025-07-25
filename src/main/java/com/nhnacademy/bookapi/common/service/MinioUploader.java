@@ -1,6 +1,7 @@
 package com.nhnacademy.bookapi.common.service;
 
 import io.minio.*;
+import io.minio.http.Method;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -9,6 +10,7 @@ import org.springframework.stereotype.Service;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Service
@@ -69,6 +71,29 @@ public class MinioUploader {
         } catch (Exception e) {
             log.error("이미지 삭제 실패: {}", objectName, e);
         }
+    }
+
+    public String getPresignedUrl(String objectName) {
+        String image = extractObjectName(objectName);
+        try {
+            return minioClient.getPresignedObjectUrl(
+                    GetPresignedObjectUrlArgs.builder()
+                            .method(Method.GET)
+                            .bucket(bucket)
+                            .object(image)
+                            .build()
+            );
+        } catch (Exception e) {
+            throw new RuntimeException("Presigned URL 생성 실패", e);
+        }
+    }
+
+    public String extractObjectName(String imageUrl) {
+        String prefix = "/images/book/";
+        if (imageUrl != null && imageUrl.startsWith(prefix)) {
+            return imageUrl.substring(prefix.length());
+        }
+        return imageUrl;
     }
 
     private String getContentTypeByExtension(String extension) {
