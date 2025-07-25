@@ -91,6 +91,7 @@ class CustomBookDocumentRepositoryTest {
         verify(bookRepository, times(1)).findAllById(List.of(1L, 2L));
     }
 
+
     @Test
     void increaseViewCount_shouldCallUpdate() {
         String id = "book123";
