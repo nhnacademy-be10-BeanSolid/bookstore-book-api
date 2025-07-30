@@ -76,7 +76,6 @@ public class BookDocument {
                 .map(BookTag::getName)
                 .collect(Collectors.toSet());
 
-        // 추가한 부분
         Set<Long> categoryIds = book.getBookCategories()
                 .stream()
                 .map(BookCategory::getCategoryId)

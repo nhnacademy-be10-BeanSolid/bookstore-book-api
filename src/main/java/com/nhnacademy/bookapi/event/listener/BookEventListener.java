@@ -24,8 +24,7 @@ public class BookEventListener {
     private final MinioUploader minioUploader;
 
     // 생성 이벤트
-    // 동기(한 트랜잭션 경계에 묶인다)
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleBookCreatedEvent(BookCreateEvent event) {
         // 처리 로직
         Book book = event.getBook();
@@ -74,7 +73,7 @@ public class BookEventListener {
     }
 
     // 업데이트 이벤트
-    @EventListener
+    @TransactionalEventListener(phase = TransactionPhase.BEFORE_COMMIT)
     public void handleBookUpdateEvent(BookUpdateEvent event) {
         Book book = event.getBook();
         BookDocument document = BookDocument.from(book, event.getReviewCount(), event.getRating());

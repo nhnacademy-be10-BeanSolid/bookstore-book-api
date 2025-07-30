@@ -54,8 +54,7 @@ class BookSearchServiceTest {
                 "",
                 27000,
                 30000, "이미지",
-                "출판사",
-                51320
+                "출판사"
         );
 
         AladinSearchResponse original = new AladinSearchResponse(

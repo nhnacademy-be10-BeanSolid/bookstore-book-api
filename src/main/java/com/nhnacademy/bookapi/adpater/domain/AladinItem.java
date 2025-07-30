@@ -14,8 +14,7 @@ public record AladinItem(
         Integer priceSales, // 판매가
         Integer priceStandard, // 정가
         String cover,
-        String publisher,
-        Integer categoryId
+        String publisher
 ) {
     public static AladinItem from(AladinItem item, String isbn13) {
         return new AladinItem(
@@ -29,8 +28,7 @@ public record AladinItem(
                 item.priceSales(),
                 item.priceStandard(),
                 item.cover(),
-                item.publisher(),
-                item.categoryId()
+                item.publisher()
         );
     }
 }

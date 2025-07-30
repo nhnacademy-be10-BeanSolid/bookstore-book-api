@@ -3,6 +3,7 @@ package com.nhnacademy.bookapi.document.repository;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
+import com.nhnacademy.bookapi.common.service.MinioUploader;
 import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.document.repository.impl.CustomBookDocumentRepositoryImpl;
 import org.junit.jupiter.api.BeforeEach;
@@ -28,12 +29,14 @@ class CustomBookDocumentRepositoryTest {
     ElasticsearchOperations elasticsearchOperations;
     BookRepository bookRepository;
     CustomBookDocumentRepositoryImpl repository;
+    MinioUploader minioUploader;
 
     @BeforeEach
     void setUp() {
         elasticsearchOperations = mock(ElasticsearchOperations.class);
         bookRepository = mock(BookRepository.class);
-        repository = new CustomBookDocumentRepositoryImpl(elasticsearchOperations, bookRepository);
+        minioUploader = mock(MinioUploader.class);
+        repository = new CustomBookDocumentRepositoryImpl(elasticsearchOperations, bookRepository, minioUploader);
     }
 
     @Test
@@ -87,6 +90,7 @@ class CustomBookDocumentRepositoryTest {
         verify(elasticsearchOperations, times(1)).search((Query) any(), eq(BookDocument.class));
         verify(bookRepository, times(1)).findAllById(List.of(1L, 2L));
     }
+
 
     @Test
     void increaseViewCount_shouldCallUpdate() {

@@ -3,6 +3,7 @@ package com.nhnacademy.bookapi.document.repository.impl;
 import co.elastic.clients.elasticsearch._types.FieldValue;
 import com.nhnacademy.bookapi.book.domain.response.SimpleBookResponse;
 import com.nhnacademy.bookapi.book.repository.BookRepository;
+import com.nhnacademy.bookapi.common.service.MinioUploader;
 import com.nhnacademy.bookapi.document.BookDocument;
 import com.nhnacademy.bookapi.book.domain.Book;
 import com.nhnacademy.bookapi.document.repository.CustomBookDocumentRepository;
@@ -29,6 +30,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
 
     private final ElasticsearchOperations elasticsearchOperations;
     private final BookRepository bookRepository;
+    private final MinioUploader minioUploader;
 
     private static final String BOOK_ID = "bookId";
 
@@ -79,6 +81,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                 .map(hit -> {
                     BookDocument doc = hit.getContent();
                     Book book = bookMap.get(doc.getBookId());
+
                     return new SimpleBookResponse(
                             book.getId(),
                             book.getTitle(),
@@ -135,6 +138,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                 .map(hit -> {
                     BookDocument doc = hit.getContent();
                     Book book = bookMap.get(doc.getBookId());
+
                     return new SimpleBookResponse(
                             book.getId(),
                             book.getTitle(),
@@ -185,6 +189,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                 .map(hit -> {
                     BookDocument doc = hit.getContent();
                     Book book = bookMap.get(doc.getBookId());
+
                     return new SimpleBookResponse(
                             book.getId(),
                             book.getTitle(),
@@ -197,6 +202,7 @@ public class CustomBookDocumentRepositoryImpl implements CustomBookDocumentRepos
                             doc.getRating()
                     );
                 })
+
                 .toList();
 
         long total = hits.getTotalHits();
