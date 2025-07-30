@@ -73,46 +73,6 @@ public class MinioUploader {
         }
     }
 
-    public String getPresignedUrl(String objectName) {
-        String image = extractObjectName(objectName);
-        try {
-            return minioClient.getPresignedObjectUrl(
-                    GetPresignedObjectUrlArgs.builder()
-                            .method(Method.GET)
-                            .bucket(bucket)
-                            .object(image)
-                            .build()
-            );
-        } catch (Exception e) {
-            throw new RuntimeException("Presigned URL 생성 실패", e);
-        }
-    }
-
-    public String extractObjectName(String imageUrl) {
-        if (imageUrl == null) {
-            return null;
-        }
-
-        String prefix = "/images/book/";
-        String pathPart = imageUrl;
-
-        if (imageUrl.startsWith(prefix)) {
-            pathPart = imageUrl.substring(prefix.length());
-        }
-
-        // 쿼리 파라미터 시작 위치 찾기 ('?' 또는 '&')
-        int queryIndex = pathPart.indexOf('?');
-        if (queryIndex == -1) {
-            queryIndex = pathPart.indexOf('&');
-        }
-
-        if (queryIndex != -1) {
-            pathPart = pathPart.substring(0, queryIndex);
-        }
-
-        return pathPart;
-    }
-
     private String getContentTypeByExtension(String extension) {
         if (extension == null) {
             return "application/octet-stream";

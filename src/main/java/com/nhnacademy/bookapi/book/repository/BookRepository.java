@@ -14,5 +14,6 @@ public interface BookRepository extends JpaRepository<Book, Long>, CustomBookRep
     @Modifying(clearAutomatically = true)
     @Query("UPDATE Book b SET b.viewCount = b.viewCount + 1 WHERE b.id = :id")
     void incrementViewCount(@Param("id") Long id);
+
 }
 
